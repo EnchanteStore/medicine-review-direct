@@ -1,46 +1,99 @@
 import type { Metadata } from 'next';
-import { DraftNotice } from '@/components/draft-notice';
+import { CompanyIdentity, ContactDetails, LegalNotice, Placeholder } from '@/components/legal';
 import { ContentPage } from '@/components/page-header';
 
-export const metadata: Metadata = { title: 'Privacy notice (draft)' };
+export const metadata: Metadata = { title: 'Privacy Notice (placeholder)' };
+
+const PROCESSORS = [
+  ['Supabase', 'Database, sign-in and private file storage', 'London (eu-west-2) region planned'],
+  [
+    'Amazon Web Services (SES)',
+    'Transactional email, with no health details in emails',
+    'London region planned',
+  ],
+  ['Stripe', 'Card payments, with no health details in payment records', 'To be confirmed'],
+  ['Web hosting provider', 'Running this website', 'To be confirmed'],
+] as const;
 
 export default function PrivacyPage() {
   return (
     <ContentPage
-      title="Privacy notice"
+      title="Privacy Notice"
       lead="How we will collect, use and protect your information."
     >
-      <DraftNotice />
-      <h2>Who we are</h2>
-      <p>
-        The data controller&apos;s legal name, address and Information Commissioner&apos;s Office
-        registration number will be confirmed here before launch.
-      </p>
+      <LegalNotice />
+      <h2>Data controller</h2>
+      <CompanyIdentity />
+
       <h2>Information we collect</h2>
       <ul>
         <li>Account details: email address, name, date of birth and telephone number</li>
-        <li>Health information you give us: medicines, conditions, concerns and documents</li>
-        <li>Records of your consultation and the report your pharmacist writes</li>
-        <li>Payment records (card details are handled by our payment provider, not by us)</li>
+        <li>Your answers to our safety questions and medication questionnaire</li>
+        <li>Documents you choose to upload, such as a repeat prescription list</li>
+        <li>Consultation notes and the report your pharmacist writes</li>
+        <li>Records of your consents, payments and messages</li>
       </ul>
-      <h2>Why we use it</h2>
+      <h2>Why we use it and our lawful basis</h2>
       <p>
-        To provide your medication review, keep clinical records as required, take payment and keep
-        the service secure. The lawful bases, including the condition for processing health data,
-        will be confirmed after legal review.
+        To provide your medication review and keep the clinical records we must keep.{' '}
+        <Placeholder>
+          lawful basis and Article 9 condition for health data, needs legal and DPIA review
+        </Placeholder>
       </p>
-      <h2>Who we share it with</h2>
+      <h2>Who processes your information for us</h2>
       <p>
-        Only service providers who help us run the service (such as hosting and payment providers),
-        and your GP if you give separate permission for a specific letter.
+        Each provider will be subject to a data processing agreement and a transfer assessment
+        before real patient data is used.
       </p>
+      <table className="w-full border-collapse text-left">
+        <thead>
+          <tr className="border-b border-sand-300">
+            <th scope="col" className="py-2 pr-4">
+              Provider
+            </th>
+            <th scope="col" className="py-2 pr-4">
+              Purpose
+            </th>
+            <th scope="col" className="py-2">
+              Location
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {PROCESSORS.map(([name, purpose, where]) => (
+            <tr key={name} className="border-b border-sand-200">
+              <td className="py-2 pr-4">{name}</td>
+              <td className="py-2 pr-4">{purpose}</td>
+              <td className="py-2">{where}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>We will not send identifiable records to AI providers without approved safeguards.</p>
+
       <h2>How long we keep it</h2>
-      <p>Retention periods for clinical and financial records will be confirmed before launch.</p>
+      <p>These periods are provisional and awaiting governance and privacy approval:</p>
+      <ul>
+        <li>Completed clinical records: 8 years after your last clinical contact with us</li>
+        <li>Safety escalations that form part of a care record: as clinical records</li>
+        <li>Started but abandoned requests with no clinical care: 90 days</li>
+        <li>Accounting records: generally 6 years</li>
+        <li>Routine security logs: 12 months</li>
+        <li>Temporary backups: 30 to 90 days</li>
+      </ul>
+      <p>
+        Closing your account does not automatically delete clinical records, which we must keep for
+        the period above. Records under a legal hold are kept until the hold ends.
+      </p>
       <h2>Your rights</h2>
       <p>
-        You have rights under UK data protection law, including to access, correct and in some cases
-        delete your information. Some clinical records must be kept for a minimum period.
+        You have rights under UK data protection law, including to access, correct, restrict and in
+        some cases erase your information, and to complain to the Information Commissioner&apos;s
+        Office.{' '}
+        <Placeholder>full rights wording and how to exercise them, needs legal review</Placeholder>
       </p>
+      <h2>Contact</h2>
+      <ContactDetails />
     </ContentPage>
   );
 }

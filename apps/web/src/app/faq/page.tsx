@@ -18,7 +18,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: 'Adults aged 18 or over who live in England.',
   },
   {
-    q: 'How long is the telephone consultation?',
+    q: 'How long is the consultation?',
     a: 'Your pharmacist will take the time needed to go through your medicines and questions. We will confirm the expected length when you book.',
   },
   {

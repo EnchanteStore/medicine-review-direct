@@ -9,8 +9,7 @@ export const ALLOWED_UPLOAD_TYPES = {
 export type AllowedUploadType = keyof typeof ALLOWED_UPLOAD_TYPES;
 
 export type UploadCheck =
-  | { ok: true; mimeType: AllowedUploadType; safeName: string }
-  | { ok: false; error: string };
+  { ok: true; mimeType: AllowedUploadType; safeName: string } | { ok: false; error: string };
 
 /** Strips paths and unusual characters; keeps the extension. */
 export function safeFilename(name: string): string {
@@ -28,9 +27,15 @@ export function safeFilename(name: string): string {
  * Checks size, declared type and the file's leading bytes (so a renamed file
  * cannot pretend to be a PDF or image). This is not malware scanning.
  */
-export function checkUpload(file: { name: string; type: string; size: number; head: Uint8Array }): UploadCheck {
+export function checkUpload(file: {
+  name: string;
+  type: string;
+  size: number;
+  head: Uint8Array;
+}): UploadCheck {
   if (file.size === 0) return { ok: false, error: 'The selected file is empty' };
-  if (file.size > MAX_UPLOAD_BYTES) return { ok: false, error: 'The selected file must be smaller than 10MB' };
+  if (file.size > MAX_UPLOAD_BYTES)
+    return { ok: false, error: 'The selected file must be smaller than 10MB' };
   const def = ALLOWED_UPLOAD_TYPES[file.type as AllowedUploadType];
   if (!def) return { ok: false, error: 'The selected file must be a PDF, JPG or PNG' };
   const matches = def.magic.some((sig) => sig.every((b, i) => file.head[i] === b));

@@ -9,7 +9,8 @@ export const LAUNCH_GATES = {
   retention_policy_and_dpia: 'Retention policy and DPIA',
   company_ico_gphc_details: 'Company, ICO and GPhC details',
   vat_and_brand_checks: 'VAT and brand checks',
-  processor_agreements_and_security_review: 'Data residency, processor agreements and security review',
+  processor_agreements_and_security_review:
+    'Data residency, processor agreements and security review',
 } as const;
 
 export type LaunchGate = keyof typeof LAUNCH_GATES;

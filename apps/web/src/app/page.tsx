@@ -10,7 +10,7 @@ const steps = [
   },
   {
     title: 'Speak to a pharmacist',
-    body: 'A UK-registered pharmacist reviews your information, then calls you at a time you book for an unhurried telephone consultation.',
+    body: 'A GPhC-registered pharmacist reviews your information, then speaks to you by telephone or secure video at a time you book.',
   },
   {
     title: 'Get a written report',
@@ -32,7 +32,8 @@ export default async function HomePage() {
             </h1>
             <p className="mt-6 max-w-xl text-xl text-ink-700">
               Taking several medicines and unsure if they are all still right for you? Talk it
-              through with an experienced pharmacist by telephone and get a clear written report.
+              through with an experienced pharmacist by telephone or secure video and get a clear
+              written report.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
@@ -60,7 +61,7 @@ export default async function HomePage() {
               <p className="text-ink-700">See our pricing page for current prices.</p>
             )}
             <ul className="list-disc space-y-1 pl-5 text-ink-700">
-              <li>Telephone consultation with a pharmacist</li>
+              <li>Telephone or secure video consultation</li>
               <li>Personalised written report</li>
               <li>Optional letter for your GP</li>
             </ul>

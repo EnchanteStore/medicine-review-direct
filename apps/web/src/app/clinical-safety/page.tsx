@@ -1,53 +1,55 @@
-import { Alert } from '@mrd/ui';
 import type { Metadata } from 'next';
-import { DraftNotice } from '@/components/draft-notice';
+import { FullEmergencyWarning } from '@/components/emergency-banner';
+import { LegalNotice, PharmacistRegistration, Placeholder } from '@/components/legal';
 import { ContentPage } from '@/components/page-header';
+import { brandName } from '@/lib/site';
 
-export const metadata: Metadata = { title: 'Clinical safety' };
+export const metadata: Metadata = {
+  title: 'Clinical Service and Safety Information (placeholder)',
+};
 
 export default function ClinicalSafetyPage() {
+  const brand = brandName();
   return (
     <ContentPage
-      title="Clinical safety"
-      lead="How we keep our service safe, and what it can and cannot do."
+      title="Clinical Service and Safety Information"
+      lead="What our service does, what it does not do, and how we keep it safe."
     >
-      <DraftNotice kind="clinical" />
-
-      <Alert tone="danger" title="This service is not for emergencies" role="note">
-        <p>
-          We are not monitored for emergencies. If you are seriously unwell, call 999. For urgent
-          medical advice, call NHS 111.
-        </p>
-      </Alert>
+      <LegalNotice reviewer="clinical" />
+      <FullEmergencyWarning className="my-6" />
 
       <h2>What we do</h2>
       <ul>
-        <li>Review the medicines you tell us about, with your permission</li>
-        <li>Talk with you by telephone about how you are getting on with them</li>
-        <li>Write a report with findings and suggestions to discuss with your GP or prescriber</li>
+        <li>Private medication reviews for adults aged 18 or over in England</li>
+        <li>A consultation with a GPhC-registered pharmacist by telephone or secure video</li>
+        <li>A personalised report prepared, checked and signed by that pharmacist</li>
       </ul>
-
       <h2>What we do not do</h2>
       <ul>
-        <li>Diagnose medical conditions</li>
-        <li>Prescribe, supply or dispense medicines</li>
-        <li>Tell you to stop or change a medicine without involving your prescriber</li>
-        <li>Replace your GP, or provide urgent or emergency care</li>
-        <li>Access your NHS records</li>
+        <li>Emergency or same-day urgent care</li>
+        <li>Diagnose conditions, prescribe, or change your medicines</li>
+        <li>Claim any NHS affiliation, or access your NHS records</li>
         <li>Use automated or AI systems to make clinical decisions</li>
       </ul>
-
       <h2>Safety questions</h2>
       <p>
-        Before you pay, we ask some safety questions. If your answers suggest you may need urgent
-        help, we will show you where to get it and will not take a booking at that time. A member of
-        our clinical team is also alerted.
+        Before you continue, we ask a short set of safety questions. If your answers suggest an
+        emergency, we stop and tell you to call 999 immediately. If they suggest you need help
+        today, we pause your request and advise you to contact your GP or NHS 111; a pharmacist must
+        then check it is suitable before you can book. {brand} will not contact emergency services
+        for you.
       </p>
-
-      <h2>Your pharmacist is responsible</h2>
       <p>
-        Every finding and recommendation in your report is written and checked by a UK-registered
-        pharmacist. Your report is only released after the pharmacist has approved it.
+        Taking a higher-risk medicine does not stop you using the service; it means a pharmacist
+        will look at it carefully. Our questions never declare your medicines safe.
+      </p>
+      <h2>Your pharmacist</h2>
+      <PharmacistRegistration />
+      <h2>Regulatory status</h2>
+      <p>
+        <Placeholder>
+          MHRA medical-device classification and CQC scope assessments, needed before launch
+        </Placeholder>
       </p>
     </ContentPage>
   );

@@ -26,12 +26,20 @@ describe('order lifecycle', () => {
   });
 
   it('urgent hold leaves only to intake (after reassessment), declined or cancelled', () => {
-    expect([...ORDER_TRANSITIONS.safety_urgent_hold].sort()).toEqual(['cancelled', 'declined', 'intake']);
+    expect([...ORDER_TRANSITIONS.safety_urgent_hold].sort()).toEqual([
+      'cancelled',
+      'declined',
+      'intake',
+    ]);
     expect(canTransitionOrder('safety_urgent_hold', 'awaiting_payment')).toBe(false);
   });
 
   it('checkout needs a submitted questionnaire, open payments and no urgent hold', () => {
-    const base = { status: 'questionnaire_submitted' as const, paymentsOpen: true, patientHasUrgentHold: false };
+    const base = {
+      status: 'questionnaire_submitted' as const,
+      paymentsOpen: true,
+      patientHasUrgentHold: false,
+    };
     expect(canStartCheckout(base)).toBe(true);
     expect(canStartCheckout({ ...base, paymentsOpen: false })).toBe(false);
     expect(canStartCheckout({ ...base, patientHasUrgentHold: true })).toBe(false);
@@ -66,7 +74,9 @@ describe('roles', () => {
 
   it('unverified or suspended clinicians do not get clinical access', () => {
     expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'pending' }])).toBe(false);
-    expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'suspended' }])).toBe(false);
+    expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'suspended' }])).toBe(
+      false,
+    );
     expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'verified' }])).toBe(true);
   });
 

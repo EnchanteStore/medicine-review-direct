@@ -1,29 +1,36 @@
 import type { Metadata } from 'next';
-import { DraftNotice } from '@/components/draft-notice';
+import { LegalNotice, Placeholder } from '@/components/legal';
 import { ContentPage } from '@/components/page-header';
 
-export const metadata: Metadata = { title: 'Refunds and cancellations (draft)' };
+export const metadata: Metadata = { title: 'Cancellation and Refund Policy (placeholder)' };
 
 export default function RefundsPage() {
   return (
-    <ContentPage title="Refunds and cancellations">
-      <DraftNotice />
-      <h2>Cancelling before your consultation</h2>
+    <ContentPage title="Cancellation and Refund Policy">
+      <LegalNotice />
+      <h2>Your cancellation rights</h2>
       <p>
-        You will be able to ask to cancel from your account. The notice period and how much is
-        refunded will be confirmed before launch.
+        <Placeholder>
+          statutory cancellation rights and how they apply to this service, needs legal review
+        </Placeholder>
       </p>
-      <h2>Rescheduling</h2>
+      <h2>Cancelling or moving your consultation</h2>
       <p>
-        You will be able to ask to move your appointment. Rescheduling rules are to be confirmed.
+        <Placeholder>
+          notice periods, rescheduling rules and any charges, needs owner and legal approval
+        </Placeholder>
       </p>
-      <h2>If we cannot provide the service</h2>
+      <h2>If the service is not suitable for you</h2>
       <p>
-        If our pharmacist decides the service is not suitable for you, for example because you need
-        urgent care, we will explain why and arrange a refund.
+        If a pharmacist decides the service is not suitable, for example because you need urgent
+        care, we will explain why and where to get help.{' '}
+        <Placeholder>refund amount in this case, needs owner approval</Placeholder>
       </p>
       <h2>How refunds are paid</h2>
-      <p>Refunds are paid back to the card you used. Timescales depend on your card provider.</p>
+      <p>
+        Refunds go back to the card you paid with.{' '}
+        <Placeholder>timescales, needs confirmation</Placeholder>
+      </p>
     </ContentPage>
   );
 }

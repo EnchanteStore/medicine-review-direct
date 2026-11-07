@@ -92,7 +92,7 @@ export function ProfileForm({ initial }: { initial: ProfileFormValues }) {
       <FormField
         id="phoneNumber"
         label="UK phone number (optional)"
-        hint="We will use this to call you for your telephone consultation."
+        hint="We may use this to call you for your consultation."
         errors={fieldErrors(state, 'phoneNumber')}
       >
         {(aria) => (

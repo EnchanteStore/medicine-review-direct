@@ -7,12 +7,16 @@ const PAGES = [
   { path: '/pricing', h1: 'Pricing' },
   { path: '/about', h1: 'About us' },
   { path: '/faq', h1: 'Frequently asked questions' },
-  { path: '/contact', h1: 'Contact us' },
-  { path: '/clinical-safety', h1: 'Clinical safety', draft: true },
-  { path: '/privacy', h1: 'Privacy notice', draft: true },
-  { path: '/terms', h1: 'Terms of service', draft: true },
-  { path: '/refunds', h1: 'Refunds and cancellations', draft: true },
-  { path: '/complaints', h1: 'Complaints', draft: true },
+  {
+    path: '/clinical-safety',
+    h1: 'Clinical Service and Safety Information',
+    legal: true,
+    full: true,
+  },
+  { path: '/privacy', h1: 'Privacy Notice', legal: true },
+  { path: '/terms', h1: 'Terms of Service', legal: true },
+  { path: '/refunds', h1: 'Cancellation and Refund Policy', legal: true },
+  { path: '/complaints', h1: 'Complaints and Contact Information', legal: true, full: true },
   { path: '/sign-up', h1: 'Create an account' },
   { path: '/sign-in', h1: 'Sign in' },
   { path: '/forgot-password', h1: 'Reset your password' },
@@ -23,10 +27,18 @@ for (const p of PAGES) {
     const res = await page.goto(p.path);
     expect(res?.status()).toBe(200);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
-    await expect(page.getByText('Not for emergencies.')).toBeVisible();
+    const banner = page.getByTestId('emergency-banner-short');
+    await expect(banner).toContainText('Important: Not an emergency service.');
+    await expect(banner).toContainText('PharmReview');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-GB');
-    if (p.draft) {
-      await expect(page.getByText('Draft', { exact: true })).toBeVisible();
+    if (p.legal) {
+      await expect(page.getByText('Placeholder', { exact: true })).toBeVisible();
+      await expect(page.getByTestId('placeholder').first()).toBeVisible();
+    }
+    if (p.full) {
+      await expect(page.getByTestId('emergency-warning-full')).toContainText(
+        'PharmReview does not provide emergency or urgent medical care and is not monitored 24 hours a day.',
+      );
     }
     await expectNoA11yViolations(page);
   });
@@ -37,7 +49,8 @@ test('pricing shows the server-controlled launch price', async ({ page }) => {
   const price = page.getByTestId('price-standard_review');
   await expect(price).toContainText('£59');
   await expect(price).toContainText('£79');
-  await expect(page.getByText('Online booking is not open yet')).toBeVisible();
+  await expect(page.getByTestId('payments-disabled')).toBeVisible();
+  await expect(page.getByText('We do not add VAT to this price.')).toBeVisible();
 });
 
 test('unknown pages return a helpful 404', async ({ page }) => {
@@ -80,4 +93,34 @@ test('navigation works on all viewports', async ({ page, isMobile }) => {
   }
   await expect(page).toHaveURL(/\/pricing$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pricing');
+});
+
+test('the old contact page redirects to complaints and contact information', async ({ page }) => {
+  await page.goto('/contact');
+  await expect(page).toHaveURL(/\/complaints#contact$/);
+});
+
+test('legal pages never invent company, ICO, GPhC or VAT details', async ({ page }) => {
+  await page.goto('/terms');
+  for (const label of [
+    'Company legal name',
+    'Company registration number',
+    'Registered office address',
+    'ICO registration number',
+    'VAT registration number',
+    'Responsible pharmacist GPhC registration number',
+    'Professional indemnity insurer',
+  ]) {
+    await expect(
+      page.getByText(`[Placeholder: ${label} not yet supplied and verified]`).first(),
+    ).toBeVisible();
+  }
+  await expect(page.getByText('Provisional, pending name and trade mark clearance')).toBeVisible();
+});
+
+test('a development preview notice is shown while the live service is not approved', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.getByTestId('service-notice')).toContainText('Development preview');
 });

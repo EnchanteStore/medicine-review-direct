@@ -1,6 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { expect, test } from '@playwright/test';
-import { SEED, SEED_PASSWORD, signIn } from './helpers';
+import {
+  SEED,
+  SEED_PASSWORD,
+  TEST_PASSWORD,
+  createStaff,
+  expectNoA11yViolations,
+  signIn,
+  totp,
+} from './helpers';
+import { readFileSync } from 'node:fs';
+
+const ruleset = JSON.parse(
+  readFileSync(
+    new URL('../../../packages/domain/src/safety/ruleset-2026-11-draft-1.json', import.meta.url),
+    'utf8',
+  ),
+);
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -31,26 +47,55 @@ test.describe('staff area (UI, server-side role checks)', () => {
     expect(res?.status()).toBe(404);
   });
 
-  test('a verified ops admin can open the staff area but is told there is no clinical access', async ({
-    page,
-  }) => {
+  test('verified staff without MFA are sent to two-step verification', async ({ page }) => {
     await signIn(page, SEED.opsAdmin, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/account$/);
     await page.goto('/staff');
-    await expect(page.getByRole('heading', { name: 'Staff area', level: 1 })).toBeVisible();
-    await expect(page.getByText('Operations administrator: verified')).toBeVisible();
-    await expect(
-      page.getByText('Your role does not include access to clinical records.'),
-    ).toBeVisible();
+    await expect(page).toHaveURL(/\/mfa$/);
+    await expect(page.getByRole('heading', { name: 'Two-step verification' })).toBeVisible();
   });
 
-  test('a verified pharmacist sees the clinical workspace placeholder', async ({ page }) => {
-    await signIn(page, SEED.pharmacistVerified, SEED_PASSWORD);
+  test('a patient cannot open the MFA page', async ({ page }) => {
+    await signIn(page, SEED.patient, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/account$/);
-    await page.goto('/staff');
-    await expect(page.getByText('Pharmacist: verified')).toBeVisible();
-    await expect(page.getByText(/pharmacist workspace/)).toBeVisible();
+    const res = await page.goto('/mfa');
+    expect(res?.status()).toBe(404);
   });
+
+  for (const [role, label, text] of [
+    [
+      'ops_admin',
+      'Operations administrator: verified',
+      'Your role does not include access to clinical records.',
+    ],
+    ['pharmacist', 'Pharmacist: verified', 'pharmacist workspace'],
+  ] as const) {
+    test(`a new ${role} enrols a TOTP authenticator and then reaches the staff area`, async ({
+      page,
+    }) => {
+      const staff = await createStaff(role, role);
+      await signIn(page, staff.email, TEST_PASSWORD);
+      await expect(page).toHaveURL(/\/account$/);
+      await page.goto('/staff');
+      await expect(page).toHaveURL(/\/mfa$/);
+      await page.getByRole('button', { name: 'Set up an authenticator app' }).click();
+      const secret = (await page.getByTestId('mfa-secret').textContent())!.trim();
+      await expect(
+        page.getByRole('img', { name: 'QR code for your authenticator app' }),
+      ).toBeVisible();
+      await expectNoA11yViolations(page);
+
+      await page.getByLabel('6-digit code').fill('000000');
+      await page.getByRole('button', { name: 'Verify' }).click();
+      await expect(page.getByText('That code is not right.')).toBeVisible();
+
+      await page.getByLabel('6-digit code').fill(totp(secret));
+      await page.getByRole('button', { name: 'Verify' }).click();
+      await expect(page).toHaveURL(/\/staff$/);
+      await expect(page.getByText(label)).toBeVisible();
+      await expect(page.getByText(new RegExp(text))).toBeVisible();
+    });
+  }
 });
 
 test.describe('data API (RLS with real user tokens)', () => {
@@ -103,5 +148,32 @@ test.describe('data API (RLS with real user tokens)', () => {
     expect(products.data).toEqual([{ code: 'standard_review', price_pence: 5900 }]);
     const profiles = await anon.from('profiles').select('id');
     expect(profiles.error?.code).toBe('42501');
+  });
+
+  test('verified staff signed in without MFA (aal1) get no staff data from the API', async () => {
+    const { client } = await apiClientAs(SEED.opsAdmin);
+    expect((await client.from('audit_log').select('id')).data).toEqual([]);
+    expect((await client.from('staff_roles').select('id')).data).toHaveLength(1);
+  });
+
+  test('the active rule set in the database matches the reviewed JSON definition', async () => {
+    const { client } = await apiClientAs(SEED.patient);
+    const { data } = await client
+      .from('safety_rulesets')
+      .select('version, status, definition')
+      .eq('is_active', true)
+      .single();
+    expect(data!.status).toBe('draft');
+    expect(data!.definition).toEqual(ruleset);
+  });
+
+  test('anonymous visitors see the service as closed for payments', async () => {
+    const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
+    const { data } = await anon.rpc('service_status');
+    expect(data).toMatchObject({
+      payments_open: false,
+      live_service_enabled: false,
+      active_ruleset_status: 'draft',
+    });
   });
 });

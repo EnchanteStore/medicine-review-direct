@@ -30,7 +30,9 @@ describe('safety rule set', () => {
   });
 
   it('covers every emergency topic in the owner decision', () => {
-    const emergencyIds = ACTIVE_RULESET.questions.filter((q) => q.pathway === 'emergency').map((q) => q.id);
+    const emergencyIds = ACTIVE_RULESET.questions
+      .filter((q) => q.pathway === 'emergency')
+      .map((q) => q.id);
     expect(emergencyIds).toEqual(['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7']);
   });
 
@@ -46,7 +48,9 @@ describe('safety rule set', () => {
   });
 
   it.each(fixture.invalid)('$name is rejected', (c) => {
-    expect(() => evaluateScreening(ACTIVE_RULESET, answers(c.answers))).toThrow(ScreeningValidationError);
+    expect(() => evaluateScreening(ACTIVE_RULESET, answers(c.answers))).toThrow(
+      ScreeningValidationError,
+    );
   });
 
   it('the generated pgTAP case file is up to date with the fixture', async () => {
@@ -60,7 +64,10 @@ describe('safety rule set', () => {
 
   it('the migration embeds the same rule set definition', () => {
     const sql = readFileSync(
-      resolve(dirname(fileURLToPath(import.meta.url)), '../../../supabase/migrations/20261107000300_phase2_patient_intake.sql'),
+      resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        '../../../supabase/migrations/20261107000300_phase2_patient_intake.sql',
+      ),
       'utf8',
     );
     const match = /\$ruleset\$(.*)\$ruleset\$/s.exec(sql);

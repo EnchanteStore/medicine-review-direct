@@ -11,7 +11,10 @@ export const BUSINESS_FIELDS = {
   registeredAddress: { label: 'Registered office address', env: 'BUSINESS_REGISTERED_ADDRESS' },
   contactEmail: { label: 'Contact email address', env: 'BUSINESS_CONTACT_EMAIL' },
   contactPhone: { label: 'Contact telephone number', env: 'BUSINESS_CONTACT_PHONE' },
-  icoRegistrationNumber: { label: 'ICO registration number', env: 'BUSINESS_ICO_REGISTRATION_NUMBER' },
+  icoRegistrationNumber: {
+    label: 'ICO registration number',
+    env: 'BUSINESS_ICO_REGISTRATION_NUMBER',
+  },
   superintendentPharmacistName: {
     label: 'Responsible pharmacist name',
     env: 'BUSINESS_RESPONSIBLE_PHARMACIST_NAME',
@@ -21,7 +24,10 @@ export const BUSINESS_FIELDS = {
     env: 'BUSINESS_RESPONSIBLE_PHARMACIST_GPHC',
   },
   vatNumber: { label: 'VAT registration number', env: 'BUSINESS_VAT_NUMBER' },
-  indemnityProvider: { label: 'Professional indemnity insurer', env: 'BUSINESS_INDEMNITY_PROVIDER' },
+  indemnityProvider: {
+    label: 'Professional indemnity insurer',
+    env: 'BUSINESS_INDEMNITY_PROVIDER',
+  },
 } as const;
 
 export type BusinessFieldKey = keyof typeof BUSINESS_FIELDS;

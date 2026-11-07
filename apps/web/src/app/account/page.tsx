@@ -1,8 +1,12 @@
 import { Alert, Badge, Button, Card } from '@mrd/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { StartReviewForm } from '@/components/intake/forms';
 import { requireUser } from '@/lib/auth';
+import { getDraft, getLatestOrder, hasIntakeConsents } from '@/lib/intake';
+import { describeOrder } from '@/lib/order-status';
 import { getOwnProfile, isProfileComplete } from '@/lib/profile';
+import { getServiceStatus } from '@/lib/service-status';
 
 export const metadata: Metadata = { title: 'Your account' };
 
@@ -13,10 +17,8 @@ const NOTICES: Record<string, string> = {
 
 // Sections shown honestly as not yet available; each is delivered in a later phase.
 const SECTIONS = [
-  { title: 'Your reviews', body: 'Start and follow your medication review.' },
-  { title: 'Consultations', body: 'Book and manage your telephone consultation.' },
+  { title: 'Consultations', body: 'Book and manage your telephone or video consultation.' },
   { title: 'Medicines', body: 'The medicines you have told us about.' },
-  { title: 'Documents', body: 'Documents you have shared with your pharmacist.' },
   { title: 'Messages', body: 'Secure messages with your pharmacist.' },
   { title: 'Reports', body: 'Reports your pharmacist has released to you.' },
   { title: 'Payments and receipts', body: 'Your payments, receipts and refunds.' },
@@ -32,6 +34,26 @@ export default async function AccountPage({
   const params = await searchParams;
   const notice = typeof params.notice === 'string' ? NOTICES[params.notice] : undefined;
   const complete = isProfileComplete(profile);
+  const [order, status, consents] = await Promise.all([
+    getLatestOrder(user.id),
+    getServiceStatus(),
+    hasIntakeConsents(user.id),
+  ]);
+  const draft = order ? await getDraft(order.id) : null;
+  const view = order
+    ? describeOrder({
+        id: order.id,
+        status: order.status,
+        hasConsents: consents,
+        draftStep: draft?.current_step ?? null,
+        paymentsOpen: status.payments_open,
+      })
+    : null;
+  const canStartNew =
+    complete &&
+    status.intake_open &&
+    (!order ||
+      ['cancelled', 'safety_emergency_excluded', 'declined', 'completed'].includes(order.status));
 
   return (
     <div className="space-y-8">
@@ -76,16 +98,45 @@ export default async function AccountPage({
         )}
       </section>
 
-      <section aria-labelledby="sections-heading">
-        <h2 id="sections-heading" className="text-2xl">
+      <section aria-labelledby="review-heading" className="space-y-4">
+        <h2 id="review-heading" className="text-2xl">
           Your medication review
         </h2>
-        <Alert tone="info" className="mt-4">
-          <p>
-            Online reviews are not open yet. These sections will become available when the service
-            launches.
-          </p>
-        </Alert>
+        {view ? (
+          <Card className="space-y-3" data-testid="dashboard-review-status">
+            <Badge tone={view.tone === 'danger' || view.tone === 'warning' ? 'warning' : 'teal'}>
+              {view.label}
+            </Badge>
+            <p className="text-ink-700">{view.message}</p>
+            {view.next ? (
+              <Button asChild>
+                <Link href={view.next.href}>{view.next.label}</Link>
+              </Button>
+            ) : null}
+          </Card>
+        ) : null}
+        {canStartNew ? (
+          <Card className="space-y-3">
+            <p>
+              {order
+                ? 'You can start a new request.'
+                : 'Start by answering a few safety questions, then tell us about your medicines.'}
+            </p>
+            <StartReviewForm />
+          </Card>
+        ) : !order && !complete ? (
+          <p className="text-ink-700">Add your details before you start a review.</p>
+        ) : !order && !status.intake_open ? (
+          <Alert tone="info">
+            <p>We are not accepting new reviews yet.</p>
+          </Alert>
+        ) : null}
+      </section>
+
+      <section aria-labelledby="sections-heading">
+        <h2 id="sections-heading" className="text-2xl">
+          Coming later
+        </h2>
         <ul className="mt-4 grid gap-4 sm:grid-cols-2">
           {SECTIONS.map((s) => (
             <li key={s.title}>

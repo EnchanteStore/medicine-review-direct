@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 const NAV = [
   { href: '/account', label: 'Overview' },
   { href: '/account/profile', label: 'Your details' },
+  { href: '/account/settings', label: 'Settings' },
 ];
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {

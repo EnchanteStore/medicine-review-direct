@@ -72,7 +72,11 @@ export function evaluateScreening(
       else urgent = true;
     }
   }
-  return { outcome: emergency ? 'emergency' : urgent ? 'urgent' : 'routine', matchedRuleIds: matched, flags };
+  return {
+    outcome: emergency ? 'emergency' : urgent ? 'urgent' : 'routine',
+    matchedRuleIds: matched,
+    flags,
+  };
 }
 
 export const PATHWAY_LABELS: Record<ScreeningPathway, string> = {

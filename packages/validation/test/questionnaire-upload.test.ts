@@ -44,8 +44,13 @@ describe('questionnaire schemas', () => {
   });
 
   it('offers telephone or secure video consultations', () => {
-    expect(concernsStepSchema.safeParse({ mainConcern: 'x', consultationMethod: 'secure_video' }).success).toBe(true);
-    expect(concernsStepSchema.safeParse({ mainConcern: 'x', consultationMethod: 'in_person' }).success).toBe(false);
+    expect(
+      concernsStepSchema.safeParse({ mainConcern: 'x', consultationMethod: 'secure_video' })
+        .success,
+    ).toBe(true);
+    expect(
+      concernsStepSchema.safeParse({ mainConcern: 'x', consultationMethod: 'in_person' }).success,
+    ).toBe(false);
   });
 
   it('records "don\'t know" per medicine field', () => {
@@ -66,15 +71,32 @@ const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
 describe('upload checks', () => {
   it('accepts a real PDF and PNG', () => {
-    expect(checkUpload({ name: 'list.pdf', type: 'application/pdf', size: 100, head: PDF }).ok).toBe(true);
-    expect(checkUpload({ name: 'photo.png', type: 'image/png', size: 100, head: PNG }).ok).toBe(true);
+    expect(
+      checkUpload({ name: 'list.pdf', type: 'application/pdf', size: 100, head: PDF }).ok,
+    ).toBe(true);
+    expect(checkUpload({ name: 'photo.png', type: 'image/png', size: 100, head: PNG }).ok).toBe(
+      true,
+    );
   });
 
   it('rejects disguised, oversized, empty and unsupported files', () => {
-    expect(checkUpload({ name: 'evil.pdf', type: 'application/pdf', size: 100, head: PNG }).ok).toBe(false);
-    expect(checkUpload({ name: 'big.pdf', type: 'application/pdf', size: MAX_UPLOAD_BYTES + 1, head: PDF }).ok).toBe(false);
-    expect(checkUpload({ name: 'empty.pdf', type: 'application/pdf', size: 0, head: PDF }).ok).toBe(false);
-    expect(checkUpload({ name: 'a.exe', type: 'application/x-msdownload', size: 100, head: PDF }).ok).toBe(false);
+    expect(
+      checkUpload({ name: 'evil.pdf', type: 'application/pdf', size: 100, head: PNG }).ok,
+    ).toBe(false);
+    expect(
+      checkUpload({
+        name: 'big.pdf',
+        type: 'application/pdf',
+        size: MAX_UPLOAD_BYTES + 1,
+        head: PDF,
+      }).ok,
+    ).toBe(false);
+    expect(checkUpload({ name: 'empty.pdf', type: 'application/pdf', size: 0, head: PDF }).ok).toBe(
+      false,
+    );
+    expect(
+      checkUpload({ name: 'a.exe', type: 'application/x-msdownload', size: 100, head: PDF }).ok,
+    ).toBe(false);
   });
 
   it('sanitises filenames', () => {

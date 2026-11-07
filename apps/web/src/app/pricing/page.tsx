@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/page-header';
 import { PriceTag } from '@/components/price-tag';
 import { getActiveProducts } from '@/lib/products';
+import { getServiceStatus } from '@/lib/service-status';
 
 export const metadata: Metadata = { title: 'Pricing' };
 export const dynamic = 'force-dynamic';
 
 export default async function PricingPage() {
-  const result = await getActiveProducts();
+  const [result, status] = await Promise.all([getActiveProducts(), getServiceStatus()]);
 
   return (
     <>
@@ -32,22 +33,26 @@ export default async function PricingPage() {
                 <h3 className="text-lg">Included</h3>
                 <ul className="list-disc space-y-1 pl-5">
                   <li>Review of your questionnaire and any documents you share</li>
-                  <li>One telephone consultation with a UK-registered pharmacist</li>
+                  <li>
+                    One consultation with a GPhC-registered pharmacist, by telephone or secure video
+                  </li>
                   <li>A written report you can read and download in your account</li>
                   <li>An optional letter for your GP, if you agree</li>
                 </ul>
-                <Alert tone="info">
-                  <p>
-                    Online booking is not open yet. We will open bookings once the service has
-                    launched.
-                  </p>
-                </Alert>
+                {status.payments_open ? null : (
+                  <Alert tone="info">
+                    <p data-testid="payments-disabled">
+                      Payments and booking are switched off until every clinical, legal and
+                      regulatory approval is in place.
+                    </p>
+                  </Alert>
+                )}
               </Card>
             ))}
             <div className="space-y-4">
               <h2 className="text-2xl">Good to know</h2>
               <ul className="list-disc space-y-2 pl-5">
-                <li>Prices are in pounds sterling (GBP).</li>
+                <li>Prices are in pounds sterling (GBP). We do not add VAT to this price.</li>
                 <li>You only pay after you have completed the safety questions.</li>
                 <li>
                   You can read about cancelling and refunds in our{' '}

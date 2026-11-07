@@ -63,7 +63,9 @@ export const concernsStepSchema = z.object({
     error: 'Tell us your main question or concern about your medicines',
   }),
   goals: text(2000, 'What you hope to get from the review').default(''),
-  consultationMethod: z.enum(CONSULTATION_METHODS, { error: 'Choose how you would like to speak to the pharmacist' }),
+  consultationMethod: z.enum(CONSULTATION_METHODS, {
+    error: 'Choose how you would like to speak to the pharmacist',
+  }),
 });
 
 export const questionnaireSubmissionSchema = z.object({

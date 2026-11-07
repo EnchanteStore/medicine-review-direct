@@ -32,7 +32,11 @@ export interface ReleaseContext {
   eligibilityConfirmed: boolean;
   questionnaireSubmitted: boolean;
   informationSufficientConfirmed: boolean;
-  consultation: null | { twoWayCompleted: boolean; method: 'telephone' | 'secure_video'; hasNotes: boolean };
+  consultation: null | {
+    twoWayCompleted: boolean;
+    method: 'telephone' | 'secure_video';
+    hasNotes: boolean;
+  };
   clinicalAdequacyConfirmed: boolean;
   approvedWithProfessionalId: boolean;
   serviceDeclinedOrExcluded: boolean;
@@ -65,7 +69,8 @@ export function approvalBlockers(ctx: ReleaseContext): string[] {
 
 export function releaseBlockers(ctx: ReleaseContext): string[] {
   const r = approvalBlockers(ctx);
-  if (!ctx.approvedWithProfessionalId) r.push('report_not_approved_with_professional_identification');
+  if (!ctx.approvedWithProfessionalId)
+    r.push('report_not_approved_with_professional_identification');
   if (!ctx.orderInReview) r.push('order_not_in_review');
   return r;
 }
@@ -74,7 +79,11 @@ export function canTransitionReport(from: ReportStatus, to: ReportStatus): boole
   return canTransition(REPORT_TRANSITIONS, from, to);
 }
 
-export function assertReportTransition(from: ReportStatus, to: ReportStatus, ctx?: ReleaseContext): void {
+export function assertReportTransition(
+  from: ReportStatus,
+  to: ReportStatus,
+  ctx?: ReleaseContext,
+): void {
   if (!canTransitionReport(from, to)) {
     throw new InvalidTransitionError('report', from, to);
   }

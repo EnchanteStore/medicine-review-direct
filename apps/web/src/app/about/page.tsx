@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ContentPage } from '@/components/page-header';
+import { brandName } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'About us' };
 
@@ -7,7 +8,7 @@ export default function AboutPage() {
   return (
     <ContentPage
       title="About us"
-      lead="Medicine Review Direct is a private service led by UK-registered pharmacists."
+      lead={`${brandName()} is a private service led by GPhC-registered pharmacists.`}
     >
       <p>
         Many people take several medicines prescribed at different times, sometimes by different

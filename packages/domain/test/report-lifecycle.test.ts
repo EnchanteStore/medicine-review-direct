@@ -69,10 +69,16 @@ describe('section 8 release gate', () => {
 
   it('requires a completed two-way consultation with notes', () => {
     expect(
-      approvalBlockers({ ...ok, consultation: { twoWayCompleted: false, method: 'telephone', hasNotes: true } }),
+      approvalBlockers({
+        ...ok,
+        consultation: { twoWayCompleted: false, method: 'telephone', hasNotes: true },
+      }),
     ).toContain('consultation_not_two_way_completed');
     expect(
-      approvalBlockers({ ...ok, consultation: { twoWayCompleted: true, method: 'telephone', hasNotes: false } }),
+      approvalBlockers({
+        ...ok,
+        consultation: { twoWayCompleted: true, method: 'telephone', hasNotes: false },
+      }),
     ).toContain('consultation_notes_missing');
   });
 
@@ -84,13 +90,17 @@ describe('section 8 release gate', () => {
       clinicalAdequacyConfirmed: false,
       approvedWithProfessionalId: false,
     };
-    expect(() => assertReportTransition('ready_for_release', 'released', onlyPaidAndBooked)).toThrow(
-      ReportReleaseBlockedError,
-    );
+    expect(() =>
+      assertReportTransition('ready_for_release', 'released', onlyPaidAndBooked),
+    ).toThrow(ReportReleaseBlockedError);
   });
 
   it('requires context for approval and release', () => {
-    expect(() => assertReportTransition('ready_for_release', 'released')).toThrow(ReportReleaseBlockedError);
-    expect(() => assertReportTransition('draft', 'clinically_approved')).toThrow(ReportReleaseBlockedError);
+    expect(() => assertReportTransition('ready_for_release', 'released')).toThrow(
+      ReportReleaseBlockedError,
+    );
+    expect(() => assertReportTransition('draft', 'clinically_approved')).toThrow(
+      ReportReleaseBlockedError,
+    );
   });
 });

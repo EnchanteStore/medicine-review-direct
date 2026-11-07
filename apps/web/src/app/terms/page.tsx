@@ -1,37 +1,58 @@
 import type { Metadata } from 'next';
-import { DraftNotice } from '@/components/draft-notice';
+import Link from 'next/link';
+import {
+  CompanyIdentity,
+  LegalNotice,
+  PharmacistRegistration,
+  Placeholder,
+} from '@/components/legal';
 import { ContentPage } from '@/components/page-header';
+import { brandName } from '@/lib/site';
 
-export const metadata: Metadata = { title: 'Terms of service (draft)' };
+export const metadata: Metadata = { title: 'Terms of Service (placeholder)' };
 
 export default function TermsPage() {
+  const brand = brandName();
   return (
-    <ContentPage title="Terms of service">
-      <DraftNotice />
+    <ContentPage title="Terms of Service">
+      <LegalNotice />
+      <h2>Who we are</h2>
+      <CompanyIdentity />
+
       <h2>The service</h2>
       <p>
-        A private medication review by a UK-registered pharmacist, consisting of a telephone
-        consultation and a written report. The service is for adults aged 18 or over living in
-        England.
+        {brand} provides private pharmacist-led medication reviews for adults aged 18 or over in
+        England. A review includes a structured questionnaire, optional secure document upload, a
+        consultation with a GPhC-registered pharmacist by telephone or secure video, and a
+        personalised report prepared, checked and signed by that pharmacist.
       </p>
-      <h2>What the service is not</h2>
+      <h2>What the service does not do</h2>
       <p>
-        The service does not diagnose, prescribe, dispense or provide emergency care, and does not
-        replace your GP. You should not stop or change any medicine without speaking to your
-        prescriber.
+        We do not provide emergency or same-day urgent care, diagnose conditions, prescribe, supply
+        or change medicines, replace your GP, or access NHS records. We are not affiliated with the
+        NHS. See <Link href="/clinical-safety">Clinical Service and Safety Information</Link>.
       </p>
-      <h2>Your account</h2>
+      <h2>Suitability</h2>
       <p>
-        You must give accurate information and keep your sign-in details secure. You can ask to
-        close your account at any time, subject to our record-keeping obligations.
+        A pharmacist may decide the service is not suitable for you, for example if you need urgent
+        care or your situation needs a different kind of assessment. If so, we will tell you why and
+        where to get help. A declined service does not produce a review report.
       </p>
-      <h2>Payment</h2>
+      <h2>Pharmacist registration</h2>
+      <PharmacistRegistration />
+      <h2>Price and payment</h2>
       <p>
-        Prices are shown in pounds sterling. Payment is taken through our payment provider before
-        your consultation is booked.
+        Prices are in pounds sterling. We do not add VAT; VAT treatment is awaiting accountant
+        confirmation. <Placeholder>payment terms, needs legal review</Placeholder>
       </p>
-      <h2>Liability, governing law and company details</h2>
-      <p>To be completed after legal review.</p>
+      <h2>Cancellation</h2>
+      <p>
+        See our <Link href="/refunds">Cancellation and Refund Policy</Link>.
+      </p>
+      <h2>Liability, governing law and disputes</h2>
+      <p>
+        <Placeholder>liability, governing law and dispute terms, needs legal review</Placeholder>
+      </p>
     </ContentPage>
   );
 }
