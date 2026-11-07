@@ -36,18 +36,57 @@ Format: ID, date, decision, rationale, alternatives rejected, status.
   legacy iptables rules dropped container-to-container traffic. This is a VM quirk, not a project
   requirement; CI runners do not need it.
 
-## Decisions awaiting the pharmacist owner
+## Owner decisions, 7 November 2026 (binding; see PHASE_2_SPEC.md)
 
-| ID    | Decision needed                                                                                                        | Notes                                                           |
-| ----- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| O-001 | Safety screening wording and deterministic escalation rules                                                            | CLINICAL_SAFETY CS-05 to CS-07. Blocks Phase 2 safety screening |
-| O-002 | Legal page content (privacy, terms, refunds, complaints)                                                               | Currently DRAFT outlines; needs legal review                    |
-| O-003 | Retention periods (clinical, financial, audit, account)                                                                | Drives deletion and retention jobs                              |
-| O-004 | Email provider (and SMS for phone verification/MFA)                                                                    | Must support UK/EU processing and a DPA                         |
-| O-005 | Hosting region (UK or EU) for Supabase and the web app                                                                 | Affects transfer assessment                                     |
-| O-006 | Stripe live activation                                                                                                 | Test mode only until explicitly approved                        |
-| O-007 | Emergency banner wording                                                                                               | CS-01                                                           |
-| O-008 | VAT treatment of the review fee                                                                                        | Affects price display and invoices                              |
-| O-009 | Business identity for the website (legal entity, ICO registration, contact details, pharmacist names and GPhC numbers) | Placeholders on Contact/About                                   |
-| O-010 | Branding and name clearance for "Medicine Review Direct"                                                               | Working name                                                    |
-| O-011 | Whether a report may be released when the consultation did not take place                                              | CS-11; current domain rule requires a recorded consultation     |
+| ID    | Decision                                                                                                                                                                    | Resolves                                        |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| OD-01 | Consultations by telephone **or** secure video                                                                                                                              | Phase 1 assumed telephone only                  |
+| OD-02 | Three screening pathways (emergency exclusion, urgent exclusion, routine flags); rule-versioned, clinically approved, tested; no AI downgrades                              | O-001 (structure; wording still pending)        |
+| OD-03 | Exact full emergency banner wording, brand configurable; shortened persistent version during intake                                                                         | O-007 (full text)                               |
+| OD-04 | Five legal pages with clearly marked placeholders; never invent identity, registration, insurance or cancellation rights                                                    | O-002 (structure; wording pending legal review) |
+| OD-05 | Provisional retention schedule (8y clinical, 90d abandoned, 6y accounting, 12m security logs, 30 to 90d backups); lawful holds; deletion never auto-erases clinical records | O-003 (provisional)                             |
+| OD-06 | Supabase London eu-west-2; AWS SES London; SMS disabled                                                                                                                     | O-004, O-005                                    |
+| OD-07 | Intended VAT-exempt model; never add 20% VAT automatically; awaiting accountant                                                                                             | O-008 (provisional)                             |
+| OD-08 | Dedicated UK limited company; identity fields are unverified configuration; "PharmReview" is a provisional brand                                                            | O-009, O-010 (process)                          |
+| OD-09 | Report-release gate (section 8); a declined service never produces a review report                                                                                          | O-011                                           |
+| OD-10 | Live clinical service disabled until all section 9 sign-offs are recorded                                                                                                   | O-006 (Stripe live is covered by the same gate) |
+
+## Technical decisions made in Phase 2
+
+| ID    | Decision                                                                                                                                                                                  | Rationale                                                                                    | Alternatives rejected                                      |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| D-024 | Screening is evaluated **in Postgres** (`app.evaluate_screening`), with a TypeScript mirror tested against the same fixture                                                               | A client cannot choose its own outcome; blocking is enforced where the data lives            | Trusting a server-computed outcome passed in by the client |
+| D-025 | Rule set defined once in JSON, embedded in the migration, immutable per version; pgTAP cases generated from the fixture with a staleness test                                             | One reviewed artefact for clinical sign-off; no drift between layers                         | Rules duplicated by hand in SQL and TS                     |
+| D-026 | "Not sure" escalates on emergency/urgent questions (draft policy)                                                                                                                         | Conservative; no automated downgrading                                                       | Treating unsure as no                                      |
+| D-027 | Emergency exclusion is terminal for the order; urgent hold blocks payment and booking on **all** of the patient's orders until reassessment                                               | Matches "ordinary booking cannot override" and "stop routine booking for the active concern" | Per-order hold only                                        |
+| D-028 | Routine flags (and high-risk name matches or 10+ medicines) set `suitability_review_required`; booking needs a pharmacist complexity review                                               | Owner section 1: complex patients need an individual assessment, without blocking intake     | Blocking intake; no assessment                             |
+| D-029 | Kill switch: live = every launch gate approved **and** an approved rule set. `development` mode opens synthetic intake only, never payments; default is `production` (closed)             | No flag can bypass clinical approval; safe default                                           | Environment variable toggle in the app                     |
+| D-030 | Report gate enforced by a trigger for every role (including service role); approval and release need the assigned verified pharmacist with aal2                                           | "No administrator, automation or ordinary feature flag can bypass clinical approval"         | App-level checks only                                      |
+| D-031 | Staff MFA enforced in the database: `has_verified_role` requires `aal2`                                                                                                                   | A stolen password alone exposes nothing                                                      | UI-only MFA redirect                                       |
+| D-032 | Medications stored as validated JSON on the questionnaire version, not as a separate table                                                                                                | Versioning and amendments copy one row atomically; Phase 4 can normalise if needed           | Separate `medications` table per version                   |
+| D-033 | Questionnaire writes only through `security definer` functions; submitted versions immutable; amendments create a new version and supersede the old one                                   | Controlled amendments with history                                                           | Direct table updates                                       |
+| D-034 | Documents: server-side type, size and magic-byte checks; private bucket with per-user paths; `pending_scan` until scanned; scanner is a labelled stub; filenames excluded from audit logs | Honest about missing scanning; clinicians never see unscanned files                          | Marking uploads clean by default                           |
+| D-035 | Brand and business identity come from environment configuration, with placeholder rendering and verified flags                                                                            | Missing metadata must not block development; never invent values                             | Hard-coded copy                                            |
+| D-036 | `/contact` redirects to the combined Complaints and Contact Information page                                                                                                              | Five legal pages as specified                                                                | Separate contact page                                      |
+| D-037 | Notifications: one generic template; Mailpit transport only in development; SES not implemented, so nothing is ever sent elsewhere                                                        | No real sends; no health details in email                                                    | Sending through Supabase or SMTP in production now         |
+
+## Decisions still awaiting the owner or professional advisers
+
+| ID   | Decision needed                                                                                                                              | Notes                                    |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| P-01 | Approve rule set `2026-11-draft.1`: question wording, unsure policy, documented cases                                                        | CLINICAL_SAFETY CS-05, CS-06             |
+| P-02 | Approve the shortened banner wording                                                                                                         | CS-01a                                   |
+| P-03 | Escalation SOP and operational response arrangements (who reviews urgent holds and complexity reviews, and when)                             | Launch gates                             |
+| P-04 | Approve the draft high-risk medicine term list                                                                                               | CS-15                                    |
+| P-05 | Legal wording for all five pages, including cancellation rights and refund amounts                                                           | Solicitor                                |
+| P-06 | Retention periods and DPIA                                                                                                                   | Governance and privacy                   |
+| P-07 | MHRA and CQC scope assessments                                                                                                               | Regulatory                               |
+| P-08 | Company, ICO, GPhC and indemnity details; VAT confirmation; brand clearance                                                                  | Accountant, solicitor, trade mark search |
+| P-09 | Processor agreements, residency validation, security review                                                                                  | Before any real patient data             |
+| P-10 | Staff MFA recovery procedure                                                                                                                 | Operational                              |
+| P-11 | Whether patients may start a new request after an emergency exclusion (currently allowed; the earlier exclusion stays visible to clinicians) | Clinical                                 |
+
+## Superseded: decisions awaiting the owner (Phase 1 list)
+
+O-001 to O-011 are resolved or partly resolved by OD-01 to OD-10 above. The open parts are
+carried forward as P-01 to P-11.

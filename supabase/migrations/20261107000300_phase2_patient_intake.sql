@@ -1037,8 +1037,10 @@ set search_path = ''
 as $$
 declare
   o public.review_orders;
+  uid uuid;
 begin
-  select * into o from public.review_orders where id = p_order_id and patient_id = app.require_user();
+  uid := app.require_user();
+  select * into o from public.review_orders where id = p_order_id and patient_id = uid;
   if not found then
     raise exception 'order not found' using errcode = 'no_data_found';
   end if;
@@ -1081,7 +1083,7 @@ $$;
 create function app.evaluate_screening(p_definition jsonb, p_answers jsonb)
 returns jsonb
 language plpgsql
-immutable
+stable
 set search_path = ''
 as $$
 declare
@@ -1183,9 +1185,12 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  uid uuid;
 begin
+  uid := app.require_user();
   update public.safety_screenings set acknowledged_at = now()
-    where id = p_screening_id and patient_id = app.require_user() and acknowledged_at is null
+    where id = p_screening_id and patient_id = uid and acknowledged_at is null
       and outcome in ('emergency', 'urgent');
 end;
 $$;
@@ -1530,12 +1535,11 @@ security definer
 set search_path = ''
 as $$
 declare
-  o public.review_orders;
   drafts integer;
   docs integer;
   screenings integer;
 begin
-  select * into o from public.review_orders where id = p_order_id;
+  perform 1 from public.review_orders where id = p_order_id;
   if not found then raise exception 'order not found' using errcode = 'no_data_found'; end if;
   if not exists (select 1 from app.retention_candidates() c where c.order_id = p_order_id) then
     raise exception 'order is not eligible for purge (clinical, recent or under legal hold)' using errcode = 'check_violation';

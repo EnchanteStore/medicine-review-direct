@@ -25,8 +25,18 @@ All data in every environment so far is **synthetic**.
 - Email links use token hashes verified server-side at `/auth/confirm`; links are single use and
   expire after 1 hour. A forged token is rejected (E2E tested).
 - Password-changed notification email enabled.
-- **Planned:** TOTP MFA (mandatory for staff, optional for patients, Phase 2/4), phone
-  verification, account closure requests, session timeouts for staff.
+- **Staff MFA (Phase 2, built):**
+  - Staff use TOTP through Supabase Auth.
+  - `app.has_verified_role()`, which underlies every staff RLS policy and staff function,
+    requires an `aal2` session, so a verified staff member signed in with a password only sees
+    nothing beyond their own role row (pgTAP and Data API tested).
+  - `/staff` redirects to `/mfa` for enrolment or verification (E2E: enrolment with a real TOTP
+    code, and rejection of a wrong code).
+  - MFA recovery for staff who lose a device is a manual process to be written (launch item).
+- **Planned:** optional patient MFA, phone verification (SMS disabled until approved), session
+  timeouts for staff.
+- **Account closure (Phase 2, built):** patients request deletion. Clinical records are never
+  auto-erased (see Retention below).
 
 ## Authorisation
 
@@ -36,7 +46,11 @@ Defence in depth, each layer independently enforced:
 2. Each protected layout/page/action calls `supabase.auth.getUser()` server-side.
 3. `/staff` requires at least one **verified** staff role; others get a 404.
 4. **Postgres RLS is the final authority.** The web app uses the user's JWT; the service role key
-   is not used by the web app in Phase 1.
+   is not used by the web app. Playwright uses the local demo service key only to create
+   synthetic test users.
+5. **Clinical state changes go through `security definer` functions or triggers** that re-check
+   ownership, state and role. Patients have no direct write grants on orders, screenings or
+   questionnaires.
 
 Key rules (all tested with pgTAP; several also through the real Data API in Playwright):
 
@@ -46,6 +60,36 @@ Key rules (all tested with pgTAP; several also through the real Data API in Play
 - Unverified or suspended staff get nothing beyond their own role row.
 - Verified pharmacists have no blanket access to patient data; access will be assignment-scoped.
 - Audit log and consents are append-only, even for the table owner.
+- Phase 2 additions:
+  - Safety screenings, submitted questionnaires, suitability assessments, consultations,
+    released reports and launch sign-offs are immutable.
+  - Clinicians see only orders assigned to them (or all, for clinical admins), and only
+    documents that passed scanning.
+  - Storage RLS restricts each patient to their own folder in the private `patient-documents`
+    bucket.
+- Report approval and release are restricted to the assigned verified pharmacist with MFA, for
+  every role including the service role (see PHASE_2_SPEC section 8).
+
+## Live-service kill switch
+
+Public intake requires the live service or `development` mode. Payments and booking require the
+live service in every mode. The live service needs every launch gate signed off plus a
+clinically approved rule set. `app_settings.environment` defaults to `production` (closed); only
+local and CI seeds set `development`, and it is visible on every page as a "Development preview"
+notice. Changing it is a service-role/database-owner action and must be part of deployment
+review.
+
+## Retention and erasure
+
+These rules are enforced in the database:
+
+- Retention periods are configurable but provisional, and changes are audited.
+- Lawful holds block purges.
+- Deletion requests store a retention assessment and never erase clinical records.
+- The abandoned-intake purge refuses anything clinical, recent or held.
+- Foreign keys to `auth.users` use `on delete restrict`.
+
+The purge job is designed, not scheduled.
 
 ## Application controls
 
@@ -68,13 +112,20 @@ Key rules (all tested with pgTAP; several also through the real Data API in Play
 
 ## Planned controls by phase
 
-- **Phase 2:** private Storage bucket with per-user path policies, malware scanning before
-  documents become visible (`scan_status`), short-lived signed URLs, upload size/MIME limits,
-  MFA enrolment.
+- **Phase 2 (done):**
+  - private Storage bucket with per-user path policies
+  - `scan_status` gating
+  - upload size, type and magic-byte checks
+  - staff MFA
+  - kill switch
+  - retention schema
+- **Still to do from Phase 2:**
+  - a real malware scanner (the current one is a labelled stub)
+  - short-lived signed URLs for clinician viewing (Phase 4)
 - **Phase 3:** Stripe webhook signature verification, `stripe_events` idempotency, payment status
   only from verified events, server-side prices only, booking exclusion constraints.
 - **Phase 4:** staff invitation flow, independent verification evidence, assignment-scoped RLS,
-  mandatory staff MFA, report release guard in the database.
+  pharmacist workspace UI on top of the release gate (gate already in the database).
 - **Phase 5:** penetration test, nonce CSP, shared rate-limit store, backups and restore drill,
   retention jobs, DPIA, DSPT evidence, incident response runbook.
 
@@ -90,6 +141,11 @@ Key rules (all tested with pgTAP; several also through the real Data API in Play
 
 - UK GDPR lawful basis and Article 9 condition for health data; DPIA.
 - Data retention periods for clinical, financial and audit records.
-- Hosting region (UK or EU) and international transfer assessment for each processor.
-- Email/SMS provider and its data processing terms.
+- Hosting region **decided: London (eu-west-2)** for Supabase and SES. Still to do: validate
+  residency of subprocessors, logs, backups and analytics, plus a transfer assessment for each
+  processor.
+- Email **decided: AWS SES London** (not implemented; local Mailpit only). SMS disabled. DPAs
+  still needed.
+- No identifiable records to AI providers without approved safeguards (there is no AI
+  integration).
 - Cyber Essentials / DSPT scope.

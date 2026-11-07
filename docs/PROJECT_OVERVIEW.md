@@ -1,17 +1,18 @@
 # Project overview
 
-**Medicine Review Direct** (working name, subject to branding and legal clearance) is a private
-online medication review service for adults aged 18+ in England, delivered by UK-registered
-pharmacists.
+**PharmReview** (provisional trading name, configurable, pending name and trade mark clearance;
+the repository keeps its original working name) is a private online medication review service
+for adults aged 18+ in England, delivered by GPhC-registered pharmacists.
 
 - **Owner and clinical approver:** Eason Sung, UK-registered pharmacist. Approves all clinical
   content, safety rules and clinical safety decisions.
-- **Status:** Phase 1 (foundation) complete on a feature branch. Not deployed. Not accepting
-  patients. All data is synthetic.
+- **Status:** Phase 1 (foundation) and Phase 2 (patient intake) built on stacked feature branches.
+  Not deployed. The live clinical service is disabled until the section 9 sign-offs are recorded.
+  All data is synthetic.
 
 ## The service
 
-One telephone consultation with a pharmacist plus a written report. Launch price £59 (normal
+One consultation with a pharmacist, by telephone or secure video, plus a written report. Launch price £59 (normal
 displayed price £79), GBP only, server-controlled.
 
 Patient journey (target, built across Phases 1 to 4):
@@ -81,5 +82,6 @@ pnpm --filter @mrd/web build && pnpm test:e2e   # Playwright + axe (needs Supaba
 - [SECURITY_MODEL.md](./SECURITY_MODEL.md): authn/authz, threats, controls, open items
 - [CLINICAL_SAFETY.md](./CLINICAL_SAFETY.md): clinical boundaries and items needing approval
 - [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md): Phases 1 to 6
+- [PHASE_2_SPEC.md](./PHASE_2_SPEC.md): owner decisions (7 Nov 2026), implementation and pre-launch blockers
 - [PROGRESS.md](./PROGRESS.md): what is done, with test evidence
 - [DECISION_LOG.md](./DECISION_LOG.md): decisions and those awaiting the owner

@@ -1,59 +1,76 @@
 # Clinical safety
 
-**Clinical approver:** Eason Sung, UK-registered pharmacist. Nothing in this document, the website
-copy or the software constitutes approved clinical content until the owner signs it off. This is
-not a DCB0129/DCB0160 clinical safety case; producing one (and appointing a Clinical Safety
-Officer) is a Phase 5 item.
+**Clinical approver:** Eason Sung, UK-registered pharmacist. The binding Phase 2 decisions (7 Nov 2026) are recorded in [PHASE_2_SPEC.md](./PHASE_2_SPEC.md). Nothing else in the software, website
+copy or rule set is approved clinical content until the owner signs it off.
+
+This is not a DCB0129/DCB0160 clinical safety case. Producing one is part of the launch gates.
 
 ## Clinical boundaries (enforced in product design)
 
-The service does **not**: diagnose; prescribe; supply or dispense; give autonomous instructions to
-stop, start or change medicines; replace the GP; provide urgent or emergency care; access NHS
-records; or use AI/automated systems for clinical decisions. There are no NHS logos and no
-implied NHS endorsement.
+The service does **not**:
 
-How the software supports these boundaries:
+- provide emergency or same-day urgent care
+- diagnose
+- prescribe, supply or dispense
+- give autonomous instructions to change medicines
+- replace the GP
+- access NHS records
+- claim NHS affiliation
+- use AI for clinical decisions
 
-- Every page shows emergency advice (999 / NHS 111) and states the service is not monitored for
-  emergencies.
-- Report release is gated (domain logic now, database trigger in Phase 4) on clinical approval, a
-  paid order, a recorded consultation and an explicit verified-pharmacist action. Reports are
-  never auto-released.
-- Safety screening will use **deterministic, versioned, pharmacist-approved rules only**. No AI
-  triage. An emergency outcome blocks routine checkout (`safety_escalated` has no path to
-  payment, unit-tested), shows approved advice, records acknowledgement, alerts clinical staff,
-  and is audited.
-- Free-text medicine matching is not clinical validation; the pharmacist validates during review.
-- Ops admins cannot see clinical content (RLS, tested).
+How the software enforces these boundaries:
 
-## Items awaiting your approval
+- **Emergency warning:**
+  - the owner's exact wording is shown at safety checkpoints
+  - a shortened version is shown on every page
+  - neither implies that we call 999 or monitor anything
+- **Screening is deterministic and versioned.** It is evaluated in the database, and no AI or
+  automation can downgrade an outcome:
+  - Emergency exclusion is terminal for the order.
+  - An urgent hold needs a documented pharmacist reassessment.
+  - Routine flags never block, and never declare medicines safe.
+- **Complex patients** (any routine flag, high-risk medicine name match, or 10+ medicines) need an
+  individual pharmacist suitability assessment before booking.
+- **The report-release gate** (owner section 8) is enforced in the database for every role. A
+  declined or excluded service cannot produce a review report.
+- **Free-text matching of medicine names** only raises pharmacist attention flags. It is not
+  clinical validation.
+- **Ops admins cannot see clinical content**, and staff without MFA see nothing (RLS, tested).
 
-| ID    | Item                                                                                                                                                                                                                                                                                     | Where it appears      | Status                           |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | -------------------------------- |
-| CS-01 | Emergency banner wording ("Not for emergencies… call 999… NHS 111… not monitored")                                                                                                                                                                                                       | Every page            | Draft in use, **needs approval** |
-| CS-02 | Clinical safety page content                                                                                                                                                                                                                                                             | `/clinical-safety`    | Marked DRAFT                     |
-| CS-03 | Service scope statements on Home, How it works, About, FAQ                                                                                                                                                                                                                               | Public pages          | Draft, **needs approval**        |
-| CS-04 | Eligibility: adults 18+ in England (self-declared at sign-up; DOB validated 18+)                                                                                                                                                                                                         | Sign-up, profile      | Implemented, **confirm**         |
-| CS-05 | Safety screening topics and exact question wording (chest pain, severe breathing difficulty, anaphylaxis, significant bleeding, overdose, severe hypoglycaemia, stroke symptoms, collapse/confusion, severe infection, serious ADR, pregnancy medication concerns, mental health crisis) | Phase 2 questionnaire | Topics only; **wording needed**  |
-| CS-06 | Deterministic escalation rules and the emergency advice shown for each                                                                                                                                                                                                                   | Phase 2               | **Rules needed**                 |
-| CS-07 | Who is alerted on escalation, and expected response (noting the service is not monitored for emergencies)                                                                                                                                                                                | Phase 2/4             | **Decision needed**              |
-| CS-08 | Questionnaire content, "why we ask" explanations and "don't know" options                                                                                                                                                                                                                | Phase 2               | **Content needed**               |
-| CS-09 | Report section template, standard limitations and disclaimer text                                                                                                                                                                                                                        | Phase 4               | **Content needed**               |
-| CS-10 | GP letter template and recipient verification method                                                                                                                                                                                                                                     | Phase 4               | **Content needed**               |
-| CS-11 | Behaviour when a consultation does not happen (report allowed? wording?)                                                                                                                                                                                                                 | Phase 4               | **Decision needed**              |
-| CS-12 | Out-of-hours messaging warning wording                                                                                                                                                                                                                                                   | Phase 4               | **Content needed**               |
-| CS-13 | Pharmacist verification procedure (GPhC register check, identity, indemnity)                                                                                                                                                                                                             | Phase 4               | **Procedure needed**             |
-| CS-14 | Clinical record retention period                                                                                                                                                                                                                                                         | Phase 5               | **Decision needed**              |
+## Status of clinical items
 
-## Hazard log (initial, to be expanded into a formal log)
+| ID     | Item                                                                                                                   | Status                                                                                                                                                                                                                 |
+| ------ | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CS-01  | Full emergency banner wording                                                                                          | **Approved by owner** (exact text, 7 Nov 2026). Implemented; unit-tested for exact match                                                                                                                               |
+| CS-01a | Shortened persistent banner wording                                                                                    | **DRAFT: needs owner approval**: "Important: Not an emergency service. {brand} is not monitored 24 hours a day. In a life-threatening emergency, call 999 immediately. For urgent advice, contact your GP or NHS 111." |
+| CS-02  | Clinical Service and Safety Information page                                                                           | Placeholder; needs clinical and regulatory review                                                                                                                                                                      |
+| CS-05  | Screening question wording (16 questions in rule set `2026-11-draft.1`)                                                | **DRAFT: needs clinical approval**. Topics follow the owner decision                                                                                                                                                   |
+| CS-06  | Screening rules: "Not sure" escalates on emergency/urgent questions; flags incomplete information on routine questions | **DRAFT: needs clinical approval**                                                                                                                                                                                     |
+| CS-06a | Documented test cases (24 positive/negative/ambiguous, 3 invalid)                                                      | DRAFT; pass in both TypeScript and the database                                                                                                                                                                        |
+| CS-07  | Escalation SOP: who reviews urgent holds and complexity reviews, and response expectations                             | **Not written. Launch gate**                                                                                                                                                                                           |
+| CS-08  | Questionnaire content, "why we ask" text, "don't know" options                                                         | Draft implemented; needs approval                                                                                                                                                                                      |
+| CS-09  | Report template, limitations and disclaimer                                                                            | Phase 4; needs content                                                                                                                                                                                                 |
+| CS-10  | GP letter template and recipient verification                                                                          | Phase 4                                                                                                                                                                                                                |
+| CS-11  | Report when consultation did not happen                                                                                | **Decided:** never a completed review report without a completed two-way consultation; a declined service may produce a safety or referral communication only (owner section 8)                                        |
+| CS-12  | Out-of-hours messaging wording                                                                                         | Phase 4                                                                                                                                                                                                                |
+| CS-13  | Pharmacist verification procedure (GPhC, identity, indemnity)                                                          | Launch gate                                                                                                                                                                                                            |
+| CS-14  | Clinical record retention                                                                                              | **Provisional:** 8 years after last clinical contact; needs governance approval                                                                                                                                        |
+| CS-15  | High-risk medicine term list (20 terms, draft)                                                                         | Needs clinical approval                                                                                                                                                                                                |
+| CS-16  | MHRA medical-device classification and CQC scope assessments                                                           | **Launch gates**                                                                                                                                                                                                       |
 
-| Hazard                                                      | Cause                  | Control (built / planned)                                                                                     |
-| ----------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Patient in an emergency uses the service instead of 999/111 | Misunderstanding scope | Banner on every page (built); safety screening blocks checkout (Phase 2)                                      |
-| Patient changes medicines based on the report alone         | Report wording         | Approved disclaimer and recommendations framed for GP discussion (Phase 4, CS-09)                             |
-| Report shown before pharmacist approval                     | Software defect        | Release guard in domain (built, tested) and DB trigger (Phase 4)                                              |
-| Report for the wrong patient                                | Access control defect  | RLS own-row isolation (built, tested); report access only when released                                       |
-| Unverified person acts as pharmacist                        | Staff onboarding       | Verified status required; GPhC number required for verified pharmacists; no self-verification (built, tested) |
-| Ops staff see clinical data                                 | Role misconfiguration  | `is_verified_clinician()` excludes ops_admin (built, tested)                                                  |
-| Health information leaks via email                          | Notification content   | Generic templates only; current auth emails contain no health information (built)                             |
-| Under-18 uses the service                                   | Eligibility            | Declaration at sign-up and DOB validation in app and DB (built, tested)                                       |
+## Hazard log (initial)
+
+| Hazard                                                           | Cause                  | Controls (built unless stated)                                                                                                                                                       |
+| ---------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Patient in an emergency continues routine intake                 | Misunderstanding scope | Emergency questions first; terminal exclusion; full warning and 999 instruction; DB blocks payment and booking (pgTAP + E2E "emergency blocks purchase")                             |
+| Patient believes the service will call 999 or is monitoring them | Wording                | Owner-approved text; tests assert no "we will call" or "we monitor" wording                                                                                                          |
+| Patient with an urgent problem waits for a review                | Wording, booking       | Urgent hold; GP/NHS 111 advice; booking blocked across all the patient's orders until a documented reassessment                                                                      |
+| Screening outcome tampered with by the client                    | Client-side logic      | Outcome computed in the database; patients cannot insert screenings or change order status (tested)                                                                                  |
+| Ambiguous answer under-triaged                                   | "Not sure" answers     | Conservative escalation policy (draft, needs approval)                                                                                                                               |
+| High-risk medicine user blocked unnecessarily                    | Over-triage            | Routine flags never block (tested), but trigger an individual suitability review before booking                                                                                      |
+| Report released without an adequate consultation                 | Process failure        | Section 8 gate in the database: two-way consultation with notes, sufficiency and adequacy confirmations, assigned verified pharmacist with MFA; service role cannot release (tested) |
+| Report shown before release                                      | Defect                 | RLS shows reports to patients only when `released` (tested)                                                                                                                          |
+| Unscanned malicious upload reaches a pharmacist                  | No scanner yet         | RLS hides `pending_scan` documents from clinicians; the scanner is a labelled stub (launch blocker)                                                                                  |
+| Health information leaks by email                                | Notification content   | Generic "update in your account" template only (tested)                                                                                                                              |
+| Clinical records lost on account deletion                        | Deletion workflow      | Deletion requests never erase clinical records; `on delete restrict`; purge refuses clinical orders (tested)                                                                         |
+| Staff account compromise exposes patient data                    | Credential theft       | TOTP MFA; database staff privileges require aal2 (tested)                                                                                                                            |
