@@ -1,0 +1,74 @@
+/*
+ * Medicine Review Direct design tokens (Tailwind CSS v4 theme).
+ * Palette: deep teal and ink on a warm neutral. All text/background pairs used
+ * by components meet WCAG 2.2 AA (most meet AAA); see docs/ARCHITECTURE.md.
+ */
+@theme {
+  --color-ink-900: #10242b;
+  --color-ink-700: #2c4148;
+  --color-ink-600: #45585e;
+
+  --color-teal-900: #083a3d;
+  --color-teal-800: #0b4a4e;
+  --color-teal-700: #0f5e63;
+  --color-teal-600: #187177;
+  --color-teal-100: #d7ebe9;
+  --color-teal-50: #eef6f5;
+
+  --color-sand-50: #faf8f4;
+  --color-sand-100: #f3efe7;
+  --color-sand-200: #e7e0d3;
+  --color-sand-300: #d3c9b6;
+
+  --color-danger-700: #a3201a;
+  --color-danger-50: #fdf0ef;
+  --color-warning-800: #6b4300;
+  --color-warning-50: #fff6e5;
+  --color-success-700: #1d6b3a;
+  --color-success-50: #edf7f0;
+
+  --color-focus: #ffbf47;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-card: 0 1px 2px rgb(16 36 43 / 0.06), 0 4px 16px rgb(16 36 43 / 0.06);
+}
+
+@layer base {
+  html {
+    /* 18px base: larger default for older users and low digital confidence. */
+    font-size: 112.5%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-sand-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-ink-900);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--color-focus);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
