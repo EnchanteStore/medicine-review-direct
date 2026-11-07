@@ -21,11 +21,24 @@ export const REPORT_TRANSITIONS: TransitionMap<ReportStatus> = {
   released: [],
 };
 
+/**
+ * Section 8 release gate (owner decision, 7 Nov 2026). Mirrors
+ * `app.report_gate_blockers` in the database, which is authoritative.
+ * A questionnaire, AI draft, payment or booked appointment never
+ * independently authorises release.
+ */
 export interface ReleaseContext {
-  orderPaid: boolean;
-  consultationRecorded: boolean;
-  /** Must be the pharmacist performing the release, distinct from automated processes. */
-  releasedByVerifiedPharmacist: boolean;
+  screeningCleared: boolean;
+  eligibilityConfirmed: boolean;
+  questionnaireSubmitted: boolean;
+  informationSufficientConfirmed: boolean;
+  consultation: null | { twoWayCompleted: boolean; method: 'telephone' | 'secure_video'; hasNotes: boolean };
+  clinicalAdequacyConfirmed: boolean;
+  approvedWithProfessionalId: boolean;
+  serviceDeclinedOrExcluded: boolean;
+  orderInReview: boolean;
+  /** The assigned, verified pharmacist acting in an MFA session. */
+  actorIsAssignedVerifiedPharmacist: boolean;
 }
 
 export class ReportReleaseBlockedError extends Error {
@@ -35,35 +48,39 @@ export class ReportReleaseBlockedError extends Error {
   }
 }
 
+export function approvalBlockers(ctx: ReleaseContext): string[] {
+  const r: string[] = [];
+  if (!ctx.screeningCleared) r.push('safety_screening_not_cleared');
+  if (!ctx.eligibilityConfirmed) r.push('eligibility_profile_incomplete');
+  if (!ctx.questionnaireSubmitted) r.push('no_submitted_questionnaire');
+  if (!ctx.informationSufficientConfirmed) r.push('clinical_information_not_confirmed_sufficient');
+  if (!ctx.consultation) r.push('no_consultation_recorded');
+  else if (!ctx.consultation.twoWayCompleted) r.push('consultation_not_two_way_completed');
+  else if (!ctx.consultation.hasNotes) r.push('consultation_notes_missing');
+  if (!ctx.clinicalAdequacyConfirmed) r.push('clinical_adequacy_not_confirmed');
+  if (ctx.serviceDeclinedOrExcluded) r.push('service_declined_or_excluded');
+  if (!ctx.actorIsAssignedVerifiedPharmacist) r.push('actor_not_assigned_verified_pharmacist');
+  return r;
+}
+
 export function releaseBlockers(ctx: ReleaseContext): string[] {
-  const reasons: string[] = [];
-  if (!ctx.orderPaid) reasons.push('order is not paid');
-  if (!ctx.consultationRecorded) reasons.push('consultation has not been recorded');
-  if (!ctx.releasedByVerifiedPharmacist)
-    reasons.push('release must be performed by a verified pharmacist');
-  return reasons;
+  const r = approvalBlockers(ctx);
+  if (!ctx.approvedWithProfessionalId) r.push('report_not_approved_with_professional_identification');
+  if (!ctx.orderInReview) r.push('order_not_in_review');
+  return r;
 }
 
 export function canTransitionReport(from: ReportStatus, to: ReportStatus): boolean {
   return canTransition(REPORT_TRANSITIONS, from, to);
 }
 
-/**
- * Validates a report transition. Release additionally requires a paid order,
- * a recorded consultation and an explicit pharmacist action; reports are never
- * made visible to patients automatically.
- */
-export function assertReportTransition(
-  from: ReportStatus,
-  to: ReportStatus,
-  ctx?: ReleaseContext,
-): void {
+export function assertReportTransition(from: ReportStatus, to: ReportStatus, ctx?: ReleaseContext): void {
   if (!canTransitionReport(from, to)) {
     throw new InvalidTransitionError('report', from, to);
   }
-  if (to === 'released') {
-    if (!ctx) throw new ReportReleaseBlockedError(['release context missing']);
-    const reasons = releaseBlockers(ctx);
+  if (to === 'clinically_approved' || to === 'released') {
+    if (!ctx) throw new ReportReleaseBlockedError(['gate context missing']);
+    const reasons = to === 'released' ? releaseBlockers(ctx) : approvalBlockers(ctx);
     if (reasons.length > 0) throw new ReportReleaseBlockedError(reasons);
   }
 }

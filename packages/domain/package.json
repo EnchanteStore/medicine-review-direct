@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@mrd/config": "workspace:*",
+    "@types/node": "^22.20.5",
     "eslint": "^9.39.0",
     "typescript": "~5.9.3",
     "vitest": "^4.0.0"
