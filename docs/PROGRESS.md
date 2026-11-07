@@ -1,5 +1,46 @@
 # Progress
 
+## Phase 4: Pharmacist workspace, reports, messages and GP letters
+
+**Status:** implemented on branch `cursor/phase-4-clinical-workspace`, stacked on Phase 3. Not
+deployed. Synthetic data only. No live Stripe, no real email, no NHS connection. Clinical wording
+in the report and GP letter is **DRAFT pending clinical approval**. Public intake and live
+payments stay off.
+
+What works, checked locally on 7 November 2026 (London):
+
+- A clinical administrator assigns a pharmacist. The pharmacist, with an authenticator, records a
+  telephone consultation, writes the report, approves it, creates a multi-page PDF, and releases
+  it. The patient sees that version. A second patient and another pharmacist get a 404.
+- Before release, the patient is told no report has been released. The findings text is not on
+  the page.
+- The release email and the message email use the generic account template. Neither contains the
+  medicine name or the message text.
+- A GP letter needs this patient's agreement and a practice name. The recorded dispatch says the
+  letter was not transmitted.
+- The database rejects an unpaid release, an operations administrator assigning or reading
+  clinical rows, a direct instruction to stop a medicine, and a medication-review report on a
+  declined order. A generation failure stays hidden and can be retried.
+
+| Check                                                    | Result                                                                                                                                                                              |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Format, typecheck, lint                                  | PASS                                                                                                                                                                                |
+| Vitest                                                   | PASS. Domain 81, web 29, validation 38, ui 8                                                                                                                                        |
+| pgTAP, including file `010_phase4_clinical_access`       | PASS. 10 files, 280 assertions                                                                                                                                                      |
+| Schema lint                                              | PASS                                                                                                                                                                                |
+| Playwright, 72 tests                                     | PASS. 1.1 min. Includes record, approve, generate, release, patient view, and denial of a second patient and an unassigned pharmacist. Axe on the workspace and the released report |
+| Screen reader and browsers other than Chromium           | NOT EXECUTED                                                                                                                                                                        |
+| Real Stripe, live email, NHS send, background PDF worker | NOT EXECUTED                                                                                                                                                                        |
+| Clinical approval of the report and GP letter wording    | BLOCKED. The text is marked DRAFT                                                                                                                                                   |
+| Public intake, live payments, delivery to a real patient | BLOCKED until the launch sign-offs                                                                                                                                                  |
+
+Screenshots:
+
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-4/pharmacist-workspace.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-4/report-ready.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-4/patient-report.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-4/messages.png`
+
 ## Phase 3: Test checkout and booking
 
 **Status:** implemented on branch `cursor/phase-3-payments-booking`, stacked on Phase 2. Not

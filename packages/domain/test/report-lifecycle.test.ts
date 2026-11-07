@@ -18,9 +18,11 @@ const ok: ReleaseContext = {
   informationSufficientConfirmed: true,
   consultation: { twoWayCompleted: true, method: 'secure_video', hasNotes: true },
   clinicalAdequacyConfirmed: true,
+  contentComplete: true,
   approvedWithProfessionalId: true,
   serviceDeclinedOrExcluded: false,
   orderInReview: true,
+  orderPaid: true,
   actorIsAssignedVerifiedPharmacist: true,
 };
 
@@ -59,10 +61,12 @@ describe('section 8 release gate', () => {
     ['informationSufficientConfirmed', false, 'clinical_information_not_confirmed_sufficient'],
     ['consultation', null, 'no_consultation_recorded'],
     ['clinicalAdequacyConfirmed', false, 'clinical_adequacy_not_confirmed'],
+    ['contentComplete', false, 'report_content_incomplete'],
     ['serviceDeclinedOrExcluded', true, 'service_declined_or_excluded'],
     ['actorIsAssignedVerifiedPharmacist', false, 'actor_not_assigned_verified_pharmacist'],
     ['approvedWithProfessionalId', false, 'report_not_approved_with_professional_identification'],
     ['orderInReview', false, 'order_not_in_review'],
+    ['orderPaid', false, 'order_not_paid'],
   ] as const)('blocks release when %s is %s', (key, value, reason) => {
     expect(releaseBlockers({ ...ok, [key]: value })).toContain(reason);
   });
@@ -80,6 +84,18 @@ describe('section 8 release gate', () => {
         consultation: { twoWayCompleted: true, method: 'telephone', hasNotes: false },
       }),
     ).toContain('consultation_notes_missing');
+  });
+
+  it('an unpaid review is not blocked at approval, and cannot be released', () => {
+    const unpaid = { ...ok, orderPaid: false };
+    expect(approvalBlockers(unpaid)).not.toContain('order_not_paid');
+    expect(releaseBlockers(unpaid)).toContain('order_not_paid');
+  });
+
+  it('a failed generation can be retried and is not a release', () => {
+    expect(canTransitionReport('generation_failed', 'generating')).toBe(true);
+    expect(canTransitionReport('generation_failed', 'released')).toBe(false);
+    expect(isVisibleToPatient('generation_failed')).toBe(false);
   });
 
   it('payment, a booking or a questionnaire alone never authorise release', () => {

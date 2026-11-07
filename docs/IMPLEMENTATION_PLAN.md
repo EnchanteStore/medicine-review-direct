@@ -57,19 +57,25 @@ Deferred from Phase 2:
 
 ## Phase 4: Clinical operations
 
-- Staff invitations and independent verification records (MFA is already enforced).
-- Admin: queues, assignment, availability, billing/refunds, audit viewer, service configuration
-  (ops admin cannot see clinical content).
-- Pharmacist workspace: assigned reviews, questionnaire, documents, safety answers, appointment,
-  consultation record, notes, medication issues, recommendations, monitoring, GP discussion points.
-- Reports: pharmacist UI on top of the existing database gate. Draft → approve → generate PDF
-  (React PDF, server-side, in worker) → ready → explicit release; recoverable generation
-  failure; corrections as new versions.
-- Messaging (append-only, unread indicators, attachments, contentless notifications,
-  out-of-hours warning).
-- GP letter with case-specific consent and verified recipient; dispatch evidence.
-- Tests: full journey E2E (registration through report release), permission boundaries,
-  report-never-auto-visible, unpaid-cannot-release.
+Built on `cursor/phase-4-clinical-workspace`:
+
+- Clinical administrator assigns a verified pharmacist. Operations administrators cannot assign
+  or read clinical content.
+- Pharmacist workspace for assigned reviews: questionnaire, medicines, concerns, safety answers,
+  clean documents (60-second link), payment and appointment, consultation with required notes.
+- Report sections, approval, server-side multi-page PDF, recoverable generation failure, and a
+  separate release. The patient sees only the released version. The email has no health details.
+- An unpaid or refunded review cannot be released. A declined, urgent or emergency-excluded
+  review can record a safety note or referral, not a medication-review report.
+- Messages: append-only, unread, timestamps, generic notification, out-of-hours warning.
+- GP letter: case-specific consent, practice name checked with the patient, dispatch recorded
+  as not sent.
+
+Still later, and not claimed as done:
+
+- Staff invitations and an evidence pack for independent verification.
+- Message attachments, a correction as a new report version, and a background worker for PDFs.
+- An audit-log screen. Availability and recorded refunds already exist from Phase 3.
 
 ## Phase 5: Assurance and launch preparation
 

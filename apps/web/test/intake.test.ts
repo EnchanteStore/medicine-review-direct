@@ -38,6 +38,15 @@ describe('describeOrder', () => {
     expect(describeOrder({ ...base, status: 'intake' }).next?.href).toMatch(/\/questionnaire\/2$/);
   });
 
+  it('shows a released report and hides the fact of a draft from the next step', () => {
+    const released = describeOrder({ ...base, status: 'report_released' });
+    expect(released.label).toBe('Report available');
+    expect(released.next?.href).toMatch(/\/report$/);
+    const inReview = describeOrder({ ...base, status: 'in_review' });
+    expect(inReview.message).toMatch(/Drafts stay hidden/);
+    expect(inReview.next?.href).not.toMatch(/\/report$/);
+  });
+
   it('is honest that payments are switched off before launch', () => {
     expect(describeOrder({ ...base, status: 'questionnaire_submitted' }).message).toMatch(
       /switched off/,

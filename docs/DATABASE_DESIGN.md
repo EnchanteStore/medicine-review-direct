@@ -152,13 +152,13 @@ or an urgent hold is open.
 
 ## Designed entities (later phases)
 
-| Table                                                       | Phase | Notes                                                                                                                                                                  |
-| ----------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payments`, `stripe_events`, `refunds`                      | 3     | Verified webhooks only; idempotent; order `paid` also needs the live service                                                                                           |
-| `pharmacist_availability`, `appointments`                   | 3     | Exclusion constraint against double-booking; booking needs a cleared screening, no urgent hold, and a suitability review when required (already enforced on the order) |
-| `report_versions`                                           | 4     | Immutable PDF versions and corrections; released `reports` rows are already immutable                                                                                  |
-| `gp_letters`, `messages`, `notifications_outbox`, job queue | 4     | As designed in Phase 1                                                                                                                                                 |
-| `safety_communications`                                     | 4     | Safety notification or referral letter for declined services (never a review report)                                                                                   |
+| Table                                     | Phase | Notes                                                                                                                                                                  |
+| ----------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payments`, `stripe_events`, `refunds`    | 3     | Verified webhooks only; idempotent; order `paid` also needs the live service                                                                                           |
+| `pharmacist_availability`, `appointments` | 3     | Exclusion constraint against double-booking; booking needs a cleared screening, no urgent hold, and a suitability review when required (already enforced on the order) |
+| `report_versions`                         | Later | A released report is already immutable. A correction would be a new report, not an edit. Not built in this slice                                                       |
+| `notifications_outbox`, job queue         | Later | Mailpit is called from the web app. A queue is still the plan before production                                                                                        |
+| `message` attachments                     | Later | Left out until a real scanner exists                                                                                                                                   |
 
 ## State machines
 
@@ -169,12 +169,27 @@ tables are built.
 `safety_urgent_hold` (only to `intake` after a suitable reassessment, or `declined`) | `intake →
 questionnaire_submitted` (`→ intake` for amendments) `→ awaiting_payment → paid →
 consultation_booked → in_review → report_released → completed`, plus `declined`, `cancelled`
-and `refunded`. Payment and booking need the live service. Enforced by `app.enforce_order_rules`.
+and `refunded`. Live payment and booking need the launch sign-offs. Development can use the
+labelled test checkout. Enforced by `app.enforce_order_rules`.
 
 **Report:** `draft → clinically_approved → generating → ready_for_release → released`, with
 `generation_failed` (retry or back to draft). Approval and release follow the owner's section 8
-gate (see PHASE_2_SPEC). This is enforced by `app.enforce_report_gate` for every role. `released`
-is terminal. Nothing becomes patient-visible automatically.
+gate (see PHASE_2_SPEC), plus a succeeded payment and non-empty clinical sections. This is
+enforced by `app.enforce_report_gate` for every role. `released` is terminal. Nothing becomes
+patient-visible automatically.
+
+## Phase 4 tables
+
+| Table                      | Notes                                                                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `messages`                 | Append-only except the first `read_at`. Patient and assigned pharmacist only. The body is not copied into email or the audit log                           |
+| `gp_letters`               | One per order. Draft, approved, dispatched. Patient sees it only after approval. Dispatch evidence is a fixed sentence: not transmitted, no NHS connection |
+| `safety_notices`           | `safety_notification` or `referral` on a declined, urgent or emergency-excluded order. Append-only. Not a row in `reports`                                 |
+| `reports.pdf_storage_path` | Set when the PDF is ready. Cleared if generation fails. The bucket `clinical-reports` is private                                                           |
+| `consents.order_id`        | Makes `gp_letter_sharing` specific to one review. The latest row wins                                                                                      |
+
+A completed two-way consultation moves `consultation_booked` to `in_review`. The patient can
+read that consultation only after the report is `released`.
 
 ## Migrations
 

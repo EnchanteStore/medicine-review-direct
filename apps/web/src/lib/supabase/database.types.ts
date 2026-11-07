@@ -192,6 +192,7 @@ export type Database = {
           document_version: string;
           granted: boolean;
           id: string;
+          order_id: string | null;
           recorded_at: string;
           source: Database['public']['Enums']['consent_source'];
           user_id: string;
@@ -202,6 +203,7 @@ export type Database = {
           document_version: string;
           granted: boolean;
           id?: string;
+          order_id?: string | null;
           recorded_at?: string;
           source?: Database['public']['Enums']['consent_source'];
           user_id?: string;
@@ -211,11 +213,20 @@ export type Database = {
           document_version?: string;
           granted?: boolean;
           id?: string;
+          order_id?: string | null;
           recorded_at?: string;
           source?: Database['public']['Enums']['consent_source'];
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'consents_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       consultations: {
         Row: {
@@ -333,6 +344,85 @@ export type Database = {
             foreignKeyName: 'documents_order_id_fkey';
             columns: ['order_id'];
             isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      gp_letters: {
+        Row: {
+          approved_at: string | null;
+          approved_by: string | null;
+          concern: string;
+          consent_id: string | null;
+          created_at: string;
+          discussion_points: string;
+          dispatch_evidence: string | null;
+          dispatched_at: string | null;
+          findings: string;
+          id: string;
+          order_id: string;
+          recipient_name: string | null;
+          recipient_practice: string | null;
+          recipient_verified_at: string | null;
+          recipient_verified_by: string | null;
+          status: string;
+          updated_at: string;
+          verification_note: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          concern: string;
+          consent_id?: string | null;
+          created_at?: string;
+          discussion_points: string;
+          dispatch_evidence?: string | null;
+          dispatched_at?: string | null;
+          findings: string;
+          id?: string;
+          order_id: string;
+          recipient_name?: string | null;
+          recipient_practice?: string | null;
+          recipient_verified_at?: string | null;
+          recipient_verified_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          verification_note?: string | null;
+        };
+        Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
+          concern?: string;
+          consent_id?: string | null;
+          created_at?: string;
+          discussion_points?: string;
+          dispatch_evidence?: string | null;
+          dispatched_at?: string | null;
+          findings?: string;
+          id?: string;
+          order_id?: string;
+          recipient_name?: string | null;
+          recipient_practice?: string | null;
+          recipient_verified_at?: string | null;
+          recipient_verified_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          verification_note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'gp_letters_consent_id_fkey';
+            columns: ['consent_id'];
+            isOneToOne: false;
+            referencedRelation: 'consents';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'gp_letters_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: true;
             referencedRelation: 'review_orders';
             referencedColumns: ['id'];
           },
@@ -460,6 +550,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'legal_holds_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      messages: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          order_id: string;
+          read_at: string | null;
+          sender_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          order_id: string;
+          read_at?: string | null;
+          sender_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          order_id?: string;
+          read_at?: string | null;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'messages_order_id_fkey';
             columns: ['order_id'];
             isOneToOne: false;
             referencedRelation: 'review_orders';
@@ -811,6 +937,7 @@ export type Database = {
           information_sufficient_at: string | null;
           information_sufficient_by: string | null;
           order_id: string;
+          pdf_storage_path: string | null;
           released_at: string | null;
           released_by: string | null;
           status: Database['public']['Enums']['report_status'];
@@ -831,6 +958,7 @@ export type Database = {
           information_sufficient_at?: string | null;
           information_sufficient_by?: string | null;
           order_id: string;
+          pdf_storage_path?: string | null;
           released_at?: string | null;
           released_by?: string | null;
           status?: Database['public']['Enums']['report_status'];
@@ -850,6 +978,7 @@ export type Database = {
           information_sufficient_at?: string | null;
           information_sufficient_by?: string | null;
           order_id?: string;
+          pdf_storage_path?: string | null;
           released_at?: string | null;
           released_by?: string | null;
           status?: Database['public']['Enums']['report_status'];
@@ -960,6 +1089,42 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'products';
             referencedColumns: ['code'];
+          },
+        ];
+      };
+      safety_notices: {
+        Row: {
+          body: string;
+          created_at: string;
+          created_by: string;
+          id: string;
+          kind: string;
+          order_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          kind: string;
+          order_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          kind?: string;
+          order_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'safety_notices_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -1143,6 +1308,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      approve_gp_letter: { Args: { p_letter_id: string }; Returns: undefined };
       assign_pharmacist: {
         Args: { p_order_id: string; p_pharmacist_id: string };
         Returns: undefined;
@@ -1170,6 +1336,7 @@ export type Database = {
           recorded_at: string;
         }[];
       };
+      mark_review_messages_read: { Args: { p_order_id: string }; Returns: undefined };
       patient_safety_history: {
         Args: { p_patient_id: string };
         Returns: {
@@ -1205,13 +1372,30 @@ export type Database = {
         Returns: string;
       };
       pharmacist_release_report: { Args: { p_report_id: string }; Returns: undefined };
+      pharmacist_save_report_content: {
+        Args: { p_content: Json; p_report_id: string };
+        Returns: undefined;
+      };
+      pharmacist_set_generation_status: {
+        Args: { p_pdf_path: string; p_report_id: string; p_status: string };
+        Returns: undefined;
+      };
       place_legal_hold: {
         Args: { p_order_id: string; p_reason: string; p_user_id: string };
         Returns: string;
       };
+      record_gp_letter_consent: {
+        Args: { p_granted: boolean; p_order_id: string };
+        Returns: string;
+      };
+      record_gp_letter_dispatch: { Args: { p_letter_id: string }; Returns: undefined };
       record_manual_payment: { Args: { p_order_id: string; p_reference: string }; Returns: Json };
       record_refund: {
         Args: { p_amount_pence: number; p_payment_id: string; p_reason: string };
+        Returns: string;
+      };
+      record_safety_notice: {
+        Args: { p_body: string; p_kind: string; p_order_id: string };
         Returns: string;
       };
       record_suitability_assessment: {
@@ -1239,16 +1423,25 @@ export type Database = {
         Args: { p_decision: string; p_request_id: string };
         Returns: Json;
       };
+      save_gp_letter: {
+        Args: { p_concern: string; p_discussion: string; p_findings: string; p_order_id: string };
+        Returns: string;
+      };
       save_questionnaire_draft: {
         Args: { p_answers: Json; p_medications: Json; p_order_id: string; p_step: number };
         Returns: string;
       };
+      send_review_message: { Args: { p_body: string; p_order_id: string }; Returns: string };
       service_status: { Args: Record<PropertyKey, never>; Returns: Json };
       set_availability: { Args: { p_ends: string; p_starts: string }; Returns: string };
       start_questionnaire_amendment: { Args: { p_order_id: string }; Returns: string };
       start_review_order: { Args: Record<PropertyKey, never>; Returns: string };
       submit_questionnaire: { Args: { p_order_id: string }; Returns: number };
       submit_safety_screening: { Args: { p_answers: Json; p_order_id: string }; Returns: Json };
+      verify_gp_recipient: {
+        Args: { p_letter_id: string; p_name: string; p_note: string; p_practice: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       consent_source: 'sign_up' | 'account_settings' | 'staff_recorded' | 'intake';
@@ -1257,7 +1450,8 @@ export type Database = {
         | 'privacy_notice'
         | 'adult_declaration'
         | 'health_data_processing'
-        | 'remote_consultation';
+        | 'remote_consultation'
+        | 'gp_letter_sharing';
       launch_gate:
         | 'clinical_screening_content_and_sop'
         | 'operational_response_arrangements'
@@ -1412,6 +1606,7 @@ export const Constants = {
         'adult_declaration',
         'health_data_processing',
         'remote_consultation',
+        'gp_letter_sharing',
       ],
       launch_gate: [
         'clinical_screening_content_and_sop',

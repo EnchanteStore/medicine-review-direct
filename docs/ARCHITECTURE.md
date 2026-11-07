@@ -121,7 +121,39 @@ an appointment twice, and only when it is more than 24 hours away. A cancellatio
 the slot and is kept in the appointment history. The consultation is telephone or secure video,
 taken from the questionnaire answer.
 
-Payment, a booking and a questionnaire still cannot release a report. That gate is unchanged.
+Payment, a booking and a questionnaire still cannot release a report on their own. Release also
+requires a succeeded payment. A recorded refund removes that.
+
+## Clinical workspace (Phase 4)
+
+A verified clinical administrator with an authenticator assigns a verified pharmacist. An
+operations administrator cannot assign and cannot read the questionnaire, report, messages, GP
+letter or safety note.
+
+The assigned pharmacist, in an authenticator session, sees that review only: screening answers,
+medicines, concerns, clean documents, payment and appointment. Unscanned files stay hidden. A
+clean file opens through a 60-second signed link after the database has allowed the read.
+
+Recording a completed two-way consultation, with notes, moves a booked review to `in_review`.
+Audio is not stored. The pharmacist writes findings, medication-related issues, recommendations,
+monitoring and points for the GP. The database rejects wording that tells the patient to start,
+stop or change a medicine. The template is marked DRAFT pending clinical approval.
+
+Approval and release stay on the section 8 trigger. The pharmacist then creates a multi-page PDF
+in the web request (`pdf-lib`). The file is stored in the private `clinical-reports` bucket. A
+failure sets `generation_failed` and does not publish. The pharmacist can try again, then must
+release explicitly. The patient sees that version only, and gets the same generic Mailpit email
+as any other account update.
+
+Messages on the review are append-only, with an unread flag and an out-of-hours warning. They
+are not an emergency service. A GP letter needs this patient's consent and a practice name the
+pharmacist records as checked. It is not emailed. There is no NHS connection. A declined, urgent
+or emergency-excluded review can store a safety note or referral, and cannot store a medication
+review report.
+
+The service role is still not used to approve or release. It is used for the payment webhook,
+to store the PDF, to sign a short document link, and to look up an email address for the generic
+notification.
 
 ## Environments
 

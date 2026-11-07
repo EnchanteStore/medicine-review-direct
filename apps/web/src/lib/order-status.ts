@@ -94,6 +94,21 @@ export function describeOrder(o: OrderContext): OrderView {
         message: 'Your consultation time is booked. The details are in your account.',
         next: { href: `${base}/appointment`, label: 'View your appointment' },
       };
+    case 'in_review':
+      return {
+        label: 'With your pharmacist',
+        tone: 'info',
+        message:
+          'Your pharmacist is working on your review. A report appears here only after they release it. Drafts stay hidden.',
+        next: { href: `${base}/messages`, label: 'Messages' },
+      };
+    case 'report_released':
+      return {
+        label: 'Report available',
+        tone: 'success',
+        message: 'Your pharmacist has released your report. You can read it in your account.',
+        next: { href: `${base}/report`, label: 'Read your report' },
+      };
     case 'declined':
       return {
         label: 'Not suitable for this service',
@@ -153,6 +168,40 @@ export function friendlyDbError(message: string | undefined): string {
     [/already been moved twice/, 'This appointment has already been moved twice.'],
     [/more than 24 hours/, 'An appointment can only be moved more than 24 hours before it starts.'],
     [/after your payment/, 'Choose a time after your payment is confirmed.'],
+    [
+      /start, stop or change a medicine/,
+      'This wording tells the patient to change a medicine. Say what to discuss with the prescriber instead.',
+    ],
+    [/order_not_paid/, 'This review has not been paid, so it cannot be released.'],
+    [/report release blocked/, 'The report cannot be released yet.'],
+    [/report approval blocked/, 'The report cannot be approved yet.'],
+    [
+      /assigned verified pharmacist/,
+      'Only the assigned pharmacist, signed in with an authenticator, can do that.',
+    ],
+    [
+      /cannot produce a review report/,
+      'A declined or excluded review cannot have a medication review report.',
+    ],
+    [/case-specific consent/, 'The patient has not agreed to a GP letter for this review.'],
+    [
+      /checked before the letter is approved/,
+      'Record the GP practice and how you checked it before approval.',
+    ],
+    [/not an email address/, 'Record the practice name, not an email address.'],
+    [
+      /clinical admin with MFA required/,
+      'Only a clinical administrator with an authenticator can assign a pharmacist.',
+    ],
+    [/messages are closed/, 'Messages are closed for this review.'],
+    [
+      /only for a declined/,
+      'A safety note is only for a declined, urgent or emergency-excluded review.',
+    ],
+    [
+      /report content can only change in draft/,
+      'This report has been approved, so the wording is locked.',
+    ],
   ];
   for (const [re, text] of known) if (re.test(m)) return text;
   return 'Something went wrong. Please try again.';

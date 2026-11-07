@@ -140,8 +140,15 @@ The purge job is designed, not scheduled.
   - short-lived signed URLs for clinician viewing (Phase 4)
 - **Phase 3:** Stripe webhook signature verification, `stripe_events` idempotency, payment status
   only from verified events, server-side prices only, booking exclusion constraints.
-- **Phase 4:** staff invitation flow, independent verification evidence, assignment-scoped RLS,
-  pharmacist workspace UI on top of the release gate (gate already in the database).
+- **Phase 4 (done for this slice):**
+  - assignment is a clinical-administrator function; operations administrators still cannot read clinical tables (pgTAP)
+  - assigned pharmacist can read that patient's name, date of birth, payment status and appointment
+  - unscanned documents stay hidden; a clean file is opened with a 60-second signed URL after an RLS check
+  - report PDF is in a private bucket and is streamed only when the report is ready or released
+  - messages are append-only; the email is the generic account template
+  - GP letter drafts are hidden from the patient; the letter is not emailed
+  - release still requires the assigned pharmacist with MFA, and now also a succeeded payment
+- **Still later:** staff invitation flow, independent verification evidence, message attachments, a background worker for PDF generation
 - **Phase 5:** penetration test, nonce CSP, shared rate-limit store, backups and restore drill,
   retention jobs, DPIA, DSPT evidence, incident response runbook.
 
