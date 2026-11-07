@@ -44,7 +44,7 @@ describe('describeOrder', () => {
     );
     expect(
       describeOrder({ ...base, status: 'questionnaire_submitted', paymentsOpen: true }).message,
-    ).toMatch(/payment and booking/);
+    ).toMatch(/not a live card payment/);
   });
 });
 

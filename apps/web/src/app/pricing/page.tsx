@@ -39,7 +39,14 @@ export default async function PricingPage() {
                   <li>A written report you can read and download in your account</li>
                   <li>An optional letter for your GP, if you agree</li>
                 </ul>
-                {status.payments_open ? null : (
+                {status.payments_mode === 'test' ? (
+                  <Alert tone="info">
+                    <p data-testid="payments-test-only">
+                      Test checkout only. Live card payments are switched off until every clinical,
+                      legal and regulatory approval is in place.
+                    </p>
+                  </Alert>
+                ) : status.payments_mode === 'live' ? null : (
                   <Alert tone="info">
                     <p data-testid="payments-disabled">
                       Payments and booking are switched off until every clinical, legal and

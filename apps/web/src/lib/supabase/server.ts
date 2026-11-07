@@ -31,6 +31,19 @@ export async function createSupabaseServerClient() {
   );
 }
 
+/**
+ * Service-role client for the signed payment webhook only. The key is the local
+ * Supabase demo key in development. Never import this from a client component.
+ */
+export function createSupabaseServiceClient() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+  const env = publicEnv();
+  return createPlainClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 /** Anonymous client for public data (e.g. active prices). No session, RLS as `anon`. */
 export function createSupabaseAnonClient() {
   const env = publicEnv();

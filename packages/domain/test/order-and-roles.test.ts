@@ -34,15 +34,17 @@ describe('order lifecycle', () => {
     expect(canTransitionOrder('safety_urgent_hold', 'awaiting_payment')).toBe(false);
   });
 
-  it('checkout needs a submitted questionnaire, open payments and no urgent hold', () => {
+  it('checkout needs a submitted questionnaire, open payments, a cleared screening and no urgent hold', () => {
     const base = {
       status: 'questionnaire_submitted' as const,
       paymentsOpen: true,
       patientHasUrgentHold: false,
+      screeningCleared: true,
     };
     expect(canStartCheckout(base)).toBe(true);
     expect(canStartCheckout({ ...base, paymentsOpen: false })).toBe(false);
     expect(canStartCheckout({ ...base, patientHasUrgentHold: true })).toBe(false);
+    expect(canStartCheckout({ ...base, screeningCleared: false })).toBe(false);
     expect(canStartCheckout({ ...base, status: 'safety_emergency_excluded' })).toBe(false);
     expect(canStartCheckout({ ...base, status: 'intake' })).toBe(false);
   });

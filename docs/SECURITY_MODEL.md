@@ -70,6 +70,22 @@ Key rules (all tested with pgTAP; several also through the real Data API in Play
 - Report approval and release are restricted to the assigned verified pharmacist with MFA, for
   every role including the service role (see PHASE_2_SPEC section 8).
 
+## Payments (Phase 3)
+
+- The checkout amount is copied from `products` inside `begin_checkout`. The webhook must match
+  that amount and GBP or the payment is rejected.
+- `/api/stripe/webhook` accepts an event only when the `Stripe-Signature` header matches
+  Stripe's HMAC scheme. The local harness secret is not a Stripe secret. A key starting with
+  `sk_live_` is refused.
+- Provider event ids are unique. A repeated event does not create a second payment.
+- Refunds and manual payments are audited and do not call Stripe. Manual payment still goes
+  through the order trigger, so an excluded review cannot be marked paid.
+- Payment metadata stored by the app is the order id, amount and provider mode. No clinical text.
+- Appointment emails use the subject "Your appointment has been updated" and tell the patient to
+  sign in. They do not include medicines, symptoms or questionnaire answers.
+- Ops admins with MFA can read payments and refunds. They still cannot read questionnaires or
+  other clinical tables.
+
 ## Live-service kill switch
 
 Public intake requires the live service or `development` mode. Payments and booking require the

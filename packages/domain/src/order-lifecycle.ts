@@ -66,11 +66,21 @@ export interface CheckoutContext {
   status: OrderStatus;
   paymentsOpen: boolean;
   patientHasUrgentHold: boolean;
+  screeningCleared: boolean;
 }
 
-/** Payment needs a submitted questionnaire, an approved live service and no urgent hold. */
+/**
+ * Checkout needs a submitted questionnaire, an open payment mode and a cleared
+ * screening. An urgent hold or an emergency exclusion cannot pay. Opening
+ * payments does not bypass those gates.
+ */
 export function canStartCheckout(ctx: CheckoutContext): boolean {
-  return ctx.status === 'questionnaire_submitted' && ctx.paymentsOpen && !ctx.patientHasUrgentHold;
+  return (
+    ctx.status === 'questionnaire_submitted' &&
+    ctx.paymentsOpen &&
+    ctx.screeningCleared &&
+    !ctx.patientHasUrgentHold
+  );
 }
 
 export const OPEN_ORDER_STATUSES: readonly OrderStatus[] = [

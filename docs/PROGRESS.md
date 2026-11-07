@@ -1,5 +1,31 @@
 # Progress
 
+## Phase 3: Test checkout and booking
+
+**Status:** implemented on branch `cursor/phase-3-payments-booking`, stacked on Phase 2. Not
+deployed. No Stripe test key is configured, so checkout uses a labelled local harness that signs
+events the way Stripe documents. No live charge is made. Synthetic data only.
+
+What works, checked locally:
+
+- A cleared review pays £59 taken from the database, then books a pharmacist's open 30-minute
+  slot. The email says the appointment changed and does not name a medicine.
+- An emergency answer cannot start checkout.
+- The same payment event does not pay twice. A wrong amount is rejected. A second booking of the
+  same time is rejected by the database. A recorded refund is not sent to a card provider.
+- An operations administrator can read the payment and still cannot read the questionnaire.
+
+| Check                                            | Result                                                                                       |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Format, typecheck, lint                          | PASS (recorded with the final run)                                                           |
+| Vitest                                           | PASS. Domain 65, web 27, validation 38, ui 8                                                 |
+| pgTAP, including file `009_payments_and_booking` | PASS. 9 files, 237 assertions                                                                |
+| Schema lint                                      | PASS                                                                                         |
+| Playwright, 71 tests                             | PASS. 53.7s. Includes pay-then-book and an emergency answer blocking checkout                |
+| Real Stripe API checkout                         | NOT EXECUTED. No `sk_test_` key. The local harness is the stand-in and is labelled on screen |
+| Live card payments                               | BLOCKED until the launch sign-offs. A live secret key is refused                             |
+| Screen reader and other browsers                 | NOT EXECUTED                                                                                 |
+
 ## Phase 2: Patient intake
 
 Product-owner decisions P-01 to P-11 (7 November 2026) are recorded in

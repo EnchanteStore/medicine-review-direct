@@ -50,7 +50,7 @@ test('pricing shows the server-controlled launch price', async ({ page }) => {
   const price = page.getByTestId('price-standard_review');
   await expect(price).toContainText('£59');
   await expect(price).toContainText('£79');
-  await expect(page.getByTestId('payments-disabled')).toBeVisible();
+  await expect(page.getByTestId('payments-test-only')).toBeVisible();
   await expect(page.getByText('We do not add VAT to this price.')).toBeVisible();
 });
 

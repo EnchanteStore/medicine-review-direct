@@ -70,6 +70,9 @@ Format: ID, date, decision, rationale, alternatives rejected, status.
 | D-036 | `/contact` redirects to the combined Complaints and Contact Information page                                                                                                              | Five legal pages as specified                                                                | Separate contact page                                      |
 | D-037 | Notifications: one generic template; Mailpit transport only in development; SES not implemented, so nothing is ever sent elsewhere                                                        | No real sends; no health details in email                                                    | Sending through Supabase or SMTP in production now         |
 
+| D-038 | Development may open a labelled test checkout. Live card payments stay closed until every launch sign-off. The price is read from `products`. A webhook is accepted only after a signature check, and a mismatched amount is not fulfilled | The team can exercise pay-then-book with synthetic data without pretending a live charge happened. No `sk_test_` key is available, so the stand-in is a local page that signs events with Stripe's documented HMAC scheme | Letting development stay unable to pay (blocks the Phase 3 tests); calling live Stripe |
+| D-039 | Refunds are recorded in the database and are not sent to Stripe. A manual payment is an audited operations action and still passes the clinical order gates | There is no live Stripe account. Ops admins must not need to read the questionnaire to record a payment | Calling the Stripe refund API |
+
 ## Product-owner decisions P-01 to P-11 (7 November 2026)
 
 These replace the open questions with the same IDs. Each decision is approved for development.

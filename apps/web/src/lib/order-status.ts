@@ -65,9 +65,34 @@ export function describeOrder(o: OrderContext): OrderView {
         label: 'Questionnaire sent',
         tone: 'success',
         message: o.paymentsOpen
-          ? 'Thank you. Your next step is payment and booking.'
+          ? 'Thank you. The next step is a test checkout. This is not a live card payment.'
           : 'Thank you. Payment and booking are switched off until the service is approved to open, so no further action is possible yet.',
-        next: { href: base, label: 'View your review' },
+        next: o.paymentsOpen
+          ? { href: `${base}/pay`, label: 'Continue to checkout' }
+          : { href: base, label: 'View your review' },
+      };
+    case 'awaiting_payment':
+      return {
+        label: 'Waiting for payment',
+        tone: 'info',
+        message:
+          'Checkout has started. Payment is confirmed only after the signed payment notice is received.',
+        next: { href: `${base}/pay`, label: 'Return to checkout' },
+      };
+    case 'paid':
+      return {
+        label: 'Paid, appointment not booked',
+        tone: 'success',
+        message:
+          'Your test payment is confirmed. Choose a time for your telephone or video consultation.',
+        next: { href: `${base}/book`, label: 'Choose a time' },
+      };
+    case 'consultation_booked':
+      return {
+        label: 'Appointment booked',
+        tone: 'success',
+        message: 'Your consultation time is booked. The details are in your account.',
+        next: { href: `${base}/appointment`, label: 'View your appointment' },
       };
     case 'declined':
       return {
@@ -122,6 +147,12 @@ export function friendlyDbError(message: string | undefined): string {
       'This questionnaire cannot be changed at this stage.',
     ],
     [/documents cannot be added/, 'You cannot add documents at this stage.'],
+    [/checkout is not available/, 'Checkout is not available for this review.'],
+    [/payments are disabled/, 'Payments are switched off until the service is approved to open.'],
+    [/that time is not available/, 'That time is not open. Please choose another.'],
+    [/already been moved twice/, 'This appointment has already been moved twice.'],
+    [/more than 24 hours/, 'An appointment can only be moved more than 24 hours before it starts.'],
+    [/after your payment/, 'Choose a time after your payment is confirmed.'],
   ];
   for (const [re, text] of known) if (re.test(m)) return text;
   return 'Something went wrong. Please try again.';

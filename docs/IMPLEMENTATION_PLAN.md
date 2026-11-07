@@ -39,18 +39,21 @@ Deferred from Phase 2:
 - a scheduled retention job
 - storage-object purge
 
-## Phase 3: Commercial workflow
+## Phase 3: Commercial workflow — test checkout and booking implemented
 
-- Stripe hosted Checkout in **test mode**. Note that the order trigger only allows payment
-  states when the live service is enabled, so test-mode payments need a deliberate local-only
-  approach (for example, synthetic sign-offs in a disposable database), decided at the start of
-  Phase 3. Server-side prices; webhook signature verification;
-  idempotent `stripe_events`; payments, receipts, refunds with audit; manual audited workflow.
-- Booking: pharmacist availability, Europe/London display, slot exclusion constraints (no
-  double-booking under concurrency), reschedule and cancellation rules, generic emails.
-- Notification abstraction with dev/test transport only.
-- Postgres-backed job queue and `apps/worker` for emails and retries.
-- Tests: payment success/failure/duplicate webhook, concurrency booking test, refund flow.
+- Labelled local test checkout (Stripe's signature scheme). No `sk_test_` key is configured, so
+  the hosted Stripe API is not called. A live secret key is refused. The price is the database
+  price (£59). Development may open this test checkout. Production stays closed until launch
+  sign-offs. Emergency and urgent exclusions still cannot pay.
+- Signature-checked webhook, idempotent provider events, one successful payment per order,
+  receipts, and recorded refunds that are not sent to Stripe. An MFA operations administrator
+  can record a manual payment. The audit trail stores amounts and references, not clinical text.
+- Booking after a confirmed payment: pharmacist availability, 30-minute slots shown in UK time,
+  a database exclusion constraint against double-booking, up to two reschedules and only more
+  than 24 hours ahead, cancellation requests, and an appointment history. Emails say an
+  appointment changed and contain no health details.
+- Still later: the real Stripe test-mode API once a test key exists, `apps/worker`, and the
+  background job queue.
 
 ## Phase 4: Clinical operations
 
@@ -85,23 +88,23 @@ Deferred from Phase 2:
 
 ## Priority E2E scenarios (from the brief) and where they land
 
-| #   | Scenario                               | Phase | Status                                                   |
-| --- | -------------------------------------- | ----- | -------------------------------------------------------- |
-| 1   | Registration and email verification    | 1     | Automated, passing                                       |
-| 2   | Sign-in/out and password reset         | 1     | Automated, passing                                       |
-| 3   | Profile with validation                | 1     | Automated, passing                                       |
-| 4   | Questionnaire draft, submit, amend     | 2     | Not started                                              |
-| 5   | Emergency screening blocks purchase    | 2     | Domain rule unit-tested; UI not started                  |
-| 6   | Document upload and scanning           | 2     | Not started                                              |
-| 7   | Purchase via Stripe test mode          | 3     | Not started                                              |
-| 8   | Booking without double-booking         | 3     | Not started                                              |
-| 9   | Pharmacist pre-review and consultation | 4     | Not started                                              |
-| 10  | Report approve, generate, release      | 4     | Domain rule unit-tested                                  |
-| 11  | Patient views released report only     | 4     | Not started                                              |
-| 12  | GP letter with consent                 | 4     | Not started                                              |
-| 13  | Cross-patient access denied            | 1     | Automated (pgTAP + Data API), passing                    |
-| 14  | Unauthorised/unverified staff denied   | 1     | Automated (pgTAP + UI), passing                          |
-| 15  | Ops admin denied clinical records      | 1     | Automated (pgTAP + Data API), passing for current tables |
+| #   | Scenario                               | Phase | Status                                                                      |
+| --- | -------------------------------------- | ----- | --------------------------------------------------------------------------- |
+| 1   | Registration and email verification    | 1     | Automated, passing                                                          |
+| 2   | Sign-in/out and password reset         | 1     | Automated, passing                                                          |
+| 3   | Profile with validation                | 1     | Automated, passing                                                          |
+| 4   | Questionnaire draft, submit, amend     | 2     | Not started                                                                 |
+| 5   | Emergency screening blocks purchase    | 2     | Domain rule unit-tested; UI not started                                     |
+| 6   | Document upload and scanning           | 2     | Not started                                                                 |
+| 7   | Purchase via Stripe test mode          | 3     | Local signed test harness passing. Real Stripe API not called (no test key) |
+| 8   | Booking without double-booking         | 3     | Passing. Database exclusion constraint plus a Playwright booking            |
+| 9   | Pharmacist pre-review and consultation | 4     | Not started                                                                 |
+| 10  | Report approve, generate, release      | 4     | Domain rule unit-tested                                                     |
+| 11  | Patient views released report only     | 4     | Not started                                                                 |
+| 12  | GP letter with consent                 | 4     | Not started                                                                 |
+| 13  | Cross-patient access denied            | 1     | Automated (pgTAP + Data API), passing                                       |
+| 14  | Unauthorised/unverified staff denied   | 1     | Automated (pgTAP + UI), passing                                             |
+| 15  | Ops admin denied clinical records      | 1     | Automated (pgTAP + Data API), passing for current tables                    |
 
 ## Pre-launch blockers (owner decision section 9)
 
