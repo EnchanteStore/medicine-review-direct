@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { amendQuestionnaireAction } from '@/app/account/review/actions';
 import { requireUser } from '@/lib/auth';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import {
   getDocuments,
   getDraft,
@@ -41,6 +42,12 @@ export default async function ReviewOverviewPage({
     paymentsOpen: status.payments_open,
   });
   const submitted = questionnaires.filter((q) => q.status !== 'draft');
+  const supabase = await createSupabaseServerClient();
+  const { data: notices } = await supabase
+    .from('safety_notices')
+    .select('id, kind, body, created_at')
+    .eq('order_id', order.id)
+    .order('created_at', { ascending: true });
 
   return (
     <div className="space-y-6">
@@ -93,6 +100,36 @@ export default async function ReviewOverviewPage({
           ) : null}
         </Card>
       ) : null}
+
+      {(notices ?? []).length > 0 ? (
+        <Card className="space-y-3">
+          <h2 className="text-xl">Safety note</h2>
+          <Alert tone="warning">
+            <p>This is not a medication review report.</p>
+          </Alert>
+          <ul className="space-y-2">
+            {(notices ?? []).map((note) => (
+              <li key={note.id} className="whitespace-pre-wrap">
+                {note.body}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
+
+      <Card className="space-y-2">
+        <h2 className="text-xl">Report and messages</h2>
+        <p className="text-ink-700">
+          A report appears only after your pharmacist releases it. Drafts stay hidden.
+        </p>
+        <p>
+          <Link href={`/account/review/${order.id}/report`}>Your report</Link>
+          {' · '}
+          <Link href={`/account/review/${order.id}/messages`}>Messages</Link>
+          {' · '}
+          <Link href={`/account/review/${order.id}/gp-letter`}>Letter for your GP</Link>
+        </p>
+      </Card>
 
       {['intake', 'questionnaire_submitted'].includes(order.status) ? (
         <Card className="space-y-3">

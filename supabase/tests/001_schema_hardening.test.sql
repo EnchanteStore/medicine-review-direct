@@ -11,7 +11,8 @@ select tables_are('public', array['profiles', 'staff_roles', 'consents', 'audit_
   'retention_policies', 'legal_holds', 'deletion_requests', 'consultations', 'reports',
   'high_risk_medicine_changes', 'mfa_recovery_events',
   'checkout_sessions', 'provider_events', 'payments', 'refunds',
-  'pharmacist_availability', 'appointments', 'appointment_events'],
+  'pharmacist_availability', 'appointments', 'appointment_events',
+  'messages', 'gp_letters', 'safety_notices'],
   'public schema contains only the expected tables');
 
 select is_empty(

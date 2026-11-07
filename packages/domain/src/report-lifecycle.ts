@@ -38,9 +38,13 @@ export interface ReleaseContext {
     hasNotes: boolean;
   };
   clinicalAdequacyConfirmed: boolean;
+  /** Findings, a medication issue and a recommendation are present. */
+  contentComplete: boolean;
   approvedWithProfessionalId: boolean;
   serviceDeclinedOrExcluded: boolean;
   orderInReview: boolean;
+  /** A succeeded payment is on the order. A refunded or missing payment cannot be released. */
+  orderPaid: boolean;
   /** The assigned, verified pharmacist acting in an MFA session. */
   actorIsAssignedVerifiedPharmacist: boolean;
 }
@@ -62,6 +66,7 @@ export function approvalBlockers(ctx: ReleaseContext): string[] {
   else if (!ctx.consultation.twoWayCompleted) r.push('consultation_not_two_way_completed');
   else if (!ctx.consultation.hasNotes) r.push('consultation_notes_missing');
   if (!ctx.clinicalAdequacyConfirmed) r.push('clinical_adequacy_not_confirmed');
+  if (!ctx.contentComplete) r.push('report_content_incomplete');
   if (ctx.serviceDeclinedOrExcluded) r.push('service_declined_or_excluded');
   if (!ctx.actorIsAssignedVerifiedPharmacist) r.push('actor_not_assigned_verified_pharmacist');
   return r;
@@ -72,6 +77,7 @@ export function releaseBlockers(ctx: ReleaseContext): string[] {
   if (!ctx.approvedWithProfessionalId)
     r.push('report_not_approved_with_professional_identification');
   if (!ctx.orderInReview) r.push('order_not_in_review');
+  if (!ctx.orderPaid) r.push('order_not_paid');
   return r;
 }
 

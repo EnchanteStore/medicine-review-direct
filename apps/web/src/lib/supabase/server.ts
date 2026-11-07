@@ -32,8 +32,10 @@ export async function createSupabaseServerClient() {
 }
 
 /**
- * Service-role client for the signed payment webhook only. The key is the local
- * Supabase demo key in development. Never import this from a client component.
+ * Service-role client. Used for the payment webhook, storing a generated PDF,
+ * signing a short document link, and looking up an email for a generic
+ * notification. Approval and release use the signed-in user's own session.
+ * Never import this from a client component.
  */
 export function createSupabaseServiceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

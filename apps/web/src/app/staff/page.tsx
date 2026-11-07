@@ -1,4 +1,4 @@
-import { hasClinicalAccess } from '@mrd/domain';
+import { hasClinicalAccess, hasVerifiedRole } from '@mrd/domain';
 import { Alert, Card } from '@mrd/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -35,16 +35,24 @@ export default async function StaffHomePage() {
         </ul>
       </Card>
       {clinical ? (
-        <Alert tone="info">
+        <Card className="space-y-3">
+          <h2 className="text-xl">Pharmacist workspace</h2>
+          <p>Open the reviews assigned to you. A review assigned to someone else stays hidden.</p>
           <p>
-            The pharmacist workspace (assigned reviews, reports and messaging) arrives in Phase 4.
+            <Link href="/staff/reviews">Open the pharmacist workspace</Link>
+            {hasVerifiedRole(grants, 'clinical_admin') ? (
+              <>
+                {' · '}
+                <Link href="/staff/assignments">Assign a pharmacist</Link>
+              </>
+            ) : null}
           </p>
-        </Alert>
+        </Card>
       ) : (
         <Alert tone="info">
           <p>
-            Your role does not include access to clinical records. Operations tools (queues, billing
-            and service configuration) arrive in Phases 3 and 4.
+            Your role does not include access to clinical records. You cannot assign a pharmacist or
+            read a questionnaire, a report or a message.
           </p>
         </Alert>
       )}

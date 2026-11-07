@@ -7,6 +7,7 @@ import { getDraft, getLatestOrder, hasIntakeConsents } from '@/lib/intake';
 import { describeOrder } from '@/lib/order-status';
 import { getOwnProfile, isProfileComplete } from '@/lib/profile';
 import { getServiceStatus } from '@/lib/service-status';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Your account' };
 
@@ -14,15 +15,6 @@ const NOTICES: Record<string, string> = {
   verified: 'Thank you. Your email address is confirmed.',
   'password-updated': 'Your password has been changed.',
 };
-
-// Sections shown honestly as not yet available; each is delivered in a later phase.
-const SECTIONS = [
-  { title: 'Consultations', body: 'Book and manage your telephone or video consultation.' },
-  { title: 'Medicines', body: 'The medicines you have told us about.' },
-  { title: 'Messages', body: 'Secure messages with your pharmacist.' },
-  { title: 'Reports', body: 'Reports your pharmacist has released to you.' },
-  { title: 'Payments and receipts', body: 'Your payments, receipts and refunds.' },
-];
 
 export default async function AccountPage({
   searchParams,
@@ -49,6 +41,18 @@ export default async function AccountPage({
         paymentsOpen: status.payments_open,
       })
     : null;
+  const supabase = await createSupabaseServerClient();
+  const [{ count: unread }, { data: released }] = order
+    ? await Promise.all([
+        supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('order_id', order.id)
+          .is('read_at', null)
+          .neq('sender_id', user.id),
+        supabase.from('reports').select('id').eq('order_id', order.id).eq('status', 'released'),
+      ])
+    : [{ count: 0 }, { data: [] }];
   const canStartNew =
     complete &&
     status.intake_open &&
@@ -135,20 +139,38 @@ export default async function AccountPage({
 
       <section aria-labelledby="sections-heading">
         <h2 id="sections-heading" className="text-2xl">
-          Coming later
+          Reports and messages
         </h2>
         <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-          {SECTIONS.map((s) => (
-            <li key={s.title}>
-              <Card className="h-full p-5 sm:p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-lg">{s.title}</h3>
-                  <Badge className="shrink-0 whitespace-nowrap">Not yet available</Badge>
-                </div>
-                <p className="mt-2 text-ink-700">{s.body}</p>
-              </Card>
-            </li>
-          ))}
+          <li>
+            <Card className="h-full space-y-2 p-5 sm:p-6">
+              <h3 className="text-lg">Report</h3>
+              {released && released.length > 0 && order ? (
+                <>
+                  <p className="text-ink-700">Your pharmacist has released a report.</p>
+                  <Link href={`/account/review/${order.id}/report`}>Read your report</Link>
+                </>
+              ) : (
+                <p className="text-ink-700">No report has been released. Drafts are not shown.</p>
+              )}
+            </Card>
+          </li>
+          <li>
+            <Card className="h-full space-y-2 p-5 sm:p-6" data-testid="dashboard-messages">
+              <h3 className="text-lg">Messages</h3>
+              {order ? (
+                <>
+                  <p className="text-ink-700">
+                    {unread ? `${unread} unread.` : 'No unread messages.'} This is not an emergency
+                    service.
+                  </p>
+                  <Link href={`/account/review/${order.id}/messages`}>Open messages</Link>
+                </>
+              ) : (
+                <p className="text-ink-700">Messages appear here once you have a review.</p>
+              )}
+            </Card>
+          </li>
         </ul>
       </section>
     </div>

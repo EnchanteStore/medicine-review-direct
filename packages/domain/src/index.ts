@@ -8,3 +8,4 @@ export * from './business';
 export * from './launch';
 export * from './booking';
 export * from './safety/screening';
+export * from './report-content';

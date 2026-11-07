@@ -33,6 +33,9 @@ insert into public.safety_screenings (order_id, patient_id, ruleset_version, ans
 insert into public.questionnaire_submissions (order_id, patient_id, status, version_no, answers, medications, submitted_at)
   values ('60000000-0000-4000-b000-000000000001', '60000000-0000-4000-a000-000000000001', 'submitted', 1,
           '{"mainConcern":"synthetic"}', '[{"name":"Synthetic medicine"}]', now());
+insert into public.payments (order_id, patient_id, amount_pence, status, source, receipt_number)
+  values ('60000000-0000-4000-b000-000000000001', '60000000-0000-4000-a000-000000000001',
+          5900, 'succeeded', 'manual_audited', 'R-GATE-0001');
 
 -- Assigned pharmacist, MFA session
 select pg_temp.as_user('60000000-0000-4000-a000-0000000000a1', 'aal2');
@@ -63,6 +66,9 @@ select throws_like(
 select lives_ok(
   $$ select public.pharmacist_confirm_report_checks((select id from public.reports where order_id = '60000000-0000-4000-b000-000000000001'), true, true) $$,
   'pharmacist confirms information is sufficient and assessment is clinically adequate');
+select public.pharmacist_save_report_content(
+  (select id from public.reports where order_id = '60000000-0000-4000-b000-000000000001'),
+  '{"findings":"Discuss the indication with the GP.","medicationIssues":[{"medicine":"Synthetic medicine","issue":"The patient is unsure why it was started."}],"recommendations":["Ask the GP whether this medicine is still needed."],"monitoring":["Review at the next GP appointment."],"gpDiscussionPoints":["Indication for long-term use."],"safetyAdvice":"If you feel very unwell, contact your GP or NHS 111.","limitations":"DRAFT pending clinical approval. This review is for discussion with the prescriber."}'::jsonb);
 select lives_ok(
   $$ select public.pharmacist_approve_report((select id from public.reports where order_id = '60000000-0000-4000-b000-000000000001'),
        (select id from public.consultations where two_way_completed)) $$, 'approval succeeds once every condition is met');
