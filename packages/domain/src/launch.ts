@@ -15,10 +15,16 @@ export const LAUNCH_GATES = {
 
 export type LaunchGate = keyof typeof LAUNCH_GATES;
 
+export type PaymentsMode = 'closed' | 'test' | 'live';
+
 export interface ServiceStatus {
   environment: 'development' | 'production';
   intake_open: boolean;
   payments_open: boolean;
+  /** Live card payments. Never true in development, and never true before every launch sign-off. */
+  live_payments_open: boolean;
+  /** closed: no checkout. test: labelled local or Stripe test checkout. live: not used until launch. */
+  payments_mode: PaymentsMode;
   live_service_enabled: boolean;
   active_ruleset_version: string | null;
   active_ruleset_status: 'draft' | 'approved' | 'retired' | null;

@@ -91,6 +91,8 @@ test('emergency answers stop intake and block purchase (UI and database)', async
     .update({ status: 'awaiting_payment' })
     .eq('id', orderId);
   expect(pay.error?.code).toBe('42501');
+  const checkout = await api.rpc('begin_checkout', { p_order_id: orderId });
+  expect(checkout.error).not.toBeNull();
   const draft = await api.rpc('save_questionnaire_draft', {
     p_order_id: orderId,
     p_step: 1,
@@ -208,9 +210,7 @@ test('routine intake: consent, multi-step questionnaire with drafts, submission,
 
   await expect(page).toHaveURL(new RegExp(`/review/${orderId}\\?notice=submitted$`));
   await expect(page.getByTestId('order-status')).toContainText('Questionnaire sent');
-  await expect(page.getByTestId('order-status')).toContainText(
-    'Payment and booking are switched off',
-  );
+  await expect(page.getByTestId('order-status')).toContainText('not a live card payment');
   await expect(page.getByText('Version 1: current')).toBeVisible();
 
   // Generic notification only: no health details

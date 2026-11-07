@@ -1,5 +1,9 @@
 import 'server-only';
-import { accountUpdateEmail, type Notification } from './notification-templates';
+import {
+  accountUpdateEmail,
+  appointmentUpdateEmail,
+  type Notification,
+} from './notification-templates';
 import { getServiceStatus } from './service-status';
 import { brandName } from './site';
 
@@ -43,6 +47,16 @@ async function transport(): Promise<NotificationTransport | null> {
     return mailpitTransport(mailpit);
   }
   return null;
+}
+
+export async function notifyAppointmentUpdate(to: string): Promise<void> {
+  try {
+    const t = await transport();
+    if (!t) return;
+    await t.send(to, appointmentUpdateEmail(brandName()));
+  } catch {
+    console.error('[notify] appointment update failed');
+  }
 }
 
 export async function notifyAccountUpdate(to: string): Promise<void> {

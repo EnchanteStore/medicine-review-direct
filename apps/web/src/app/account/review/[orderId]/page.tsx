@@ -53,6 +53,11 @@ export default async function ReviewOverviewPage({
           </p>
         </Alert>
       ) : null}
+      {notice === 'paid' ? (
+        <Alert tone="success">
+          <p>Your test payment is confirmed. You can choose a consultation time.</p>
+        </Alert>
+      ) : null}
       <Card className="space-y-3" data-testid="order-status">
         <p className="text-sm font-semibold uppercase tracking-wide text-teal-800">Status</p>
         <h2 className="text-2xl">{view.label}</h2>

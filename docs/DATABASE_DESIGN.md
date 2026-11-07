@@ -133,6 +133,23 @@ Key database functions:
 - `app.retention_assessment`, `app.retention_candidates`, `app.purge_abandoned_intake`
 - `app.current_aal`
 
+## Built in Phase 3 (migration `20261107000500_phase3_payments_booking.sql`)
+
+| Table                     | Purpose                                                                                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `checkout_sessions`       | One open test checkout per order. Amount copied from `products` at the start. Provider is `local_test_harness` until a Stripe test key exists |
+| `provider_events`         | Idempotency key for a signed payment event. Stores a hash, not the body                                                                       |
+| `payments`                | One successful payment per order, with a receipt number. Source is `provider_event` or `manual_audited`                                       |
+| `refunds`                 | Append-only recorded refunds. `provider_refund_id` stays null                                                                                 |
+| `pharmacist_availability` | UK-time windows opened by a verified pharmacist. Overlaps are rejected                                                                        |
+| `appointments`            | 30-minute slots. A booked row holds the time. Exclusion constraint `appointments_no_double_book`                                              |
+| `appointment_events`      | Append-only history: booked, rescheduled, cancellation requested                                                                              |
+
+`app.payments_open()` is true for the labelled development checkout or for the live service.
+`app.live_payments_open()` is true only when every launch gate is signed off and the rule set
+is approved. The order trigger still refuses payment and booking when screening has not cleared
+or an urgent hold is open.
+
 ## Designed entities (later phases)
 
 | Table                                                       | Phase | Notes                                                                                                                                                                  |

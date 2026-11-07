@@ -27,6 +27,8 @@ const lines = [
   `NEXT_PUBLIC_SUPABASE_ANON_KEY=${anonKey}`,
   'NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000',
   `MAILPIT_URL=${mailpitUrl}`,
+  '# Local demo service role. Used only by the payment webhook on this machine.',
+  `SUPABASE_SERVICE_ROLE_KEY=${status.SERVICE_ROLE_KEY ?? status.SECRET_KEY}`,
   '# Playwright only (creates synthetic users). Never read by the web app.',
   `E2E_SUPABASE_SERVICE_ROLE_KEY=${status.SERVICE_ROLE_KEY ?? status.SECRET_KEY}`,
   '',

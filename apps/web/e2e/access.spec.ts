@@ -171,7 +171,9 @@ test.describe('data API (RLS with real user tokens)', () => {
     const anon = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
     const { data } = await anon.rpc('service_status');
     expect(data).toMatchObject({
-      payments_open: false,
+      payments_open: true,
+      live_payments_open: false,
+      payments_mode: 'test',
       live_service_enabled: false,
       active_ruleset_status: 'draft',
     });

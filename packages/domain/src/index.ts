@@ -6,4 +6,5 @@ export * from './pricing';
 export * from './emergency';
 export * from './business';
 export * from './launch';
+export * from './booking';
 export * from './safety/screening';

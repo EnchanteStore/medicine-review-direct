@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(41);
+select plan(43);
 
 create function pg_temp.as_user(uid uuid, aal text default 'aal1') returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true);
@@ -36,7 +36,7 @@ select throws_ok($$ select public.start_review_order() $$, '23514', 'intake is c
 reset role;
 update public.app_settings set environment = 'development';
 
-select ok(not app.payments_open(), 'development mode never opens payments without sign-offs');
+select ok(app.payments_open() and not app.live_payments_open(), 'development opens test checkout only; live payments stay closed');
 select is((public.service_status() ->> 'outstanding_gate_count')::int, 10, 'all 10 launch gates are outstanding');
 
 -- Profile completion required
@@ -113,10 +113,16 @@ select is(public.submit_questionnaire((select id from public.review_orders)), 1,
 select ok((select suitability_review_required from public.review_orders), 'a high-risk medicine flags the review without excluding the patient');
 reset role;
 
-select throws_ok(
+select lives_ok(
   $$ update public.review_orders set status = 'awaiting_payment' where patient_id = '40000000-0000-4000-a000-000000000003' $$,
+  'a clinically cleared review can reach test checkout in development');
+update public.app_settings set environment = 'production';
+select ok(not app.payments_open(), 'production without sign-offs keeps payments closed');
+select throws_ok(
+  $$ update public.review_orders set status = 'paid' where patient_id = '40000000-0000-4000-a000-000000000003' $$,
   '23514', 'order: payments and booking are disabled until the live service is approved',
-  'kill switch: payment cannot start before launch sign-off, even for a routine order');
+  'production cannot mark a review paid before launch sign-off');
+update public.app_settings set environment = 'development';
 
 -- Record every launch sign-off and approve the rule set (synthetic, inside this transaction only)
 insert into public.launch_signoffs (gate, decision, signed_off_by, evidence_reference)
@@ -175,7 +181,7 @@ select throws_ok(
 -- Revoking any sign-off closes payments again
 insert into public.launch_signoffs (gate, decision, signed_off_by, evidence_reference)
   values ('professional_indemnity', 'revoked', '40000000-0000-4000-a000-0000000000b1', 'synthetic: cover lapsed');
-select ok(not app.payments_open(), 'revoking one sign-off disables payments immediately');
+select ok(not app.live_payments_open(), 'revoking one sign-off disables live payments immediately');
 
 select throws_ok($$ update public.safety_rulesets set definition = '{"questions":[]}' where is_active $$, '42501', null,
   'rule set definitions are immutable; changes need a new version');

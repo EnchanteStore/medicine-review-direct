@@ -21,6 +21,8 @@ export default async function StaffHomePage() {
       <h1 className="font-serif text-3xl">Staff area</h1>
       <p>
         <Link href="/staff/launch-readiness">Launch readiness checklist</Link>
+        {' · '}
+        <Link href="/staff/availability">Available times</Link>
       </p>
       <Card>
         <h2 className="text-xl">Your roles</h2>

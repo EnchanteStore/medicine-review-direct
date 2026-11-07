@@ -10,8 +10,8 @@ export async function ServiceNotice() {
       <Container className="py-2 text-sm text-ink-900">
         {status.environment === 'development' ? (
           <p>
-            <strong>Development preview.</strong> Synthetic data only. This is not a live clinical
-            service: payments and bookings are switched off.
+            <strong>Development preview.</strong> Synthetic data only. Checkout here is a labelled
+            test. No live card payment is taken.
           </p>
         ) : (
           <p>

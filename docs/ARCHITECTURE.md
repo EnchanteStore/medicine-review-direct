@@ -100,6 +100,29 @@ Defined in `packages/ui/src/styles/tokens.css` as a Tailwind CSS v4 `@theme`.
 Components follow shadcn/ui conventions (cva variants, `asChild` via Radix Slot, `cn` helper)
 but are kept in-repo so they can be themed and audited.
 
+## Payments and booking (Phase 3)
+
+Development checkout is a local test harness, not Stripe. The patient is told that on the page.
+The price, currency (GBP) and product come from the `products` row. The browser cannot set them.
+
+Confirming the test payment posts a signed event to `/api/stripe/webhook`. The route checks the
+signature, then the database checks the amount against the checkout row and records the payment
+once. The same event is ignored the second time. A different amount is rejected. Live Stripe
+keys are refused. No `sk_test_` key is configured, so the Stripe API is not called.
+
+An operations administrator with an authenticator can record a manual payment or a refund. The
+refund is stored only. It is not sent to a card provider. The administrator can read payments
+and cannot read questionnaires, screenings or reports.
+
+After payment, the patient books a 30-minute slot that a pharmacist has opened. Times are stored
+in UTC and shown in Europe/London. Overlapping bookings for the same pharmacist are rejected by
+a Postgres exclusion constraint, including two requests at the same moment. The patient can move
+an appointment twice, and only when it is more than 24 hours away. A cancellation request frees
+the slot and is kept in the appointment history. The consultation is telephone or secure video,
+taken from the questionnaire answer.
+
+Payment, a booking and a questionnaire still cannot release a report. That gate is unchanged.
+
 ## Environments
 
 | Environment | Status      | Notes                                                       |

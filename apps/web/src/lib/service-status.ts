@@ -7,6 +7,8 @@ const CLOSED: ServiceStatus = {
   environment: 'production',
   intake_open: false,
   payments_open: false,
+  live_payments_open: false,
+  payments_mode: 'closed',
   live_service_enabled: false,
   active_ruleset_version: null,
   active_ruleset_status: null,

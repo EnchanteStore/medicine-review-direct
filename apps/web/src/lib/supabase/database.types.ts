@@ -22,6 +22,87 @@ export type Database = {
         };
         Relationships: [];
       };
+      appointment_events: {
+        Row: {
+          appointment_id: string;
+          event: string;
+          id: number;
+          recorded_at: string;
+          slot: unknown;
+        };
+        ComputedFields: never;
+        Insert: {
+          appointment_id: string;
+          event: string;
+          id?: never;
+          recorded_at?: string;
+          slot: unknown;
+        };
+        Update: {
+          appointment_id?: string;
+          event?: string;
+          id?: never;
+          recorded_at?: string;
+          slot?: unknown;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'appointment_events_appointment_id_fkey';
+            columns: ['appointment_id'];
+            isOneToOne: false;
+            referencedRelation: 'appointments';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      appointments: {
+        Row: {
+          created_at: string;
+          id: string;
+          method: string;
+          order_id: string;
+          patient_id: string;
+          pharmacist_id: string;
+          reschedule_count: number;
+          slot: unknown;
+          starts_at: string | null;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          method: string;
+          order_id: string;
+          patient_id: string;
+          pharmacist_id: string;
+          reschedule_count?: number;
+          slot: unknown;
+          starts_at?: never;
+          status: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          method?: string;
+          order_id?: string;
+          patient_id?: string;
+          pharmacist_id?: string;
+          reschedule_count?: number;
+          slot?: unknown;
+          starts_at?: never;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'appointments_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       audit_log: {
         Row: {
           action: string;
@@ -52,6 +133,58 @@ export type Database = {
           occurred_at?: string;
         };
         Relationships: [];
+      };
+      checkout_sessions: {
+        Row: {
+          amount_pence: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          order_id: string;
+          patient_id: string;
+          product_code: string;
+          provider: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_pence: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          order_id: string;
+          patient_id: string;
+          product_code: string;
+          provider: string;
+          status?: string;
+        };
+        Update: {
+          amount_pence?: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          order_id?: string;
+          patient_id?: string;
+          product_code?: string;
+          provider?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'checkout_sessions_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'checkout_sessions_product_code_fkey';
+            columns: ['product_code'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['code'];
+          },
+        ];
       };
       consents: {
         Row: {
@@ -362,6 +495,99 @@ export type Database = {
         };
         Relationships: [];
       };
+      payments: {
+        Row: {
+          amount_pence: number;
+          checkout_session_id: string | null;
+          created_at: string;
+          currency: string;
+          id: string;
+          manual_reference: string | null;
+          order_id: string;
+          patient_id: string;
+          provider_event_id: string | null;
+          receipt_number: string;
+          source: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_pence: number;
+          checkout_session_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          manual_reference?: string | null;
+          order_id: string;
+          patient_id: string;
+          provider_event_id?: string | null;
+          receipt_number: string;
+          source: string;
+          status: string;
+        };
+        Update: {
+          amount_pence?: number;
+          checkout_session_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          manual_reference?: string | null;
+          order_id?: string;
+          patient_id?: string;
+          provider_event_id?: string | null;
+          receipt_number?: string;
+          source?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payments_checkout_session_id_fkey';
+            columns: ['checkout_session_id'];
+            isOneToOne: false;
+            referencedRelation: 'checkout_sessions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payments_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payments_provider_event_id_fkey';
+            columns: ['provider_event_id'];
+            isOneToOne: true;
+            referencedRelation: 'provider_events';
+            referencedColumns: ['event_id'];
+          },
+        ];
+      };
+      pharmacist_availability: {
+        Row: {
+          created_at: string;
+          ends_at: string;
+          id: string;
+          pharmacist_id: string;
+          starts_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          ends_at: string;
+          id?: string;
+          pharmacist_id: string;
+          starts_at: string;
+        };
+        Update: {
+          created_at?: string;
+          ends_at?: string;
+          id?: string;
+          pharmacist_id?: string;
+          starts_at?: string;
+        };
+        Relationships: [];
+      };
       products: {
         Row: {
           code: string;
@@ -436,6 +662,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      provider_events: {
+        Row: {
+          event_id: string;
+          event_type: string;
+          outcome: string | null;
+          payload_hash: string;
+          processed_at: string | null;
+          received_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          event_id: string;
+          event_type: string;
+          outcome?: string | null;
+          payload_hash: string;
+          processed_at?: string | null;
+          received_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          event_type?: string;
+          outcome?: string | null;
+          payload_hash?: string;
+          processed_at?: string | null;
+          received_at?: string;
+        };
+        Relationships: [];
+      };
       questionnaire_submissions: {
         Row: {
           amends_submission_id: string | null;
@@ -496,6 +750,48 @@ export type Database = {
             columns: ['order_id'];
             isOneToOne: false;
             referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      refunds: {
+        Row: {
+          amount_pence: number;
+          id: string;
+          payment_id: string;
+          provider_refund_id: string | null;
+          reason: string;
+          recorded_at: string;
+          recorded_by: string;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          amount_pence: number;
+          id?: string;
+          payment_id: string;
+          provider_refund_id?: string | null;
+          reason: string;
+          recorded_at?: string;
+          recorded_by: string;
+          status?: string;
+        };
+        Update: {
+          amount_pence?: number;
+          id?: string;
+          payment_id?: string;
+          provider_refund_id?: string | null;
+          reason?: string;
+          recorded_at?: string;
+          recorded_by?: string;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'refunds_payment_id_fkey';
+            columns: ['payment_id'];
+            isOneToOne: false;
+            referencedRelation: 'payments';
             referencedColumns: ['id'];
           },
         ];
@@ -836,9 +1132,33 @@ export type Database = {
     Functions: {
       acknowledge_safety_advice: { Args: { p_screening_id: string }; Returns: undefined };
       add_high_risk_term: { Args: { p_category: string; p_term: string }; Returns: undefined };
+      apply_provider_event: {
+        Args: {
+          p_amount_pence: number;
+          p_currency: string;
+          p_event_id: string;
+          p_event_type: string;
+          p_payload_hash: string;
+          p_session_id: string;
+        };
+        Returns: Json;
+      };
       assign_pharmacist: {
         Args: { p_order_id: string; p_pharmacist_id: string };
         Returns: undefined;
+      };
+      begin_checkout: { Args: { p_order_id: string }; Returns: Json };
+      book_appointment: {
+        Args: { p_order_id: string; p_pharmacist_id: string; p_starts: string };
+        Returns: string;
+      };
+      bookable_slots: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          ends_at: string;
+          pharmacist_id: string;
+          starts_at: string;
+        }[];
       };
       confirm_prior_safety_concern: { Args: { p_order_id: string }; Returns: undefined };
       launch_readiness: {
@@ -889,6 +1209,11 @@ export type Database = {
         Args: { p_order_id: string; p_reason: string; p_user_id: string };
         Returns: string;
       };
+      record_manual_payment: { Args: { p_order_id: string; p_reference: string }; Returns: Json };
+      record_refund: {
+        Args: { p_amount_pence: number; p_payment_id: string; p_reason: string };
+        Returns: string;
+      };
       record_suitability_assessment: {
         Args: { p_kind: string; p_notes: string; p_order_id: string; p_outcome: string };
         Returns: string;
@@ -905,6 +1230,11 @@ export type Database = {
         Returns: string;
       };
       request_account_deletion: { Args: Record<PropertyKey, never>; Returns: string };
+      request_cancellation: { Args: { p_appointment_id: string }; Returns: undefined };
+      reschedule_appointment: {
+        Args: { p_appointment_id: string; p_pharmacist_id: string; p_starts: string };
+        Returns: undefined;
+      };
       review_deletion_request: {
         Args: { p_decision: string; p_request_id: string };
         Returns: Json;
@@ -914,6 +1244,7 @@ export type Database = {
         Returns: string;
       };
       service_status: { Args: Record<PropertyKey, never>; Returns: Json };
+      set_availability: { Args: { p_ends: string; p_starts: string }; Returns: string };
       start_questionnaire_amendment: { Args: { p_order_id: string }; Returns: string };
       start_review_order: { Args: Record<PropertyKey, never>; Returns: string };
       submit_questionnaire: { Args: { p_order_id: string }; Returns: number };
