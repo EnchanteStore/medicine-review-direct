@@ -118,6 +118,16 @@ They are not product-owner decisions.
 | R-03 | Messaging is closed for draft, emergency-excluded, cancelled and refunded reviews                                                                                              | An emergency-excluded patient should be directed to 999, not a mailbox that is not monitored           | Allow a message on an excluded review if the owner wants a written acknowledgement there |
 | R-04 | The medication-review PDF is streamed to the signed-in user and is not a storage link that can be forwarded. A clean document still uses a 60-second signed link               | A report link that outlives the session could be sent on. The file response is `private, no-store`     | A signed PDF URL, if a later owner decision accepts that risk                            |
 
+## Recommendations pending owner confirmation (Phase 6)
+
+These are built in the local app. They are not a decision to publish it.
+
+| ID   | Recommendation                                                                                                                                                                  | Why this was chosen                                                                                                                 | What would change if the owner disagrees                 |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| R-05 | The app stores only the auth session. A device uses chunked secure storage. The web preview uses sessionStorage, not localStorage. Reports and messages are not written to disk | A report left on the phone would remain after sign-out. One secure-storage item is too small for a session, so the session is split | AsyncStorage for the session, or caching the report text |
+| R-06 | The app does not start a review, answer screening, take payment, or book a time                                                                                                 | Public intake and live payments stay off, and store rules for payments are not reviewed. Those steps stay on the website            | Checkout or a new questionnaire inside the app           |
+| R-07 | Mobile logs accept only a fixed list of event names. Anything else, including an email or a medicine name, is dropped                                                           | A mistake in a log call should not write clinical text                                                                              | Logging the Supabase error message                       |
+
 ## Launch tasks (external evidence, not new product decisions)
 
 | Task                                                                    | Owner of the evidence           | Gate                                       |

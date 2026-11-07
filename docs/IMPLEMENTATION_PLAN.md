@@ -103,9 +103,26 @@ Still later, and not claimed as done:
 
 ## Phase 6: Native apps
 
-- Expo / React Native app reusing `packages/domain` and `packages/validation`, a typed
-  `packages/api-client`, and the same Supabase Auth and RLS. Push notifications without health
-  content.
+Built locally in `apps/mobile` on `cursor/phase-6-mobile`. It is an Expo app with the development
+identifier `uk.pharma247.pharmreview.dev`. No Expo/EAS project was created, and nothing was
+registered with Apple or Google.
+
+- A patient can sign in. The session is the only thing stored: chunked `expo-secure-store` on a
+  device, and `sessionStorage` for the web preview. Reports and messages are not saved on disk.
+- The home screen shows review status, what to do next, and the appointment. Payment and booking
+  stay on the website. The app does not take a card payment.
+- A report renders only when its status is `released`, using the same domain check as the website.
+  Drafts show a short message and none of the draft text. The emergency limitation is on every
+  screen.
+- Messages can be read and sent on an open review, with the out-of-hours warning and no
+  attachments. Documents can be picked only while the questionnaire is still open, with the same
+  type and size checks as the website. Nothing is described as scanned.
+- The trading name is shown as provisional.
+
+Still later, and not claimed as done:
+
+- A store submission, push notifications, and a physical device or emulator run.
+- Starting a new review, answering screening, or booking inside the app.
 
 ## Priority E2E scenarios (from the brief) and where they land
 

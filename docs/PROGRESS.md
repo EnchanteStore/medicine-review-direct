@@ -1,5 +1,42 @@
 # Progress
 
+## Phase 6: Local mobile app
+
+**Status:** a local Expo app on `cursor/phase-6-mobile`, stacked on Phase 5. Not submitted to a
+store. No EAS project. The identifier is `uk.pharma247.pharmreview.dev`. The trading name is
+shown as provisional. Public intake and live payments stay off. Synthetic data only.
+
+What works, checked on 7 November 2026 (London):
+
+- Sign-in keeps the session in secure storage on a device, and in sessionStorage for the web
+  preview. Unit tests show a long session round-trips and is then deleted. Logs drop anything
+  that is not an allowed event name.
+- The home screen shows the review status, what to do next, and the appointment. Payment and
+  booking are links to the website. The app has no card form.
+- A released report uses the same section builder as the website. A draft, even with complete
+  content, renders only "Drafts are not shown here." The emergency limitation is on every screen.
+- Messages use the shared out-of-hours warning and have no attachment control. Documents can be
+  chosen only while the questionnaire is open, with the same file checks as the website. The app
+  says no scanner is connected.
+
+| Check                                  | Result                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| Mobile format, typecheck, lint, Vitest | PASS. Domain patient-action tests included (domain 83). Mobile 8 tests |
+| Expo web layout preview                | PASS. No page errors. Screenshots below                                |
+| Android emulator or a physical device  | NOT EXECUTED. No emulator is installed on this machine                 |
+| Apple or Google store submission       | BLOCKED. Not registered and not submitted                              |
+| Screen reader on the app               | NOT EXECUTED                                                           |
+| Public intake and live payments        | BLOCKED. Unchanged                                                     |
+
+Screenshots from the Expo web preview, labelled as synthetic and not a patient record:
+
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/sign-in.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/home.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/report.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/report-hidden.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/messages.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-6/documents.png`
+
 ## Phase 5: Launch assurance
 
 **Status:** assurance checks added on `cursor/phase-5-launch-assurance`, stacked on Phase 4. Not
