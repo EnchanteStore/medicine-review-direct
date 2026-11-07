@@ -46,3 +46,13 @@ insert into public.staff_roles (user_id, role, verification_status, gphc_registr
   ('00000000-0000-4000-a000-000000000021', 'clinical_admin', 'verified', null, now(), '00000000-0000-4000-a000-000000000031'),
   ('00000000-0000-4000-a000-000000000011', 'pharmacist', 'verified', '0000001', now(), '00000000-0000-4000-a000-000000000021'),
   ('00000000-0000-4000-a000-000000000012', 'pharmacist', 'pending', null, null, null);
+
+-- Synthetic staff names (report approval records the pharmacist's name).
+update public.profiles set given_name = 'Priya', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000011';
+update public.profiles set given_name = 'Pending', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000012';
+update public.profiles set given_name = 'Clara', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000021';
+update public.profiles set given_name = 'Omar', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000031';
+
+-- Local development: opens synthetic intake. Payments and report release stay
+-- closed because no launch sign-offs are recorded and the rule set is DRAFT.
+update public.app_settings set environment = 'development';

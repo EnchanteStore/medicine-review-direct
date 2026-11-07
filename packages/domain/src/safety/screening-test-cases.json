@@ -1,0 +1,35 @@
+{
+  "ruleset_version": "2026-11-draft.1",
+  "note": "Documented positive, negative and ambiguous cases. Unlisted questions are answered 'no'. DRAFT pending clinical approval.",
+  "cases": [
+    { "name": "negative: all no", "kind": "negative", "answers": {}, "outcome": "routine", "flags": [] },
+    { "name": "positive: E1 chest pain", "kind": "positive", "answers": { "E1": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E2 stroke signs", "kind": "positive", "answers": { "E2": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E3 severe breathing difficulty", "kind": "positive", "answers": { "E3": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E4 severe allergic reaction", "kind": "positive", "answers": { "E4": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E5 collapse", "kind": "positive", "answers": { "E5": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E6 severe bleeding", "kind": "positive", "answers": { "E6": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: E7 immediate danger of self-harm", "kind": "positive", "answers": { "E7": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "positive: U1 serious side effect", "kind": "positive", "answers": { "U1": "yes" }, "outcome": "urgent", "flags": [] },
+    { "name": "positive: U2 harmful medication error", "kind": "positive", "answers": { "U2": "yes" }, "outcome": "urgent", "flags": [] },
+    { "name": "positive: U3 essential medicine supply", "kind": "positive", "answers": { "U3": "yes" }, "outcome": "urgent", "flags": [] },
+    { "name": "positive: U4 needs same-day assessment", "kind": "positive", "answers": { "U4": "yes" }, "outcome": "urgent", "flags": [] },
+    { "name": "routine: R1 high-risk medicine alone does not block", "kind": "negative", "answers": { "R1": "yes" }, "outcome": "routine", "flags": ["high_risk_medicine"] },
+    { "name": "routine: R2 polypharmacy flag", "kind": "negative", "answers": { "R2": "yes" }, "outcome": "routine", "flags": ["polypharmacy"] },
+    { "name": "routine: R3 monitoring gap flag", "kind": "negative", "answers": { "R3": "yes" }, "outcome": "routine", "flags": ["monitoring_gap"] },
+    { "name": "routine: R4 vulnerable situation flag", "kind": "negative", "answers": { "R4": "yes" }, "outcome": "routine", "flags": ["vulnerable_situation"] },
+    { "name": "routine: R5 pregnancy flag", "kind": "negative", "answers": { "R5": "yes" }, "outcome": "routine", "flags": ["pregnancy_or_breastfeeding"] },
+    { "name": "routine: several flags together", "kind": "negative", "answers": { "R1": "yes", "R2": "yes", "R4": "yes" }, "outcome": "routine", "flags": ["high_risk_medicine", "polypharmacy", "vulnerable_situation"] },
+    { "name": "precedence: emergency beats urgent", "kind": "positive", "answers": { "E1": "yes", "U1": "yes" }, "outcome": "emergency", "flags": [] },
+    { "name": "precedence: urgent beats routine flags", "kind": "positive", "answers": { "U2": "yes", "R1": "yes" }, "outcome": "urgent", "flags": ["high_risk_medicine"] },
+    { "name": "ambiguous: unsure on emergency escalates", "kind": "ambiguous", "answers": { "E3": "unsure" }, "outcome": "emergency", "flags": [] },
+    { "name": "ambiguous: unsure on urgent escalates", "kind": "ambiguous", "answers": { "U4": "unsure" }, "outcome": "urgent", "flags": [] },
+    { "name": "ambiguous: unsure on routine flags incomplete information", "kind": "ambiguous", "answers": { "R3": "unsure" }, "outcome": "routine", "flags": ["incomplete_information"] },
+    { "name": "ambiguous: everything unsure", "kind": "ambiguous", "answers": { "E1": "unsure", "E2": "unsure", "E3": "unsure", "E4": "unsure", "E5": "unsure", "E6": "unsure", "E7": "unsure", "U1": "unsure", "U2": "unsure", "U3": "unsure", "U4": "unsure", "R1": "unsure", "R2": "unsure", "R3": "unsure", "R4": "unsure", "R5": "unsure" }, "outcome": "emergency", "flags": ["incomplete_information"] }
+  ],
+  "invalid": [
+    { "name": "invalid: missing answer", "answers": { "E1": null } },
+    { "name": "invalid: unknown question", "answers": { "Z9": "yes" } },
+    { "name": "invalid: answer outside yes/no/unsure", "answers": { "E1": "maybe" } }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "version": "2026-11-draft.1",
+  "status_note": "DRAFT: not clinically approved. Wording and rules require sign-off by the responsible pharmacist before any public use.",
+  "answer_options": ["yes", "no", "unsure"],
+  "unsure_policy": {
+    "emergency": "escalate",
+    "urgent": "escalate",
+    "routine": "flag_incomplete"
+  },
+  "questions": [
+    {
+      "id": "E1",
+      "pathway": "emergency",
+      "text": "Do you have chest pain or pressure right now that could be a heart attack?"
+    },
+    {
+      "id": "E2",
+      "pathway": "emergency",
+      "text": "Do you have signs of a stroke right now, such as a drooping face, weakness in an arm, or slurred speech?"
+    },
+    {
+      "id": "E3",
+      "pathway": "emergency",
+      "text": "Are you having severe difficulty breathing right now?"
+    },
+    {
+      "id": "E4",
+      "pathway": "emergency",
+      "text": "Are you having a severe allergic reaction right now, such as swelling of the lips, tongue or throat?"
+    },
+    {
+      "id": "E5",
+      "pathway": "emergency",
+      "text": "Have you collapsed or lost consciousness today, or are you being asked these questions on behalf of someone who has?"
+    },
+    {
+      "id": "E6",
+      "pathway": "emergency",
+      "text": "Do you have severe bleeding that will not stop?"
+    },
+    {
+      "id": "E7",
+      "pathway": "emergency",
+      "text": "Are you in immediate danger of seriously harming yourself?"
+    },
+    {
+      "id": "U1",
+      "pathway": "urgent",
+      "text": "In the last few days, have you had what could be a serious side effect from a medicine, such as a new rash with a high temperature, yellowing skin or eyes, or unusual bleeding or bruising?"
+    },
+    {
+      "id": "U2",
+      "pathway": "urgent",
+      "text": "Have you recently taken too much of a medicine, the wrong medicine, or a medicine at the wrong time in a way that could cause harm?"
+    },
+    {
+      "id": "U3",
+      "pathway": "urgent",
+      "text": "Have you run out, or will you run out in the next 2 days, of a medicine you must not miss (for example insulin, epilepsy medicine or a blood thinner), with no way to get more?"
+    },
+    {
+      "id": "U4",
+      "pathway": "urgent",
+      "text": "Do you have new or worsening symptoms that you think need to be checked by a doctor or nurse today?"
+    },
+    {
+      "id": "R1",
+      "pathway": "routine",
+      "flag": "high_risk_medicine",
+      "text": "Do you take any medicines that need extra care, such as a blood thinner, insulin, methotrexate, lithium or a strong painkiller?"
+    },
+    {
+      "id": "R2",
+      "pathway": "routine",
+      "flag": "polypharmacy",
+      "text": "Do you take 10 or more different medicines, including ones you buy yourself?"
+    },
+    {
+      "id": "R3",
+      "pathway": "routine",
+      "flag": "monitoring_gap",
+      "text": "Are you meant to have regular blood tests or check-ups for a medicine, but have not had one when expected?"
+    },
+    {
+      "id": "R4",
+      "pathway": "routine",
+      "flag": "vulnerable_situation",
+      "text": "Do you find it hard to manage your medicines on your own, for example because of memory problems or living alone?"
+    },
+    {
+      "id": "R5",
+      "pathway": "routine",
+      "flag": "pregnancy_or_breastfeeding",
+      "text": "Are you pregnant, breastfeeding, or planning a pregnancy?"
+    }
+  ]
+}

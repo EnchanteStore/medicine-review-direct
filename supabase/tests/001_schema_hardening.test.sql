@@ -5,7 +5,10 @@ create extension if not exists pgtap with schema extensions;
 
 select plan(14);
 
-select tables_are('public', array['profiles', 'staff_roles', 'consents', 'audit_log', 'products'],
+select tables_are('public', array['profiles', 'staff_roles', 'consents', 'audit_log', 'products',
+  'app_settings', 'launch_signoffs', 'safety_rulesets', 'review_orders', 'safety_screenings',
+  'suitability_assessments', 'questionnaire_submissions', 'high_risk_medicine_terms', 'documents',
+  'retention_policies', 'legal_holds', 'deletion_requests', 'consultations', 'reports'],
   'public schema contains only the expected tables');
 
 select is_empty(
