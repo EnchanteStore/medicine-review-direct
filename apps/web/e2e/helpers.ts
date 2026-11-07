@@ -147,6 +147,7 @@ export async function countEmails(to: string): Promise<number> {
 }
 
 export async function expectNoA11yViolations(page: Page) {
+  await expect(page).toHaveTitle(/.+/);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze();

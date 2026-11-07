@@ -5,7 +5,8 @@ import { createSupabaseServerClient, createSupabaseServiceClient } from '@/lib/s
 
 export const dynamic = 'force-dynamic';
 
-const MINUTES = 60;
+/** Seconds, not minutes. A forwarded link should die within a minute. */
+const EXPIRES_SECONDS = 60;
 
 /** Short-lived access to a clean document. Unscanned files stay hidden by RLS. */
 export async function GET(_request: Request, context: { params: Promise<{ documentId: string }> }) {
@@ -22,7 +23,7 @@ export async function GET(_request: Request, context: { params: Promise<{ docume
   if (!document) return new NextResponse('Not found', { status: 404 });
   const signed = await createSupabaseServiceClient()
     .storage.from('patient-documents')
-    .createSignedUrl(document.storage_path, MINUTES);
+    .createSignedUrl(document.storage_path, EXPIRES_SECONDS);
   const url = signed.data?.signedUrl;
   const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
   if (!url || signed.error || !url.startsWith(supabaseUrl)) {

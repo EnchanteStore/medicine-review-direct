@@ -1,5 +1,43 @@
 # Progress
 
+## Phase 5: Launch assurance
+
+**Status:** assurance checks added on `cursor/phase-5-launch-assurance`, stacked on Phase 4. Not
+deployed. Public intake, live payments and real email stay off. No clinical, legal or regulatory
+approval is claimed. R-01, R-02 and R-03 stay as built.
+
+Checked locally on 7 November 2026 (London), after `supabase db reset` and then the test suite.
+An earlier pgTAP run against a database that already held Playwright rows failed in
+`006_questionnaire_documents_retention` and `009_payments_and_booking`: those files read
+`deletion_requests` and `checkout_sessions` as the database owner, and more than one row existed.
+That is test isolation, not a product failure. CI starts from a reset database. The result below
+is that run.
+
+| Check                                                                                                                                                                  | Result                                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Format, typecheck, lint                                                                                                                                                | PASS                                                                                                       |
+| Vitest                                                                                                                                                                 | PASS. Domain 81, web 30, validation 38, ui 8                                                               |
+| Schema lint                                                                                                                                                            | PASS                                                                                                       |
+| pgTAP after database reset                                                                                                                                             | PASS. 10 files, 280 assertions. Includes unpaid release (`010`) and release without a consultation (`007`) |
+| Playwright                                                                                                                                                             | PASS. 75 tests, 1.3 min                                                                                    |
+| Priority journey (register, verify, screen, consent, questionnaire, test payment, book, pharmacist MFA, consult, approve, generate, release, patient reads the report) | PASS. `e2e/journey.spec.ts`                                                                                |
+| Draft report hidden, including the PDF route                                                                                                                           | PASS in that journey. The file returned 404 before release                                                 |
+| Payment rows and provider events contain no health details, and the event body is not stored                                                                           | PASS in that journey, plus `payment-metadata.test.ts`                                                      |
+| Emails in the journey contain no health details                                                                                                                        | PASS                                                                                                       |
+| Auth rate limit                                                                                                                                                        | PASS. `e2e/auth.spec.ts`, ten failures then "Too many attempts"                                            |
+| Signed document link expires                                                                                                                                           | PASS. The route's link is about 60 seconds. A one-second link was rejected after it expired                |
+| Keyboard-only screening and booking                                                                                                                                    | PASS. `e2e/assurance.spec.ts`. Desktop Chromium only                                                       |
+| Emergency screening blocks checkout                                                                                                                                    | PASS. Existing `e2e/intake.spec.ts`                                                                        |
+| Second patient, unassigned pharmacist, operations administrator                                                                                                        | PASS. Existing clinical, access and pgTAP tests. Not removed                                               |
+| Screen-reader test                                                                                                                                                     | NOT EXECUTED                                                                                               |
+| Other browsers, penetration test, backup restore drill                                                                                                                 | NOT EXECUTED                                                                                               |
+| Clinical wording, MHRA, CQC, indemnity, legal pages, DPIA, company and ICO details, VAT, brand, Stripe live, SES, hosting region                                       | BLOCKED. See [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md). None are marked approved                      |
+
+PDF pages, opened with poppler. Both pages are labelled DRAFT. The agreed sections continue onto page 2.
+
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-5/report-page-1.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-5/report-page-2.png`
+
 ## Phase 4: Pharmacist workspace, reports, messages and GP letters
 
 **Status:** implemented on branch `cursor/phase-4-clinical-workspace`, stacked on Phase 3. Not
