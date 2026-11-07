@@ -12,6 +12,14 @@ export const Input = React.forwardRef<
 ));
 Input.displayName = 'Input';
 
+export const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className, ...props }, ref) => (
+  <textarea ref={ref} className={cn(inputClasses, 'min-h-32', className)} {...props} />
+));
+Textarea.displayName = 'Textarea';
+
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return <label className={cn('block font-semibold text-ink-900', className)} {...props} />;
 }

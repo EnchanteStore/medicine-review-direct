@@ -16,24 +16,35 @@ are labelled.
   reset, Zod-validated profile, protected dashboard shell, staff area shell, rate limiting.
 - Vitest, Playwright and axe tests.
 
-## Phase 2: Patient application
+## Phase 2: Patient intake — implemented (see PHASE_2_SPEC.md and PROGRESS.md)
 
-- Review order creation (`review_orders`) with the order state machine enforced by DB trigger.
-- Multi-step questionnaire: autosaved drafts, progress indicator, "why we ask" text, "don't know"
-  options, multiple medications, review-and-confirm, versioned submitted record, controlled
-  amendments.
-- Versioned safety screening with deterministic approved rules; emergency outcome blocks checkout,
-  records acknowledgement, alerts clinical staff, audited. **Blocked on CS-05/CS-06 content.**
-- Consents for health data processing.
-- Private document upload with malware scanning (local scanner, e.g. ClamAV container) and
-  signed URLs.
-- Patient MFA (TOTP) and phone verification (test provider only).
-- Account settings and closure request.
-- Tests: questionnaire E2E, emergency-blocks-purchase E2E, document isolation, RLS.
+- Configurable trading name ("PharmReview", provisional) and business identity with placeholders.
+- Emergency banner: the exact full wording at checkpoints; a short persistent version.
+- Five legal pages with marked placeholders.
+- Versioned DRAFT safety rule set with three pathways, evaluated in the database; documented
+  test cases; urgent reassessment; complexity review.
+- Review orders, consent capture, multi-step questionnaire with drafts, versioned submission and
+  amendments; private document upload (scanner stubbed); dashboard status.
+- Retention settings, lawful holds, deletion requests, purge function (not scheduled).
+- Report-release gate schema and tests (pharmacist UI is Phase 4).
+- Live-service kill switch tied to launch sign-offs.
+- Staff TOTP MFA enforced in the database.
+
+Deferred from Phase 2:
+
+- real malware scanning
+- an SES transport
+- patient MFA
+- phone verification (SMS disabled)
+- a scheduled retention job
+- storage-object purge
 
 ## Phase 3: Commercial workflow
 
-- Stripe hosted Checkout in **test mode**; server-side prices; webhook signature verification;
+- Stripe hosted Checkout in **test mode**. Note that the order trigger only allows payment
+  states when the live service is enabled, so test-mode payments need a deliberate local-only
+  approach (for example, synthetic sign-offs in a disposable database), decided at the start of
+  Phase 3. Server-side prices; webhook signature verification;
   idempotent `stripe_events`; payments, receipts, refunds with audit; manual audited workflow.
 - Booking: pharmacist availability, Europe/London display, slot exclusion constraints (no
   double-booking under concurrency), reschedule and cancellation rules, generic emails.
@@ -43,13 +54,14 @@ are labelled.
 
 ## Phase 4: Clinical operations
 
-- Staff invitations, independent verification records, mandatory staff MFA.
+- Staff invitations and independent verification records (MFA is already enforced).
 - Admin: queues, assignment, availability, billing/refunds, audit viewer, service configuration
   (ops admin cannot see clinical content).
 - Pharmacist workspace: assigned reviews, questionnaire, documents, safety answers, appointment,
   consultation record, notes, medication issues, recommendations, monitoring, GP discussion points.
-- Reports: draft → approve → generate PDF (React PDF, server-side, in worker) → ready → explicit
-  release; recoverable generation failure; corrections as new versions; release guard in DB.
+- Reports: pharmacist UI on top of the existing database gate. Draft → approve → generate PDF
+  (React PDF, server-side, in worker) → ready → explicit release; recoverable generation
+  failure; corrections as new versions.
 - Messaging (append-only, unread indicators, attachments, contentless notifications,
   out-of-hours warning).
 - GP letter with case-specific consent and verified recipient; dispatch evidence.
@@ -90,3 +102,21 @@ are labelled.
 | 13  | Cross-patient access denied            | 1     | Automated (pgTAP + Data API), passing                    |
 | 14  | Unauthorised/unverified staff denied   | 1     | Automated (pgTAP + UI), passing                          |
 | 15  | Ops admin denied clinical records      | 1     | Automated (pgTAP + Data API), passing for current tables |
+
+## Pre-launch blockers (owner decision section 9)
+
+The live clinical service, public intake and patient payments stay disabled until every item is
+signed off in `launch_signoffs` and the rule set is approved. The full checklist, with the
+database gate name for each item, is in [PHASE_2_SPEC.md section 9](./PHASE_2_SPEC.md#pre-launch-blockers-checklist).
+Summary:
+
+1. Clinical screening content and escalation SOP
+2. Operational response arrangements
+3. MHRA medical-device classification assessment
+4. CQC scope assessment
+5. Professional indemnity
+6. Legal terms and privacy notice
+7. Retention policy and DPIA
+8. Company, ICO and GPhC details
+9. VAT and brand checks
+10. Data residency, processor agreements and security review (including a real malware scanner)

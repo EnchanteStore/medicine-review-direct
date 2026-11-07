@@ -1,16 +1,17 @@
 import { Container } from '@mrd/ui';
 import Link from 'next/link';
-import { FOOTER_NAV, SITE_NAME } from '@/lib/site';
+import { FOOTER_NAV, getBusinessConfig } from '@/lib/site';
 
 export function SiteFooter() {
+  const config = getBusinessConfig();
   return (
     <footer className="mt-20 border-t border-sand-200 bg-sand-100">
       <Container className="grid gap-8 py-10 sm:grid-cols-2">
         <div className="space-y-3">
-          <p className="font-serif text-lg font-bold text-teal-900">{SITE_NAME}</p>
+          <p className="font-serif text-lg font-bold text-teal-900">{config.tradingName}</p>
           <p className="text-sm text-ink-700">
-            A private medication review service with UK-registered pharmacists, for adults in
-            England. We do not diagnose, prescribe or provide emergency care.
+            Private pharmacist-led medication reviews for adults in England. We do not diagnose,
+            prescribe, change medicines or provide emergency or urgent care.
           </p>
           <p className="text-sm text-ink-700">
             This service is not connected to or endorsed by the NHS.
@@ -30,8 +31,10 @@ export function SiteFooter() {
       </Container>
       <Container className="border-t border-sand-200 py-6 text-sm text-ink-700">
         <p>
-          Working name, subject to branding and legal clearance. Pre-launch preview: website content
-          is in draft and the service is not yet accepting patients.
+          {config.tradingNameProvisional
+            ? `${config.tradingName} is a provisional trading name, pending name and trade mark clearance. `
+            : null}
+          Legal and clinical policies are placeholders awaiting professional review.
         </p>
       </Container>
     </footer>

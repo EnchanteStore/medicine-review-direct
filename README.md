@@ -1,6 +1,6 @@
-# Medicine Review Direct
+# Medicine Review Direct (trading as PharmReview, provisional)
 
-Private online pharmacist medication review service for adults in England (working name).
+Private online pharmacist medication review service for adults in England.
 **Pre-launch. Not deployed. Synthetic data only.**
 
 Start with [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md).
@@ -30,5 +30,5 @@ pnpm --filter @mrd/web build && pnpm test:e2e   # Playwright + axe
 
 [Overview](docs/PROJECT_OVERVIEW.md) · [Architecture](docs/ARCHITECTURE.md) ·
 [Database](docs/DATABASE_DESIGN.md) · [Security](docs/SECURITY_MODEL.md) ·
-[Clinical safety](docs/CLINICAL_SAFETY.md) · [Plan](docs/IMPLEMENTATION_PLAN.md) ·
+[Clinical safety](docs/CLINICAL_SAFETY.md) · [Phase 2 spec](docs/PHASE_2_SPEC.md) · [Plan](docs/IMPLEMENTATION_PLAN.md) ·
 [Progress](docs/PROGRESS.md) · [Decisions](docs/DECISION_LOG.md)

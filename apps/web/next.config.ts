@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   transpilePackages: ['@mrd/ui', '@mrd/domain', '@mrd/validation'],
+  experimental: {
+    // Document uploads (10MB limit, checked server-side) go through a server action.
+    serverActions: { bodySizeLimit: '11mb' },
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

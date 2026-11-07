@@ -1,32 +1,49 @@
 import type { Metadata } from 'next';
-import { DraftNotice } from '@/components/draft-notice';
+import {
+  CompanyIdentity,
+  ContactDetails,
+  LegalNotice,
+  PharmacistRegistration,
+  Placeholder,
+} from '@/components/legal';
+import { FullEmergencyWarning } from '@/components/emergency-banner';
 import { ContentPage } from '@/components/page-header';
 
-export const metadata: Metadata = { title: 'Complaints (draft)' };
+export const metadata: Metadata = { title: 'Complaints and Contact Information (placeholder)' };
 
 export default function ComplaintsPage() {
   return (
-    <ContentPage title="Complaints">
-      <DraftNotice />
-      <p>
-        We want to hear if something has gone wrong. Complaints help us improve and keep the service
-        safe.
+    <ContentPage title="Complaints and Contact Information">
+      <LegalNotice />
+      <FullEmergencyWarning className="my-6" />
+
+      <h2 id="contact">Contact us</h2>
+      <p>Do not contact us about anything urgent. We do not monitor messages 24 hours a day.</p>
+      <ContactDetails />
+      <p className="mt-4">
+        Once you have an account, use secure messages in your account for anything about your
+        health. We never ask for health information by ordinary email.
       </p>
+
+      <h2>Who we are</h2>
+      <CompanyIdentity />
+      <h2>Pharmacist registration</h2>
+      <PharmacistRegistration />
+
       <h2>How to complain</h2>
       <p>
-        Contact details for complaints will be published before launch. You will also be able to
-        raise a complaint from your account.
+        <Placeholder>
+          complaints contact route and acknowledgement timescale, needs owner approval
+        </Placeholder>
       </p>
-      <h2>What happens next</h2>
       <ol>
-        <li>We acknowledge your complaint. Timescales are to be confirmed.</li>
-        <li>A senior pharmacist investigates if your complaint is about clinical care.</li>
+        <li>We acknowledge your complaint.</li>
+        <li>A senior pharmacist investigates complaints about clinical care.</li>
         <li>We send you a written response explaining what we found and any actions taken.</li>
       </ol>
       <h2>If you are not satisfied</h2>
       <p>
-        Details of independent bodies you can contact, such as the General Pharmaceutical Council,
-        will be confirmed here after review.
+        <Placeholder>independent bodies and escalation routes, needs regulatory review</Placeholder>
       </p>
     </ContentPage>
   );

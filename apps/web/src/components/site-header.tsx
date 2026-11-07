@@ -2,7 +2,7 @@ import { Button, Container } from '@mrd/ui';
 import Link from 'next/link';
 import { signOutAction } from '@/app/(auth)/actions';
 import { getCurrentUser } from '@/lib/auth';
-import { PRIMARY_NAV, SITE_NAME } from '@/lib/site';
+import { PRIMARY_NAV, brandName } from '@/lib/site';
 
 export async function SiteHeader() {
   const user = await getCurrentUser();
@@ -36,7 +36,7 @@ export async function SiteHeader() {
           href="/"
           className="font-serif text-xl font-bold text-teal-900 no-underline hover:text-teal-800"
         >
-          {SITE_NAME}
+          {brandName()}
         </Link>
 
         <nav aria-label="Main" className="hidden lg:block">

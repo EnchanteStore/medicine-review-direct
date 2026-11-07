@@ -36,6 +36,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
+      - name: Generated pgTAP screening cases are up to date
+        run: node packages/domain/scripts/generate-screening-pgtap.mjs && git diff --exit-code supabase/tests
       - run: pnpm build
 
   database:
@@ -50,8 +52,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Start local database (applies migrations and seed)
-        run: pnpm exec supabase db start
+      - name: Start local database and storage (applies migrations and seed)
+        run: pnpm exec supabase start -x studio,imgproxy,postgres-meta,mailpit,realtime,edge-runtime,logflare,vector,supavisor
       - name: Lint database schema
         run: pnpm exec supabase db lint --level warning --fail-on error
       - name: Run pgTAP tests

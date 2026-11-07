@@ -5,6 +5,7 @@ export {
   FormField,
   Input,
   Label,
+  Textarea,
   inputClasses,
   type CheckboxFieldProps,
   type FormFieldProps,

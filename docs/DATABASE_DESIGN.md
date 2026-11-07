@@ -99,72 +99,88 @@ rejected). Readable by verified admins only. Events today: `account.created`,
 admins see all. Price changes are audited. Seeded: `standard_review` £59 (normally £79). Price
 writes through the API are not granted yet (admin price editing arrives with the ops dashboard).
 
-## Designed entities (built in later phases)
+## Built in Phase 2 (migration `20261107000300_phase2_patient_intake.sql`)
 
-### Phase 2: patient application
+| Table                       | Purpose                                                                                    | Write path                                                                                | Read (RLS)                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `app_settings`              | `environment` (`production` default, `development` in local seed)                          | Service role only                                                                         | Via `service_status()` only                         |
+| `launch_signoffs`           | Append-only sign-offs per `launch_gate` (10 gates)                                         | Clinical admin (MFA) insert                                                               | Verified admins                                     |
+| `safety_rulesets`           | Versioned, immutable rule set definitions; one active; `draft`/`approved`                  | Migration / service role                                                                  | Authenticated                                       |
+| `review_orders`             | Order state machine; `suitability_review_required`; assigned pharmacist                    | `start_review_order()` and other functions; trigger `app.enforce_order_rules`             | Own; assigned pharmacist; clinical admin            |
+| `safety_screenings`         | Answers, outcome, matched rules, flags, rule set version; immutable except acknowledgement | `submit_safety_screening()` (evaluates in SQL)                                            | Own; clinicians on the order                        |
+| `suitability_assessments`   | Urgent reassessment and complexity review; immutable                                       | `record_suitability_assessment()` (clinician, MFA)                                        | Clinicians on the order                             |
+| `questionnaire_submissions` | Draft, submitted and superseded versions, `amends_submission_id`, attention flags          | `save_questionnaire_draft()`, `submit_questionnaire()`, `start_questionnaire_amendment()` | Own; clinicians on the order                        |
+| `high_risk_medicine_terms`  | Draft term list for attention flags                                                        | Migration                                                                                 | Verified clinicians                                 |
+| `documents`                 | Metadata for private storage objects; `scan_status`                                        | `register_document()` (checks path and object exist)                                      | Own; clinicians only when `clean`                   |
+| `retention_policies`        | Six provisional categories                                                                 | Service role (audited)                                                                    | Verified admins                                     |
+| `legal_holds`               | Holds on a user or order                                                                   | `place_legal_hold()` (clinical admin, MFA)                                                | Clinical admins                                     |
+| `deletion_requests`         | Requests and stored retention assessment                                                   | `request_account_deletion()`, `review_deletion_request()`                                 | Own; clinical admins                                |
+| `consultations`             | Method (telephone/secure_video), time, two-way flag, clinical notes; immutable             | `pharmacist_record_consultation()`                                                        | Clinicians on the order                             |
+| `reports`                   | Report status, confirmations, approval with name and GPhC number, release                  | `pharmacist_*` functions; trigger `app.enforce_report_gate` for all roles                 | Patient only when released; clinicians on the order |
 
-| Table                       | Key columns                                                                                                                         | RLS outline                                                                                                                          |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `review_orders`             | `id`, `patient_id`, `product_code`, `status` (order state machine), `price_pence_at_purchase`, `assigned_pharmacist_id`, timestamps | Patient: own. Assigned pharmacist and clinical_admin: read. Ops: status/billing columns via a restricted view without clinical joins |
-| `questionnaire_versions`    | `id`, `version`, `schema` (jsonb), `approved_by`, `approved_at`, `is_active`                                                        | Read: authenticated. Write: service role after pharmacist approval                                                                   |
-| `questionnaire_submissions` | `id`, `order_id`, `questionnaire_version_id`, `answers` (jsonb), `status` (`draft`/`submitted`), `submitted_at`, `supersedes_id`    | Patient: own drafts editable; submitted rows immutable; amendments create new rows                                                   |
-| `medications`               | `id`, `submission_id`, `name`, `strength`, `formulation`, `dose`, `frequency`, `route`, `indication`, `notes`, `dont_know_flags`    | As submissions. Free text is not clinically validated                                                                                |
-| `safety_screenings`         | `id`, `order_id`, `ruleset_version`, `answers`, `outcome` (`clear`/`escalated`), `matched_rules`, `acknowledged_at`                 | Patient: insert/read own; immutable. Clinicians: read. Escalation alerts clinical staff                                              |
-| `safety_rulesets`           | `version`, `rules` (deterministic jsonb), `emergency_advice`, `approved_by`, `approved_at`                                          | Read-only to app; changes require pharmacist approval                                                                                |
-| `documents`                 | `id`, `order_id`, `owner_id`, `storage_path`, `mime_type`, `size_bytes`, `sha256`, `scan_status` (`pending`/`clean`/`infected`)     | Patient: own. Assigned pharmacist: read when clean. Private bucket; short-lived signed URLs only                                     |
+Storage: the private bucket `patient-documents`. Patients may insert and read only under
+`<user_id>/` while intake is open.
 
-### Phase 3: commercial
+New consent types: `health_data_processing` (required before questionnaire drafts) and
+`remote_consultation` (required before submission). New consent source: `intake`.
 
-| Table                     | Key columns                                                                                                                              | Notes                                                                                                                                                                   |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payments`                | `id`, `order_id`, `stripe_checkout_session_id` (unique), `stripe_payment_intent_id`, `amount_pence`, `currency`, `status`, `receipt_url` | Written only from verified Stripe webhooks or audited manual workflow                                                                                                   |
-| `stripe_events`           | `event_id` PK, `type`, `received_at`, `processed_at`, `payload_hash`                                                                     | Idempotency: event processed once                                                                                                                                       |
-| `refunds`                 | `id`, `payment_id`, `amount_pence`, `reason`, `requested_by`, `approved_by`, `stripe_refund_id`, `status`                                | Ops admin, audited                                                                                                                                                      |
-| `pharmacist_availability` | `id`, `pharmacist_id`, `starts_at`, `ends_at` (timestamptz; displayed Europe/London)                                                     | Exclusion constraint prevents overlaps                                                                                                                                  |
-| `appointments`            | `id`, `order_id`, `pharmacist_id`, `slot` (tstzrange), `status`, `reschedule_count`                                                      | `EXCLUDE USING gist (pharmacist_id WITH =, slot WITH &&) WHERE status in ('booked')` prevents double-booking under concurrency; booking requires a paid order (trigger) |
+Key database functions:
 
-### Phase 4: clinical operations
+- `app.evaluate_screening`
+- `app.order_screening_cleared`
+- `app.report_gate_blockers`
+- `app.live_service_enabled`, `app.intake_open`, `app.payments_open`
+- `app.retention_assessment`, `app.retention_candidates`, `app.purge_abandoned_intake`
+- `app.current_aal`
 
-| Table                  | Key columns                                                                                                                              | Notes                                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `consultations`        | `id`, `appointment_id`, `occurred` (bool), `outcome`, `started_at`, `ended_at`, `notes`                                                  | Records whether the consultation happened; required before release |
-| `clinical_notes`       | `id`, `order_id`, `author_id`, `body`, `created_at`                                                                                      | Append-only; assigned pharmacist and clinical_admin only           |
-| `reports`              | `id`, `order_id`, `status` (report state machine), `current_version_id`, `approved_by`, `approved_at`, `released_by`, `released_at`      | Patient can read **only** when `status = 'released'`               |
-| `report_versions`      | `id`, `report_id`, `version`, `content` (jsonb sections), `pdf_storage_path`, `pdf_sha256`, `created_by`, `created_at`, `correction_of`  | Immutable; corrections create a new version with reason            |
-| `gp_letters`           | `id`, `order_id`, `consent_id`, `recipient_practice`, `recipient_verified_by`, `content`, `status`, `dispatched_at`, `dispatch_evidence` | Requires case-specific consent and verified recipient              |
-| `messages`             | `id`, `order_id`, `sender_id`, `body`, `attachment_document_id`, `created_at`, `read_at`                                                 | Append-only; notifications carry no content                        |
-| `notifications_outbox` | `id`, `user_id`, `template`, `status`, `attempts`, `next_attempt_at`                                                                     | Generic templates only; dev mode never sends                       |
-| `jobs`                 | queue tables (pg-boss/pgmq)                                                                                                              | Idempotent PDF generation, emails, retries                         |
+## Designed entities (later phases)
+
+| Table                                                       | Phase | Notes                                                                                                                                                                  |
+| ----------------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payments`, `stripe_events`, `refunds`                      | 3     | Verified webhooks only; idempotent; order `paid` also needs the live service                                                                                           |
+| `pharmacist_availability`, `appointments`                   | 3     | Exclusion constraint against double-booking; booking needs a cleared screening, no urgent hold, and a suitability review when required (already enforced on the order) |
+| `report_versions`                                           | 4     | Immutable PDF versions and corrections; released `reports` rows are already immutable                                                                                  |
+| `gp_letters`, `messages`, `notifications_outbox`, job queue | 4     | As designed in Phase 1                                                                                                                                                 |
+| `safety_communications`                                     | 4     | Safety notification or referral letter for declined services (never a review report)                                                                                   |
 
 ## State machines
 
 Defined in `packages/domain` (unit-tested) and to be enforced by database triggers when the
 tables are built.
 
-**Order:** `draft → questionnaire_submitted → awaiting_payment → paid → consultation_booked →
-in_review → report_released → completed`, with `safety_escalated` (blocks checkout, terminal
-except cancel), `cancelled`, `refunded`.
+**Order (Phase 2):** `draft →` (screening) `safety_emergency_excluded` (terminal) |
+`safety_urgent_hold` (only to `intake` after a suitable reassessment, or `declined`) | `intake →
+questionnaire_submitted` (`→ intake` for amendments) `→ awaiting_payment → paid →
+consultation_booked → in_review → report_released → completed`, plus `declined`, `cancelled`
+and `refunded`. Payment and booking need the live service. Enforced by `app.enforce_order_rules`.
 
 **Report:** `draft → clinically_approved → generating → ready_for_release → released`, with
-`generation_failed` (retry or back to draft). Release requires a paid order, a recorded
-consultation and an explicit verified-pharmacist action. `released` is terminal; corrections
-create a new version. Nothing becomes patient-visible automatically.
+`generation_failed` (retry or back to draft). Approval and release follow the owner's section 8
+gate (see PHASE_2_SPEC). This is enforced by `app.enforce_report_gate` for every role. `released`
+is terminal. Nothing becomes patient-visible automatically.
 
 ## Migrations
 
-| File                                   | Contents                                                                                                          |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `20261107000100_foundation_schema.sql` | Types, `app` helpers, profiles, staff_roles, consents, audit_log, products, triggers, RLS, grants, launch product |
+| File                                       | Contents                                                                                                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261107000100_foundation_schema.sql`     | Types, `app` helpers, profiles, staff_roles, consents, audit_log, products, triggers, RLS, grants, launch product                                                               |
+| `20261107000200_phase2_enum_values.sql`    | New consent types and source                                                                                                                                                    |
+| `20261107000300_phase2_patient_intake.sql` | Staff MFA in role helpers, kill switch, rule sets, orders, screening, questionnaire, documents and storage policies, retention, consultations and reports with the release gate |
 
 `supabase/seed.sql` creates **local-only synthetic** users and staff roles (`@example.test`).
 
-## Tests (`supabase/tests`, 62 assertions)
+## Tests (`supabase/tests`, 219 assertions)
 
-- `001_schema_hardening`: expected tables, RLS on all tables, pinned search_path, no API access
-  to `write_audit`, table and column privileges, launch price.
-- `002_patient_isolation`: sign-up trigger, cross-patient read/update denial, protected columns,
-  DB-level age and phone rules, consent append-only and forgery prevention, no self-escalation,
-  audit metadata contains field names only, anonymous denial.
-- `003_staff_access`: verification constraints, ops admin denied patient data, unverified and
-  verified-but-unassigned pharmacist denied, clinical admin access, suspension revokes access,
-  inactive products hidden, audit log immutable even to the owner.
+- `001_schema_hardening`: expected tables, RLS on every table, pinned search_path, privileges.
+- `002_patient_isolation`: cross-patient isolation, protected columns, consent forgery.
+- `003_staff_access`: staff boundaries, suspension, immutable audit log, **aal1 staff denied**.
+- `004_safety_rule_cases` (**generated** from the shared fixture): 24 documented cases plus 3
+  invalid inputs.
+- `005_safety_pathways_and_kill_switch`: emergency, urgent and routine pathways; database
+  blocking of payment and booking; urgent hold across orders; MFA reassessment; complexity
+  review before booking; kill switch, sign-offs and revocation.
+- `006_questionnaire_documents_retention`: consent gates, drafts, versioned submission and
+  amendment, immutability, documents, scan gating, deletion requests, legal holds, purge.
+- `007_report_release_gate`: every section 8 condition; service role, clinical admin,
+  unassigned and non-MFA pharmacists denied; immutable release; declined and excluded orders
+  cannot produce reports.

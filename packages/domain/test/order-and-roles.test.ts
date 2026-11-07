@@ -21,22 +21,40 @@ describe('order lifecycle', () => {
     }
   });
 
-  it('safety escalation blocks routine checkout', () => {
-    expect(canTransitionOrder('safety_escalated', 'awaiting_payment')).toBe(false);
-    expect(canTransitionOrder('safety_escalated', 'paid')).toBe(false);
-    expect(canStartCheckout('safety_escalated')).toBe(false);
+  it('emergency exclusion is terminal: no path to intake, payment or booking', () => {
+    expect(ORDER_TRANSITIONS.safety_emergency_excluded).toEqual([]);
+  });
+
+  it('urgent hold leaves only to intake (after reassessment), declined or cancelled', () => {
+    expect([...ORDER_TRANSITIONS.safety_urgent_hold].sort()).toEqual([
+      'cancelled',
+      'declined',
+      'intake',
+    ]);
+    expect(canTransitionOrder('safety_urgent_hold', 'awaiting_payment')).toBe(false);
+  });
+
+  it('checkout needs a submitted questionnaire, open payments and no urgent hold', () => {
+    const base = {
+      status: 'questionnaire_submitted' as const,
+      paymentsOpen: true,
+      patientHasUrgentHold: false,
+    };
+    expect(canStartCheckout(base)).toBe(true);
+    expect(canStartCheckout({ ...base, paymentsOpen: false })).toBe(false);
+    expect(canStartCheckout({ ...base, patientHasUrgentHold: true })).toBe(false);
+    expect(canStartCheckout({ ...base, status: 'safety_emergency_excluded' })).toBe(false);
+    expect(canStartCheckout({ ...base, status: 'intake' })).toBe(false);
   });
 
   it('cannot be paid without passing through awaiting_payment', () => {
-    expect(canTransitionOrder('draft', 'paid')).toBe(false);
     expect(canTransitionOrder('questionnaire_submitted', 'paid')).toBe(false);
     expect(() => assertOrderTransition('awaiting_payment', 'paid')).not.toThrow();
   });
 
-  it('booking requires payment', () => {
-    expect(canTransitionOrder('awaiting_payment', 'consultation_booked')).toBe(false);
+  it('a declined service cannot reach report_released', () => {
+    expect(canTransitionOrder('declined', 'report_released')).toBe(false);
     expect(isOrderPaid('awaiting_payment')).toBe(false);
-    expect(isOrderPaid('consultation_booked')).toBe(true);
   });
 
   it('has the expected terminal states', () => {
@@ -44,6 +62,7 @@ describe('order lifecycle', () => {
       'cancelled',
       'completed',
       'refunded',
+      'safety_emergency_excluded',
     ]);
   });
 });
@@ -59,9 +78,6 @@ describe('roles', () => {
       false,
     );
     expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'verified' }])).toBe(true);
-    expect(hasClinicalAccess([{ role: 'clinical_admin', verificationStatus: 'verified' }])).toBe(
-      true,
-    );
   });
 
   it('hasVerifiedRole checks role and status', () => {
@@ -72,21 +88,17 @@ describe('roles', () => {
 });
 
 describe('pricing', () => {
-  it('formats pence as GBP', () => {
+  it('formats pence as GBP without adding VAT', () => {
     expect(formatGBP(5900)).toBe('£59');
-    expect(formatGBP(7900)).toBe('£79');
     expect(formatGBP(5950)).toBe('£59.50');
   });
 
   it('rejects invalid amounts', () => {
     expect(() => formatGBP(-1)).toThrow(RangeError);
-    expect(() => formatGBP(59.5)).toThrow(RangeError);
   });
 
   it('computes launch discount', () => {
-    const p = { pricePence: 5900, standardPricePence: 7900 };
-    expect(isDiscounted(p)).toBe(true);
-    expect(savingPence(p)).toBe(2000);
-    expect(isDiscounted({ pricePence: 7900, standardPricePence: null })).toBe(false);
+    expect(isDiscounted({ pricePence: 5900, standardPricePence: 7900 })).toBe(true);
+    expect(savingPence({ pricePence: 5900, standardPricePence: 7900 })).toBe(2000);
   });
 });

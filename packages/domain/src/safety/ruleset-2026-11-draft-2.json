@@ -1,0 +1,32 @@
+{
+  "version": "2026-11-draft.2",
+  "status_note": "Approved for development on 7 Nov 2026 (P-01). Pending clinical approval and an MHRA medical-device scope assessment. Not approved for public launch.",
+  "answer_options": ["yes", "no", "unsure"],
+  "unsure_policy": {
+    "emergency": "escalate",
+    "urgent": "escalate",
+    "routine": "flag_incomplete"
+  },
+  "questions": [
+    {
+      "id": "Q1",
+      "pathway": "emergency",
+      "text": "Are you currently experiencing any of the following: chest pain suggesting a heart attack, severe difficulty breathing, signs of a stroke, collapse, severe bleeding, a severe allergic reaction, or immediate danger of serious self-harm?"
+    },
+    {
+      "id": "Q2",
+      "pathway": "urgent",
+      "text": "Have you recently taken more medicine than prescribed, taken the wrong medicine, or made a medication mistake that you think could be dangerous?"
+    },
+    {
+      "id": "Q3",
+      "pathway": "urgent",
+      "text": "Are you requesting this review because of a new or worsening medicine-related problem or symptom that you think may need urgent medical attention?"
+    },
+    {
+      "id": "Q4",
+      "pathway": "urgent",
+      "text": "Have you run out of, missed, or been unable to obtain an essential medicine, and are you concerned this could cause harm before you can receive medical advice?"
+    }
+  ]
+}

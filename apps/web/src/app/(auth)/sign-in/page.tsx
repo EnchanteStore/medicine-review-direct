@@ -6,6 +6,7 @@ import { AuthShell } from '@/components/auth-shell';
 import { SignInForm } from '@/components/forms/sign-in-form';
 import { getCurrentUser } from '@/lib/auth';
 import { safeNextPath } from '@/lib/safe-redirect';
+import { brandName } from '@/lib/site';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
@@ -32,7 +33,7 @@ export default async function SignInPage({
       title="Sign in"
       aside={
         <p>
-          New to Medicine Review Direct? <Link href="/sign-up">Create an account</Link>
+          New to {brandName()}? <Link href="/sign-up">Create an account</Link>
         </p>
       }
     >

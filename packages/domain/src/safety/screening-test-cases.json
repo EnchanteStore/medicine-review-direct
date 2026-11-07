@@ -1,0 +1,102 @@
+{
+  "ruleset_version": "2026-11-draft.2",
+  "note": "P-01 cases. Not sure is never treated as no. Unanswered is invalid. DRAFT pending clinical approval and MHRA assessment.",
+  "cases": [
+    {
+      "name": "negative: all no",
+      "kind": "negative",
+      "answers": {},
+      "outcome": "routine",
+      "flags": []
+    },
+    {
+      "name": "positive: Q1 yes stops intake",
+      "kind": "positive",
+      "answers": { "Q1": "yes" },
+      "outcome": "emergency",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q1 not sure stops intake",
+      "kind": "ambiguous",
+      "answers": { "Q1": "unsure" },
+      "outcome": "emergency",
+      "flags": []
+    },
+    {
+      "name": "positive: Q2 yes pauses intake",
+      "kind": "positive",
+      "answers": { "Q2": "yes" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q2 not sure pauses intake",
+      "kind": "ambiguous",
+      "answers": { "Q2": "unsure" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "positive: Q3 yes pauses booking",
+      "kind": "positive",
+      "answers": { "Q3": "yes" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q3 not sure pauses booking",
+      "kind": "ambiguous",
+      "answers": { "Q3": "unsure" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "positive: Q4 yes pauses booking",
+      "kind": "positive",
+      "answers": { "Q4": "yes" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q4 not sure pauses booking",
+      "kind": "ambiguous",
+      "answers": { "Q4": "unsure" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "precedence: Q1 yes beats Q2 yes",
+      "kind": "positive",
+      "answers": { "Q1": "yes", "Q2": "yes" },
+      "outcome": "emergency",
+      "flags": []
+    },
+    {
+      "name": "precedence: Q1 not sure beats Q3 yes",
+      "kind": "ambiguous",
+      "answers": { "Q1": "unsure", "Q3": "yes" },
+      "outcome": "emergency",
+      "flags": []
+    },
+    {
+      "name": "precedence: Q2 yes beats Q4 no",
+      "kind": "positive",
+      "answers": { "Q2": "yes", "Q4": "no" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "negative: not sure is not used",
+      "kind": "negative",
+      "answers": { "Q1": "no", "Q2": "no", "Q3": "no", "Q4": "no" },
+      "outcome": "routine",
+      "flags": []
+    }
+  ],
+  "invalid": [
+    { "name": "invalid: missing answer", "answers": { "Q1": null } },
+    { "name": "invalid: unknown question", "answers": { "E1": "yes" } },
+    { "name": "invalid: answer outside yes/no/unsure", "answers": { "Q1": "maybe" } }
+  ]
+}

@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(24);
 
 insert into auth.users (id, email, aud, role, raw_user_meta_data) values
   ('20000000-0000-4000-a000-0000000000c1', 'rls.patient.c@example.test', 'authenticated', 'authenticated',
@@ -38,7 +38,7 @@ select throws_ok(
 
 -- Ops admin
 set local role authenticated;
-select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000d1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000d1","role":"authenticated","aal":"aal2"}', true);
 select is_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'ops admin cannot read patient profiles');
 select is_empty($$ select 1 from public.consents where user_id = '20000000-0000-4000-a000-0000000000c1' $$,
@@ -51,20 +51,25 @@ select isnt_empty($$ select 1 from public.products where code = 'future_followup
 select throws_ok($$ update public.products set price_pence = 1 $$, '42501', null,
   'ops admin cannot change prices through the API in Phase 1');
 
+-- MFA: the same verified ops admin without an aal2 session gets no staff privileges
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000d1","role":"authenticated","aal":"aal1"}', true);
+select is_empty($$ select 1 from public.audit_log $$, 'staff without an MFA (aal2) session cannot read the audit log');
+select is((select count(*)::int from public.staff_roles), 1, 'staff without MFA see only their own role row');
+
 -- Pending pharmacist
-select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000a2","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000a2","role":"authenticated","aal":"aal2"}', true);
 select is_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'unverified pharmacist cannot read patient profiles');
 select is((select count(*)::int from public.staff_roles), 1, 'unverified pharmacist sees only their own role');
 select is_empty($$ select 1 from public.audit_log $$, 'unverified pharmacist cannot read the audit log');
 
 -- Verified pharmacist: no blanket patient access (assignment-scoped access arrives in Phase 4)
-select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000a1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000a1","role":"authenticated","aal":"aal2"}', true);
 select is_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'verified pharmacist has no blanket access to patient profiles');
 
 -- Verified clinical admin
-select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000b1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000b1","role":"authenticated","aal":"aal2"}', true);
 select isnt_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'verified clinical admin can read patient profiles');
 select is((select count(*)::int from public.consents where user_id = '20000000-0000-4000-a000-0000000000c1'), 3,
@@ -78,7 +83,7 @@ reset role;
 update public.staff_roles set verification_status = 'suspended'
   where user_id = '20000000-0000-4000-a000-0000000000b1';
 set local role authenticated;
-select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000b1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000b1","role":"authenticated","aal":"aal2"}', true);
 select is_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'suspended clinical admin loses patient access');
 
