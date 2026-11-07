@@ -32,8 +32,7 @@ export default async function HomePage() {
             </h1>
             <p className="mt-6 max-w-xl text-xl text-ink-700">
               Taking several medicines and unsure if they are all still right for you? Talk it
-              through with an experienced pharmacist by telephone and get a clear written
-              report.
+              through with an experienced pharmacist by telephone and get a clear written report.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
@@ -75,7 +74,10 @@ export default async function HomePage() {
           {steps.map((step, i) => (
             <li key={step.title}>
               <Card className="h-full">
-                <p className="flex size-10 items-center justify-center rounded-full bg-teal-700 text-lg font-bold text-white" aria-hidden="true">
+                <p
+                  className="flex size-10 items-center justify-center rounded-full bg-teal-700 text-lg font-bold text-white"
+                  aria-hidden="true"
+                >
                   {i + 1}
                 </p>
                 <h3 className="mt-4 text-xl">{step.title}</h3>

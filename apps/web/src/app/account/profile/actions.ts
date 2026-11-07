@@ -8,7 +8,10 @@ import { composeIsoDate } from '@/lib/date-fields';
 import { formString, type FormState } from '@/lib/form-state';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export async function updateProfileAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function updateProfileAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const user = await getCurrentUser();
   if (!user) redirect('/sign-in?next=/account/profile');
 

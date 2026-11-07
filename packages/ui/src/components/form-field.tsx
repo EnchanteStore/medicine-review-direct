@@ -4,11 +4,12 @@ import { cn } from '../lib/cn';
 export const inputClasses =
   'block w-full min-h-12 rounded-md border-2 border-ink-600 bg-white px-3 py-2 text-base text-ink-900 placeholder:text-ink-600 aria-[invalid=true]:border-danger-700';
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input ref={ref} className={cn(inputClasses, className)} {...props} />
-  ),
-);
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, ...props }, ref) => (
+  <input ref={ref} className={cn(inputClasses, className)} {...props} />
+));
 Input.displayName = 'Input';
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
@@ -59,7 +60,10 @@ export function FormField({ id, label, hint, errors, children, className }: Form
   );
 }
 
-export interface CheckboxFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface CheckboxFieldProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type'
+> {
   id: string;
   label: React.ReactNode;
   errors?: string[] | undefined;

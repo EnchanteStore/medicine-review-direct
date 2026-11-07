@@ -23,7 +23,12 @@ describe('Button', () => {
 describe('FormField', () => {
   it('associates label, hint and error with the input', () => {
     render(
-      <FormField id="email" label="Email address" hint="We'll send a link" errors={['Enter an email']}>
+      <FormField
+        id="email"
+        label="Email address"
+        hint="We'll send a link"
+        errors={['Enter an email']}
+      >
         {(aria) => <Input {...aria} />}
       </FormField>,
     );

@@ -20,7 +20,9 @@ export function publicEnv(): PublicEnv {
   });
   if (!parsed.success) {
     const keys = parsed.error.issues.map((i) => i.path.join('.')).join(', ');
-    throw new Error(`Invalid or missing environment variables: ${keys}. See apps/web/.env.example.`);
+    throw new Error(
+      `Invalid or missing environment variables: ${keys}. See apps/web/.env.example.`,
+    );
   }
   cached = parsed.data;
   return cached;

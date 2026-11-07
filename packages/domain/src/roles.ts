@@ -19,9 +19,7 @@ const CLINICAL_ROLES: readonly StaffRole[] = ['pharmacist', 'clinical_admin'];
  * without a round trip. Ops admins never gain clinical access through this path.
  */
 export function hasClinicalAccess(grants: readonly StaffRoleGrant[]): boolean {
-  return grants.some(
-    (g) => CLINICAL_ROLES.includes(g.role) && g.verificationStatus === 'verified',
-  );
+  return grants.some((g) => CLINICAL_ROLES.includes(g.role) && g.verificationStatus === 'verified');
 }
 
 export function hasVerifiedRole(grants: readonly StaffRoleGrant[], role: StaffRole): boolean {

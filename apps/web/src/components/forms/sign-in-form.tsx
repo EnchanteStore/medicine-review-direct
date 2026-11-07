@@ -41,7 +41,13 @@ export function SignInForm({ next }: { next: string }) {
 
         <FormField id="password" label="Password" errors={fieldErrors(state, 'password')}>
           {(aria) => (
-            <Input {...aria} name="password" type="password" autoComplete="current-password" required />
+            <Input
+              {...aria}
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
           )}
         </FormField>
 

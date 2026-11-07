@@ -103,7 +103,8 @@ export async function signInAction(_prev: FormState, formData: FormData): Promis
       return {
         status: 'error',
         code: 'email_not_confirmed',
-        message: 'You need to confirm your email address before you can sign in. Check your inbox for the link we sent you.',
+        message:
+          'You need to confirm your email address before you can sign in. Check your inbox for the link we sent you.',
         values,
       };
     }
@@ -125,7 +126,8 @@ export async function resendVerificationAction(
   }
   const ip = await clientIp();
   if (!authRateLimits.resendVerificationPerIp.hit(ip).allowed) return rateLimited();
-  if (!authRateLimits.resendVerificationPerEmail.hit(parsed.data.email).allowed) return rateLimited();
+  if (!authRateLimits.resendVerificationPerEmail.hit(parsed.data.email).allowed)
+    return rateLimited();
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resend({
@@ -136,11 +138,15 @@ export async function resendVerificationAction(
   if (error && error.status !== 429) logAuthError('resend-verification', error.code);
   return {
     status: 'success',
-    message: 'If your account still needs confirming, we have sent a new link to your email address.',
+    message:
+      'If your account still needs confirming, we have sent a new link to your email address.',
   };
 }
 
-export async function forgotPasswordAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function forgotPasswordAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const raw = { email: formString(formData, 'email') };
   const parsed = forgotPasswordSchema.safeParse(raw);
   if (!parsed.success) {
@@ -160,11 +166,15 @@ export async function forgotPasswordAction(_prev: FormState, formData: FormData)
   // Same message whether or not the account exists.
   return {
     status: 'success',
-    message: 'If an account exists for that email address, we have sent a link to reset your password. The link expires in 1 hour.',
+    message:
+      'If an account exists for that email address, we have sent a link to reset your password. The link expires in 1 hour.',
   };
 }
 
-export async function resetPasswordAction(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function resetPasswordAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const parsed = resetPasswordSchema.safeParse({
     password: formString(formData, 'password'),
     confirmPassword: formString(formData, 'confirmPassword'),
@@ -177,7 +187,8 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
   if (!user) {
     return {
       status: 'error',
-      message: 'Your password reset link has expired or has already been used. Please request a new one.',
+      message:
+        'Your password reset link has expired or has already been used. Please request a new one.',
     };
   }
 

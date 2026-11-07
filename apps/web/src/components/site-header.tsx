@@ -43,7 +43,10 @@ export async function SiteHeader() {
           <ul className="flex items-center gap-6">
             {PRIMARY_NAV.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="font-semibold text-ink-900 no-underline hover:underline">
+                <Link
+                  href={item.href}
+                  className="font-semibold text-ink-900 no-underline hover:underline"
+                >
                   {item.label}
                 </Link>
               </li>

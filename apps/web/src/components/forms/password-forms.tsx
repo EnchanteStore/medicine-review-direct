@@ -58,7 +58,13 @@ export function ResetPasswordForm() {
         errors={fieldErrors(state, 'confirmPassword')}
       >
         {(aria) => (
-          <Input {...aria} name="confirmPassword" type="password" autoComplete="new-password" required />
+          <Input
+            {...aria}
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+          />
         )}
       </FormField>
       <SubmitButton pendingText="Saving…">Save new password</SubmitButton>

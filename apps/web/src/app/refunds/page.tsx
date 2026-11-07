@@ -14,11 +14,13 @@ export default function RefundsPage() {
         refunded will be confirmed before launch.
       </p>
       <h2>Rescheduling</h2>
-      <p>You will be able to ask to move your appointment. Rescheduling rules are to be confirmed.</p>
+      <p>
+        You will be able to ask to move your appointment. Rescheduling rules are to be confirmed.
+      </p>
       <h2>If we cannot provide the service</h2>
       <p>
-        If our pharmacist decides the service is not suitable for you, for example because you
-        need urgent care, we will explain why and arrange a refund.
+        If our pharmacist decides the service is not suitable for you, for example because you need
+        urgent care, we will explain why and arrange a refund.
       </p>
       <h2>How refunds are paid</h2>
       <p>Refunds are paid back to the card you used. Timescales depend on your card provider.</p>

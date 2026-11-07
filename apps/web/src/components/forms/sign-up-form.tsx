@@ -56,7 +56,13 @@ export function SignUpForm() {
         errors={fieldErrors(state, 'confirmPassword')}
       >
         {(aria) => (
-          <Input {...aria} name="confirmPassword" type="password" autoComplete="new-password" required />
+          <Input
+            {...aria}
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+          />
         )}
       </FormField>
 

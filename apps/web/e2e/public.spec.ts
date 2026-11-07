@@ -68,9 +68,15 @@ test('navigation works on all viewports', async ({ page, isMobile }) => {
   await page.goto('/');
   if (isMobile) {
     await page.locator('summary', { hasText: 'Menu' }).click();
-    await page.getByRole('navigation', { name: 'Main (mobile)' }).getByRole('link', { name: 'Pricing' }).click();
+    await page
+      .getByRole('navigation', { name: 'Main (mobile)' })
+      .getByRole('link', { name: 'Pricing' })
+      .click();
   } else {
-    await page.getByRole('navigation', { name: 'Main', exact: true }).getByRole('link', { name: 'Pricing' }).click();
+    await page
+      .getByRole('navigation', { name: 'Main', exact: true })
+      .getByRole('link', { name: 'Pricing' })
+      .click();
   }
   await expect(page).toHaveURL(/\/pricing$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pricing');

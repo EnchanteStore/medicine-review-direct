@@ -40,7 +40,11 @@ describe('order lifecycle', () => {
   });
 
   it('has the expected terminal states', () => {
-    expect(terminalStates(ORDER_TRANSITIONS).sort()).toEqual(['cancelled', 'completed', 'refunded']);
+    expect(terminalStates(ORDER_TRANSITIONS).sort()).toEqual([
+      'cancelled',
+      'completed',
+      'refunded',
+    ]);
   });
 });
 
@@ -51,9 +55,13 @@ describe('roles', () => {
 
   it('unverified or suspended clinicians do not get clinical access', () => {
     expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'pending' }])).toBe(false);
-    expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'suspended' }])).toBe(false);
+    expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'suspended' }])).toBe(
+      false,
+    );
     expect(hasClinicalAccess([{ role: 'pharmacist', verificationStatus: 'verified' }])).toBe(true);
-    expect(hasClinicalAccess([{ role: 'clinical_admin', verificationStatus: 'verified' }])).toBe(true);
+    expect(hasClinicalAccess([{ role: 'clinical_admin', verificationStatus: 'verified' }])).toBe(
+      true,
+    );
   });
 
   it('hasVerifiedRole checks role and status', () => {

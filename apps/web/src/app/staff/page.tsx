@@ -30,13 +30,15 @@ export default async function StaffHomePage() {
       </Card>
       {clinical ? (
         <Alert tone="info">
-          <p>The pharmacist workspace (assigned reviews, reports and messaging) arrives in Phase 4.</p>
+          <p>
+            The pharmacist workspace (assigned reviews, reports and messaging) arrives in Phase 4.
+          </p>
         </Alert>
       ) : (
         <Alert tone="info">
           <p>
-            Your role does not include access to clinical records. Operations tools (queues,
-            billing and service configuration) arrive in Phases 3 and 4.
+            Your role does not include access to clinical records. Operations tools (queues, billing
+            and service configuration) arrive in Phases 3 and 4.
           </p>
         </Alert>
       )}

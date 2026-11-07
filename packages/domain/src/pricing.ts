@@ -27,10 +27,14 @@ export function formatGBP(pence: number): string {
     : new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(pounds);
 }
 
-export function isDiscounted(product: Pick<ServiceProduct, 'pricePence' | 'standardPricePence'>): boolean {
+export function isDiscounted(
+  product: Pick<ServiceProduct, 'pricePence' | 'standardPricePence'>,
+): boolean {
   return product.standardPricePence !== null && product.standardPricePence > product.pricePence;
 }
 
-export function savingPence(product: Pick<ServiceProduct, 'pricePence' | 'standardPricePence'>): number {
+export function savingPence(
+  product: Pick<ServiceProduct, 'pricePence' | 'standardPricePence'>,
+): number {
   return isDiscounted(product) ? (product.standardPricePence as number) - product.pricePence : 0;
 }

@@ -13,37 +13,37 @@ export default function HowItWorksPage() {
     >
       <ol>
         <li>
-          <strong>Create your account.</strong> You will need an email address. We will send you
-          a link to confirm it.
+          <strong>Create your account.</strong> You will need an email address. We will send you a
+          link to confirm it.
         </li>
         <li>
           <strong>Answer questions about your health and medicines.</strong> You can save your
           answers and come back later. If you are not sure about something, you can say so.
         </li>
         <li>
-          <strong>Safety check.</strong> We ask a few questions to make sure this service is
-          right for you. If you need urgent help, we will tell you where to get it.
+          <strong>Safety check.</strong> We ask a few questions to make sure this service is right
+          for you. If you need urgent help, we will tell you where to get it.
         </li>
         <li>
-          <strong>Pay and book your call.</strong> Choose a time for your telephone
-          consultation. All times are UK time.
+          <strong>Pay and book your call.</strong> Choose a time for your telephone consultation.
+          All times are UK time.
         </li>
         <li>
-          <strong>Your pharmacist prepares.</strong> They read your answers and any documents
-          you have shared before they call you.
+          <strong>Your pharmacist prepares.</strong> They read your answers and any documents you
+          have shared before they call you.
         </li>
         <li>
           <strong>Telephone consultation.</strong> Your pharmacist calls you to talk about your
           medicines and answer your questions.
         </li>
         <li>
-          <strong>Your written report.</strong> Your pharmacist writes and checks your report.
-          We will email you when it is ready to read in your account. The email will not
-          include any health information.
+          <strong>Your written report.</strong> Your pharmacist writes and checks your report. We
+          will email you when it is ready to read in your account. The email will not include any
+          health information.
         </li>
         <li>
-          <strong>Optional GP letter.</strong> If you agree, your pharmacist can prepare a
-          letter for your GP.
+          <strong>Optional GP letter.</strong> If you agree, your pharmacist can prepare a letter
+          for your GP.
         </li>
       </ol>
 

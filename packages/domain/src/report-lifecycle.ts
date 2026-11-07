@@ -39,7 +39,8 @@ export function releaseBlockers(ctx: ReleaseContext): string[] {
   const reasons: string[] = [];
   if (!ctx.orderPaid) reasons.push('order is not paid');
   if (!ctx.consultationRecorded) reasons.push('consultation has not been recorded');
-  if (!ctx.releasedByVerifiedPharmacist) reasons.push('release must be performed by a verified pharmacist');
+  if (!ctx.releasedByVerifiedPharmacist)
+    reasons.push('release must be performed by a verified pharmacist');
   return reasons;
 }
 

@@ -16,8 +16,8 @@ export default function TermsPage() {
       </p>
       <h2>What the service is not</h2>
       <p>
-        The service does not diagnose, prescribe, dispense or provide emergency care, and does
-        not replace your GP. You should not stop or change any medicine without speaking to your
+        The service does not diagnose, prescribe, dispense or provide emergency care, and does not
+        replace your GP. You should not stop or change any medicine without speaking to your
         prescriber.
       </p>
       <h2>Your account</h2>
@@ -27,8 +27,8 @@ export default function TermsPage() {
       </p>
       <h2>Payment</h2>
       <p>
-        Prices are shown in pounds sterling. Payment is taken through our payment provider
-        before your consultation is booked.
+        Prices are shown in pounds sterling. Payment is taken through our payment provider before
+        your consultation is booked.
       </p>
       <h2>Liability, governing law and company details</h2>
       <p>To be completed after legal review.</p>

@@ -47,7 +47,9 @@ const nameSchema = (label: string) =>
     .string({ error: `Enter your ${label}` })
     .trim()
     .min(1, { error: `Enter your ${label}` })
-    .max(100, { error: `${label[0]?.toUpperCase()}${label.slice(1)} must be 100 characters or fewer` })
+    .max(100, {
+      error: `${label[0]?.toUpperCase()}${label.slice(1)} must be 100 characters or fewer`,
+    })
     .regex(/^[\p{L}\p{M}' .-]+$/u, {
       error: `${label[0]?.toUpperCase()}${label.slice(1)} must only include letters, spaces, hyphens and apostrophes`,
     });

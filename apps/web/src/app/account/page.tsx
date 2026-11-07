@@ -65,7 +65,9 @@ export default async function AccountPage({
           <Card className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h3 className="text-lg">Add your details</h3>
-              <p className="text-ink-700">We need your name and date of birth before your review.</p>
+              <p className="text-ink-700">
+                We need your name and date of birth before your review.
+              </p>
             </div>
             <Button asChild>
               <Link href="/account/profile">Add your details</Link>
@@ -80,8 +82,8 @@ export default async function AccountPage({
         </h2>
         <Alert tone="info" className="mt-4">
           <p>
-            Online reviews are not open yet. These sections will become available when the
-            service launches.
+            Online reviews are not open yet. These sections will become available when the service
+            launches.
           </p>
         </Alert>
         <ul className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -90,7 +92,7 @@ export default async function AccountPage({
               <Card className="h-full p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-lg">{s.title}</h3>
-                  <Badge>Not yet available</Badge>
+                  <Badge className="shrink-0 whitespace-nowrap">Not yet available</Badge>
                 </div>
                 <p className="mt-2 text-ink-700">{s.body}</p>
               </Card>

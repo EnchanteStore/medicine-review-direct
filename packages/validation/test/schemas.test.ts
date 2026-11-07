@@ -26,7 +26,11 @@ describe('signUpSchema', () => {
   });
 
   it('rejects short passwords', () => {
-    const r = signUpSchema.safeParse({ ...validSignUp, password: 'short1', confirmPassword: 'short1' });
+    const r = signUpSchema.safeParse({
+      ...validSignUp,
+      password: 'short1',
+      confirmPassword: 'short1',
+    });
     expect(r.success).toBe(false);
     if (!r.success) expect(toFieldErrors(r.error).password?.[0]).toMatch(/at least 12/);
   });
@@ -46,7 +50,8 @@ describe('signUpSchema', () => {
   it('rejects mismatched confirmation', () => {
     const r = signUpSchema.safeParse({ ...validSignUp, confirmPassword: 'different pass 42' });
     expect(r.success).toBe(false);
-    if (!r.success) expect(toFieldErrors(r.error).confirmPassword).toEqual(['Passwords do not match']);
+    if (!r.success)
+      expect(toFieldErrors(r.error).confirmPassword).toEqual(['Passwords do not match']);
   });
 
   it('requires adult confirmation and terms acknowledgement', () => {
@@ -76,11 +81,14 @@ describe('signIn / forgot / reset', () => {
 
   it('reset requires matching strong password', () => {
     expect(
-      resetPasswordSchema.safeParse({ password: 'new password 99', confirmPassword: 'new password 99' })
-        .success,
+      resetPasswordSchema.safeParse({
+        password: 'new password 99',
+        confirmPassword: 'new password 99',
+      }).success,
     ).toBe(true);
     expect(
-      resetPasswordSchema.safeParse({ password: 'new password 99', confirmPassword: 'nope' }).success,
+      resetPasswordSchema.safeParse({ password: 'new password 99', confirmPassword: 'nope' })
+        .success,
     ).toBe(false);
   });
 });

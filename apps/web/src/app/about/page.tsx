@@ -10,24 +10,23 @@ export default function AboutPage() {
       lead="Medicine Review Direct is a private service led by UK-registered pharmacists."
     >
       <p>
-        Many people take several medicines prescribed at different times, sometimes by
-        different clinicians. It is easy to lose track of why each one was started, or to
-        wonder whether they still suit you. GP appointments are often short, and there is not
-        always time to go through everything.
+        Many people take several medicines prescribed at different times, sometimes by different
+        clinicians. It is easy to lose track of why each one was started, or to wonder whether they
+        still suit you. GP appointments are often short, and there is not always time to go through
+        everything.
       </p>
       <p>
         We offer an unhurried, independent review with a pharmacist, an expert in medicines. We
-        listen, explain and suggest things you may want to discuss with your GP or prescriber.
-        Every recommendation is made and checked by a registered pharmacist. We do not use
-        automated or AI systems to make clinical decisions.
+        listen, explain and suggest things you may want to discuss with your GP or prescriber. Every
+        recommendation is made and checked by a registered pharmacist. We do not use automated or AI
+        systems to make clinical decisions.
       </p>
 
       <h2>Our pharmacists</h2>
       <p>
-        All our pharmacists are registered with the General Pharmaceutical Council (GPhC). We
-        check each pharmacist&apos;s registration before they can see any patient information.
-        Pharmacist names and registration numbers will be shown here and on every report before
-        launch.
+        All our pharmacists are registered with the General Pharmaceutical Council (GPhC). We check
+        each pharmacist&apos;s registration before they can see any patient information. Pharmacist
+        names and registration numbers will be shown here and on every report before launch.
       </p>
 
       <h2>Independent and private</h2>

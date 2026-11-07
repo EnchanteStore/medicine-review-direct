@@ -30,8 +30,8 @@ export function SiteFooter() {
       </Container>
       <Container className="border-t border-sand-200 py-6 text-sm text-ink-700">
         <p>
-          Working name, subject to branding and legal clearance. Pre-launch preview: website
-          content is in draft and the service is not yet accepting patients.
+          Working name, subject to branding and legal clearance. Pre-launch preview: website content
+          is in draft and the service is not yet accepting patients.
         </p>
       </Container>
     </footer>

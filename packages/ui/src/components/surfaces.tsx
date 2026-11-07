@@ -28,8 +28,7 @@ export const alertVariants = cva('rounded-md border-l-[6px] p-4 sm:p-5', {
 });
 
 export interface AlertProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
   title?: string;
 }
 
@@ -59,8 +58,7 @@ export const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 export function Badge({ tone, className, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />;

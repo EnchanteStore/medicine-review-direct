@@ -42,7 +42,12 @@ export function ProfileForm({ initial }: { initial: ProfileFormValues }) {
 
       <FormField id="familyName" label="Last name" errors={fieldErrors(state, 'familyName')}>
         {(aria) => (
-          <Input {...aria} name="familyName" autoComplete="family-name" defaultValue={v.familyName} />
+          <Input
+            {...aria}
+            name="familyName"
+            autoComplete="family-name"
+            defaultValue={v.familyName}
+          />
         )}
       </FormField>
 
@@ -91,7 +96,13 @@ export function ProfileForm({ initial }: { initial: ProfileFormValues }) {
         errors={fieldErrors(state, 'phoneNumber')}
       >
         {(aria) => (
-          <Input {...aria} name="phoneNumber" type="tel" autoComplete="tel" defaultValue={v.phoneNumber} />
+          <Input
+            {...aria}
+            name="phoneNumber"
+            type="tel"
+            autoComplete="tel"
+            defaultValue={v.phoneNumber}
+          />
         )}
       </FormField>
 

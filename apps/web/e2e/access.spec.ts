@@ -31,13 +31,17 @@ test.describe('staff area (UI, server-side role checks)', () => {
     expect(res?.status()).toBe(404);
   });
 
-  test('a verified ops admin can open the staff area but is told there is no clinical access', async ({ page }) => {
+  test('a verified ops admin can open the staff area but is told there is no clinical access', async ({
+    page,
+  }) => {
     await signIn(page, SEED.opsAdmin, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/account$/);
     await page.goto('/staff');
     await expect(page.getByRole('heading', { name: 'Staff area', level: 1 })).toBeVisible();
     await expect(page.getByText('Operations administrator: verified')).toBeVisible();
-    await expect(page.getByText('Your role does not include access to clinical records.')).toBeVisible();
+    await expect(
+      page.getByText('Your role does not include access to clinical records.'),
+    ).toBeVisible();
   });
 
   test('a verified pharmacist sees the clinical workspace placeholder', async ({ page }) => {

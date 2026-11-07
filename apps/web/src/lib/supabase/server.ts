@@ -9,28 +9,36 @@ import type { Database } from './database.types';
 export async function createSupabaseServerClient() {
   const env = publicEnv();
   const cookieStore = await cookies();
-  return createServerClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        try {
-          for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+  return createServerClient<Database>(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            for (const { name, value, options } of cookiesToSet) {
+              cookieStore.set(name, value, options);
+            }
+          } catch {
+            // Called from a Server Component where cookies are read-only; the proxy refreshes sessions.
           }
-        } catch {
-          // Called from a Server Component where cookies are read-only; the proxy refreshes sessions.
-        }
+        },
       },
     },
-  });
+  );
 }
 
 /** Anonymous client for public data (e.g. active prices). No session, RLS as `anon`. */
 export function createSupabaseAnonClient() {
   const env = publicEnv();
-  return createPlainClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  return createPlainClient<Database>(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+    },
+  );
 }

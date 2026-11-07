@@ -23,7 +23,11 @@ interface MailpitSummary {
 }
 
 /** Polls the local Mailpit inbox for the newest email to `to` with `subject`, and returns its /auth/confirm link. */
-export async function waitForAuthLink(to: string, subject: string, timeoutMs = 20_000): Promise<string> {
+export async function waitForAuthLink(
+  to: string,
+  subject: string,
+  timeoutMs = 20_000,
+): Promise<string> {
   const deadline = Date.now() + timeoutMs;
   const query = encodeURIComponent(`to:"${to}" subject:"${subject}"`);
   while (Date.now() < deadline) {
@@ -46,7 +50,11 @@ export async function waitForAuthLink(to: string, subject: string, timeoutMs = 2
 
 export async function countEmails(to: string): Promise<number> {
   const res = await fetch(`${MAILPIT_URL}/api/v1/search?query=${encodeURIComponent(`to:"${to}"`)}`);
-  const body = (await res.json()) as { messages_count?: number; total?: number; messages: unknown[] };
+  const body = (await res.json()) as {
+    messages_count?: number;
+    total?: number;
+    messages: unknown[];
+  };
   return body.messages.length;
 }
 

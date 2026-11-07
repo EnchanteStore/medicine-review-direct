@@ -15,8 +15,8 @@ export default function ClinicalSafetyPage() {
 
       <Alert tone="danger" title="This service is not for emergencies" role="note">
         <p>
-          We are not monitored for emergencies. If you are seriously unwell, call 999. For
-          urgent medical advice, call NHS 111.
+          We are not monitored for emergencies. If you are seriously unwell, call 999. For urgent
+          medical advice, call NHS 111.
         </p>
       </Alert>
 
@@ -39,16 +39,15 @@ export default function ClinicalSafetyPage() {
 
       <h2>Safety questions</h2>
       <p>
-        Before you pay, we ask some safety questions. If your answers suggest you may need
-        urgent help, we will show you where to get it and will not take a booking at that time.
-        A member of our clinical team is also alerted.
+        Before you pay, we ask some safety questions. If your answers suggest you may need urgent
+        help, we will show you where to get it and will not take a booking at that time. A member of
+        our clinical team is also alerted.
       </p>
 
       <h2>Your pharmacist is responsible</h2>
       <p>
-        Every finding and recommendation in your report is written and checked by a
-        UK-registered pharmacist. Your report is only released after the pharmacist has
-        approved it.
+        Every finding and recommendation in your report is written and checked by a UK-registered
+        pharmacist. Your report is only released after the pharmacist has approved it.
       </p>
     </ContentPage>
   );

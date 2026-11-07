@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   countEmails,
   expectNoA11yViolations,
@@ -11,7 +11,7 @@ import {
 const PASSWORD = 'synthetic pass 2026';
 const NEW_PASSWORD = 'another synthetic 2027';
 
-async function signUp(page: import('@playwright/test').Page, email: string, password = PASSWORD) {
+async function signUp(page: Page, email: string, password = PASSWORD) {
   await page.goto('/sign-up');
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Create a password').fill(password);
@@ -33,9 +33,14 @@ test('sign-up validation shows accessible, linked errors', async ({ page }) => {
   const summary = page.getByRole('alert').filter({ hasText: 'There is a problem' });
   await expect(summary).toBeVisible();
   await expect(summary).toBeFocused();
-  await expect(summary.getByRole('link', { name: /correct format/ })).toHaveAttribute('href', '#email');
+  await expect(summary.getByRole('link', { name: /correct format/ })).toHaveAttribute(
+    'href',
+    '#email',
+  );
   await expect(summary.getByRole('link', { name: /at least 12 characters/ })).toBeVisible();
-  await expect(summary.getByRole('link', { name: 'You must confirm you are 18 or over' })).toBeVisible();
+  await expect(
+    summary.getByRole('link', { name: 'You must confirm you are 18 or over' }),
+  ).toBeVisible();
   await expect(page.getByLabel('Email address')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.getByLabel('Email address')).toHaveValue('not-an-email');
   await expect(page.getByLabel('Create a password')).toHaveValue('');
@@ -79,10 +84,9 @@ test('register, verify email, complete profile, sign out and sign back in', asyn
   await page.getByLabel('UK phone number (optional)').fill('12345');
   await page.getByRole('button', { name: 'Save details' }).click();
   const summary = page.getByRole('alert').filter({ hasText: 'There is a problem' });
-  await expect(summary.getByRole('link', { name: /only for adults aged 18 or over/ })).toHaveAttribute(
-    'href',
-    '#dobDay',
-  );
+  await expect(
+    summary.getByRole('link', { name: /only for adults aged 18 or over/ }),
+  ).toHaveAttribute('href', '#dobDay');
   await expect(summary.getByRole('link', { name: /Enter a UK phone number/ })).toBeVisible();
   await expectNoA11yViolations(page);
 
@@ -142,7 +146,9 @@ test('password reset via emailed link', async ({ page }) => {
   await expect(page).toHaveURL(/\/account$/);
 });
 
-test('password reset for an unknown email gives the same response and sends nothing', async ({ page }) => {
+test('password reset for an unknown email gives the same response and sends nothing', async ({
+  page,
+}) => {
   const email = uniqueEmail('nobody');
   await page.goto('/forgot-password');
   await page.getByLabel('Email address').fill(email);
@@ -152,7 +158,9 @@ test('password reset for an unknown email gives the same response and sends noth
   expect(await countEmails(email)).toBe(0);
 });
 
-test('signing up with an existing email does not reveal that the account exists', async ({ page }) => {
+test('signing up with an existing email does not reveal that the account exists', async ({
+  page,
+}) => {
   const email = uniqueEmail('dupe');
   await signUp(page, email);
   await expect(page).toHaveURL(/\/sign-up\/check-email$/);
@@ -201,5 +209,7 @@ test('repeated failed sign-ins for one email are rate limited', async ({ page })
     await expect(page.getByText('Your email address or password is incorrect.')).toBeVisible();
   }
   await signIn(page, email, 'wrong password again');
-  await expect(page.getByText('Too many attempts. Please wait 15 minutes and try again.')).toBeVisible();
+  await expect(
+    page.getByText('Too many attempts. Please wait 15 minutes and try again.'),
+  ).toBeVisible();
 });

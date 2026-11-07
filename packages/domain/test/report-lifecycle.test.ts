@@ -22,7 +22,9 @@ describe('report lifecycle', () => {
   it('cannot skip clinical approval', () => {
     expect(canTransitionReport('draft', 'generating')).toBe(false);
     expect(canTransitionReport('draft', 'ready_for_release')).toBe(false);
-    expect(() => assertReportTransition('draft', 'released', okCtx)).toThrow(InvalidTransitionError);
+    expect(() => assertReportTransition('draft', 'released', okCtx)).toThrow(
+      InvalidTransitionError,
+    );
   });
 
   it('cannot release directly from generation (no automatic release)', () => {

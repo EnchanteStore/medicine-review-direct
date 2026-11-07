@@ -9,13 +9,13 @@ export default function ComplaintsPage() {
     <ContentPage title="Complaints">
       <DraftNotice />
       <p>
-        We want to hear if something has gone wrong. Complaints help us improve and keep the
-        service safe.
+        We want to hear if something has gone wrong. Complaints help us improve and keep the service
+        safe.
       </p>
       <h2>How to complain</h2>
       <p>
-        Contact details for complaints will be published before launch. You will also be able
-        to raise a complaint from your account.
+        Contact details for complaints will be published before launch. You will also be able to
+        raise a complaint from your account.
       </p>
       <h2>What happens next</h2>
       <ol>
@@ -25,8 +25,8 @@ export default function ComplaintsPage() {
       </ol>
       <h2>If you are not satisfied</h2>
       <p>
-        Details of independent bodies you can contact, such as the General Pharmaceutical
-        Council, will be confirmed here after review.
+        Details of independent bodies you can contact, such as the General Pharmaceutical Council,
+        will be confirmed here after review.
       </p>
     </ContentPage>
   );
