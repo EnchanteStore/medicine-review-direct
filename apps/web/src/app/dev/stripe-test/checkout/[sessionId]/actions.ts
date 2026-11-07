@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { publicEnv } from '@/lib/env';
+import { buildLocalCheckoutEvent } from '@/lib/local-checkout-event';
 import { LOCAL_TEST_WEBHOOK_SECRET, signStripePayload } from '@/lib/stripe-signature';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -27,18 +28,10 @@ export async function confirmLocalCheckoutAction(formData: FormData): Promise<vo
   ) {
     redirect('/account');
   }
-  const event = {
-    id: `evt_local_${crypto.randomUUID()}`,
-    type: 'checkout.session.completed',
-    data: {
-      object: {
-        id: session.id,
-        amount_total: session.amount_pence,
-        currency: 'gbp',
-        metadata: { checkout_mode: 'local_test_harness', order_id: session.order_id },
-      },
-    },
-  };
+  const event = buildLocalCheckoutEvent(
+    { id: session.id, amountPence: session.amount_pence, orderId: session.order_id },
+    `evt_local_${crypto.randomUUID()}`,
+  );
   const payload = JSON.stringify(event);
   const header = signStripePayload(
     LOCAL_TEST_WEBHOOK_SECRET,

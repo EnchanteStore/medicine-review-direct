@@ -80,6 +80,8 @@ jobs:
           set -a; . apps/web/.env.local; set +a
           pnpm --filter @mrd/web build
       - run: pnpm --filter @mrd/web exec playwright install --with-deps chromium
+      - name: Install poppler so the PDF check can read pages
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - name: Run Playwright
         run: |
           set -a; . apps/web/.env.local; set +a

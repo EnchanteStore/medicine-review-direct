@@ -79,12 +79,27 @@ Still later, and not claimed as done:
 
 ## Phase 5: Assurance and launch preparation
 
-- DCB0129 clinical safety case and hazard log, Clinical Safety Officer sign-off.
-- DPIA, privacy notice, retention schedule and jobs, legal review of all policy pages.
-- Penetration test, nonce-based CSP, shared rate-limit store, backup/restore drill, monitoring
-  and alerting, incident runbooks, accessibility audit with real users.
-- Staging and production environments in the approved region; Stripe live activation **only with
-  explicit owner approval**.
+Built on `cursor/phase-5-launch-assurance`. This slice does not open the service.
+
+- One Playwright journey from registration and email verification through routine screening,
+  consent, questionnaire, labelled test payment, booking, pharmacist consultation, approval, PDF
+  generation, release, and the patient reading the report. Drafts stay hidden until release.
+- The existing denial tests stay: second patient, unassigned pharmacist, operations administrator,
+  and an emergency answer blocking checkout.
+- Local security checks: sign-in rate limit, no health details in emails or stored payment rows,
+  release gate for unpaid and unconsulted orders (pgTAP), and document links that expire.
+- Keyboard-only screening and booking. Screen-reader testing is not done.
+- The generated PDF is opened and checked for the agreed sections, a page break, and the DRAFT
+  label. [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md) and
+  [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md) record what is still blocked.
+
+Still later, and not claimed as done:
+
+- DCB0129 clinical safety case and Clinical Safety Officer sign-off.
+- DPIA, solicitor-approved legal pages, and the retention job.
+- Penetration test, nonce-based CSP, shared rate-limit store, a backup restore drill, monitoring,
+  and an accessibility audit with screen-reader users.
+- Staging and production in London. Live Stripe only after an explicit owner decision.
 
 ## Phase 6: Native apps
 
@@ -99,15 +114,15 @@ Still later, and not claimed as done:
 | 1   | Registration and email verification    | 1     | Automated, passing                                                          |
 | 2   | Sign-in/out and password reset         | 1     | Automated, passing                                                          |
 | 3   | Profile with validation                | 1     | Automated, passing                                                          |
-| 4   | Questionnaire draft, submit, amend     | 2     | Not started                                                                 |
-| 5   | Emergency screening blocks purchase    | 2     | Domain rule unit-tested; UI not started                                     |
-| 6   | Document upload and scanning           | 2     | Not started                                                                 |
+| 4   | Questionnaire draft, submit, amend     | 2     | Passing in `intake.spec.ts`                                                 |
+| 5   | Emergency screening blocks purchase    | 2     | Passing in `intake.spec.ts`                                                 |
+| 6   | Document upload and scanning           | 2     | Passing. Scanner is still a labelled stub                                   |
 | 7   | Purchase via Stripe test mode          | 3     | Local signed test harness passing. Real Stripe API not called (no test key) |
 | 8   | Booking without double-booking         | 3     | Passing. Database exclusion constraint plus a Playwright booking            |
-| 9   | Pharmacist pre-review and consultation | 4     | Not started                                                                 |
-| 10  | Report approve, generate, release      | 4     | Domain rule unit-tested                                                     |
-| 11  | Patient views released report only     | 4     | Not started                                                                 |
-| 12  | GP letter with consent                 | 4     | Not started                                                                 |
+| 9   | Pharmacist pre-review and consultation | 4     | Passing in `clinical.spec.ts` and the Phase 5 journey                       |
+| 10  | Report approve, generate, release      | 4     | Passing, including the database gate                                        |
+| 11  | Patient views released report only     | 4     | Passing. The journey also checks the draft is hidden                        |
+| 12  | GP letter with consent                 | 4     | Passing in `clinical.spec.ts`. Letter is not sent (R-01)                    |
 | 13  | Cross-patient access denied            | 1     | Automated (pgTAP + Data API), passing                                       |
 | 14  | Unauthorised/unverified staff denied   | 1     | Automated (pgTAP + UI), passing                                             |
 | 15  | Ops admin denied clinical records      | 1     | Automated (pgTAP + Data API), passing for current tables                    |
