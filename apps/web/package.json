@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "env:local": "node scripts/write-local-env.mjs"
   },
   "dependencies": {
     "@mrd/domain": "workspace:*",

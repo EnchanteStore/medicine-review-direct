@@ -1,0 +1,10 @@
+{
+  "extends": "@mrd/config/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "src", "e2e", "test", "*.ts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

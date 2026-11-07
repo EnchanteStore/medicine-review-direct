@@ -18,7 +18,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
-    "db:lint": "supabase db lint --level warning"
+    "db:lint": "supabase db lint --level warning",
+    "db:types": "supabase gen types typescript --local --schema public > apps/web/src/lib/supabase/database.types.ts && prettier --write apps/web/src/lib/supabase/database.types.ts"
   },
   "devDependencies": {
     "prettier": "^3.9.10",
