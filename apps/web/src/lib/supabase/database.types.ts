@@ -205,20 +205,60 @@ export type Database = {
           },
         ];
       };
+      high_risk_medicine_changes: {
+        Row: {
+          category: string | null;
+          change: string;
+          id: number;
+          recorded_at: string;
+          recorded_by: string | null;
+          term: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          category?: string | null;
+          change: string;
+          id?: never;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          term: string;
+        };
+        Update: {
+          category?: string | null;
+          change?: string;
+          id?: never;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          term?: string;
+        };
+        Relationships: [];
+      };
       high_risk_medicine_terms: {
         Row: {
+          approved_at: string | null;
+          approved_by: string | null;
           category: string;
+          effective_from: string;
+          effective_to: string | null;
           status: string;
           term: string;
         };
         ComputedFields: never;
         Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
           category: string;
+          effective_from?: string;
+          effective_to?: string | null;
           status?: string;
           term: string;
         };
         Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
           category?: string;
+          effective_from?: string;
+          effective_to?: string | null;
           status?: string;
           term?: string;
         };
@@ -293,6 +333,34 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      mfa_recovery_events: {
+        Row: {
+          approved_by: string;
+          id: string;
+          outcome: string;
+          recorded_at: string;
+          user_id: string;
+          verification_method: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          approved_by: string;
+          id?: string;
+          outcome: string;
+          recorded_at?: string;
+          user_id: string;
+          verification_method: string;
+        };
+        Update: {
+          approved_by?: string;
+          id?: string;
+          outcome?: string;
+          recorded_at?: string;
+          user_id?: string;
+          verification_method?: string;
+        };
+        Relationships: [];
       };
       products: {
         Row: {
@@ -546,10 +614,13 @@ export type Database = {
         Row: {
           assigned_pharmacist_id: string | null;
           created_at: string;
+          exclusion_label: string | null;
           id: string;
           last_clinical_contact_at: string | null;
           patient_id: string;
+          prior_concern_confirmed_at: string | null;
           product_code: string;
+          requires_prior_exclusion_review: boolean;
           status: Database['public']['Enums']['order_status'];
           status_changed_at: string;
           suitability_review_required: boolean;
@@ -559,10 +630,13 @@ export type Database = {
         Insert: {
           assigned_pharmacist_id?: string | null;
           created_at?: string;
+          exclusion_label?: string | null;
           id?: string;
           last_clinical_contact_at?: string | null;
           patient_id: string;
+          prior_concern_confirmed_at?: string | null;
           product_code?: string;
+          requires_prior_exclusion_review?: boolean;
           status?: Database['public']['Enums']['order_status'];
           status_changed_at?: string;
           suitability_review_required?: boolean;
@@ -571,10 +645,13 @@ export type Database = {
         Update: {
           assigned_pharmacist_id?: string | null;
           created_at?: string;
+          exclusion_label?: string | null;
           id?: string;
           last_clinical_contact_at?: string | null;
           patient_id?: string;
+          prior_concern_confirmed_at?: string | null;
           product_code?: string;
+          requires_prior_exclusion_review?: boolean;
           status?: Database['public']['Enums']['order_status'];
           status_changed_at?: string;
           suitability_review_required?: boolean;
@@ -758,9 +835,31 @@ export type Database = {
     };
     Functions: {
       acknowledge_safety_advice: { Args: { p_screening_id: string }; Returns: undefined };
+      add_high_risk_term: { Args: { p_category: string; p_term: string }; Returns: undefined };
       assign_pharmacist: {
         Args: { p_order_id: string; p_pharmacist_id: string };
         Returns: undefined;
+      };
+      confirm_prior_safety_concern: { Args: { p_order_id: string }; Returns: undefined };
+      launch_readiness: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          decision: string;
+          evidence_reference: string;
+          gate: Database['public']['Enums']['launch_gate'];
+          recorded_at: string;
+        }[];
+      };
+      patient_safety_history: {
+        Args: { p_patient_id: string };
+        Returns: {
+          exclusion_label: string;
+          matched_rule_ids: string[];
+          order_id: string;
+          outcome: string;
+          recorded_at: string;
+          ruleset_version: string;
+        }[];
       };
       pharmacist_approve_report: {
         Args: { p_consultation_id: string; p_report_id: string };
@@ -794,6 +893,7 @@ export type Database = {
         Args: { p_kind: string; p_notes: string; p_order_id: string; p_outcome: string };
         Returns: string;
       };
+      recover_staff_mfa: { Args: { p_method: string; p_user_id: string }; Returns: undefined };
       register_document: {
         Args: {
           p_filename: string;

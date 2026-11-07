@@ -3,7 +3,6 @@ import { QUESTIONNAIRE_STEPS } from '@mrd/validation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { FullEmergencyWarning } from '@/components/emergency-banner';
 import {
   ConcernsStepForm,
   HealthStepForm,
@@ -65,7 +64,6 @@ export default async function QuestionnaireStepPage({
         {step === 3 ? <ConcernsStepForm orderId={order.id} answers={answers} /> : null}
         {step === 4 ? (
           <div className="space-y-6">
-            <FullEmergencyWarning />
             <section className="space-y-2">
               <h2 className="text-xl">Your health</h2>
               <p>

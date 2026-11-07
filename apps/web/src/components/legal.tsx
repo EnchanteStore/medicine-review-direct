@@ -18,9 +18,13 @@ export function Fact({ k }: { k: BusinessFieldKey }) {
   return (
     <>
       {fact.value}
-      {fact.verified ? null : (
+      {fact.status === 'verified' ? null : (
         <Badge tone="warning" className="ml-2">
-          Unverified
+          {fact.status === 'owner_recorded'
+            ? 'Supplied by the company'
+            : fact.status === 'pending_verification'
+              ? 'Pending independent verification'
+              : 'Unverified'}
         </Badge>
       )}
     </>
@@ -93,20 +97,27 @@ export function CompanyIdentity() {
 
 export function PharmacistRegistration() {
   return (
-    <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[16rem_1fr]">
-      <dt className="font-semibold">Responsible pharmacist</dt>
-      <dd>
-        <Fact k="superintendentPharmacistName" />
-      </dd>
-      <dt className="font-semibold">GPhC registration number</dt>
-      <dd>
-        <Fact k="superintendentPharmacistGphc" />
-      </dd>
-      <dt className="font-semibold">Professional indemnity</dt>
-      <dd>
-        <Fact k="indemnityProvider" />
-      </dd>
-    </dl>
+    <>
+      <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-[16rem_1fr]">
+        <dt className="font-semibold">Lead pharmacist</dt>
+        <dd>
+          <Fact k="superintendentPharmacistName" />
+        </dd>
+        <dt className="font-semibold">GPhC registration number</dt>
+        <dd>
+          <Fact k="superintendentPharmacistGphc" />
+        </dd>
+        <dt className="font-semibold">Professional indemnity</dt>
+        <dd>
+          <Fact k="indemnityProvider" />
+        </dd>
+      </dl>
+      <p className="mt-4 text-ink-700">
+        The lead pharmacist is not described as an independent prescriber. PHARMA247 LTD is not
+        described as operating a GPhC-registered pharmacy premises. The live GPhC register entry has
+        not been checked by this website.
+      </p>
+    </>
   );
 }
 

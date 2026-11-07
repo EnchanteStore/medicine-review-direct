@@ -1,6 +1,7 @@
 import { hasClinicalAccess } from '@mrd/domain';
 import { Alert, Card } from '@mrd/ui';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getStaffGrants } from '@/lib/auth';
 
 export const metadata: Metadata = { title: 'Staff area' };
@@ -18,6 +19,9 @@ export default async function StaffHomePage() {
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl">Staff area</h1>
+      <p>
+        <Link href="/staff/launch-readiness">Launch readiness checklist</Link>
+      </p>
       <Card>
         <h2 className="text-xl">Your roles</h2>
         <ul className="mt-3 space-y-1">

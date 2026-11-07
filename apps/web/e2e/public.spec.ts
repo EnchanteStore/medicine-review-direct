@@ -28,7 +28,8 @@ for (const p of PAGES) {
     expect(res?.status()).toBe(200);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
     const banner = page.getByTestId('emergency-banner-short');
-    await expect(banner).toContainText('Important: Not an emergency service.');
+    await expect(banner).toContainText('Not an emergency service');
+    await expect(banner).toContainText('is not monitored 24/7');
     await expect(banner).toContainText('PharmReview');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-GB');
     if (p.legal) {
@@ -37,7 +38,7 @@ for (const p of PAGES) {
     }
     if (p.full) {
       await expect(page.getByTestId('emergency-warning-full')).toContainText(
-        'PharmReview does not provide emergency or urgent medical care and is not monitored 24 hours a day.',
+        'PharmReview is not an emergency or urgent medical service.',
       );
     }
     await expectNoA11yViolations(page);
@@ -100,17 +101,27 @@ test('the old contact page redirects to complaints and contact information', asy
   await expect(page).toHaveURL(/\/complaints#contact$/);
 });
 
-test('legal pages never invent company, ICO, GPhC or VAT details', async ({ page }) => {
+test('legal pages show the supplied company and leave unverified details as placeholders', async ({
+  page,
+}) => {
   await page.goto('/terms');
+  await expect(page.getByText('PHARMA247 LTD').first()).toBeVisible();
+  await expect(page.getByText('17365383').first()).toBeVisible();
+  await expect(page.getByText('Cheuk Kin Sung').first()).toBeVisible();
+  await expect(page.getByText('2234388').first()).toBeVisible();
+  await expect(page.getByText('Pending independent verification').first()).toBeVisible();
+  await expect(page.getByText('not described as an independent prescriber')).toBeVisible();
   for (const label of [
-    'Company legal name',
-    'Company registration number',
-    'Registered office address',
     'ICO registration number',
     'VAT registration number',
-    'Responsible pharmacist GPhC registration number',
     'Professional indemnity insurer',
   ]) {
+    await expect(
+      page.getByText(`[Placeholder: ${label} not yet supplied and verified]`).first(),
+    ).toBeVisible();
+  }
+  await page.goto('/complaints');
+  for (const label of ['Contact email address', 'Contact telephone number']) {
     await expect(
       page.getByText(`[Placeholder: ${label} not yet supplied and verified]`).first(),
     ).toBeVisible();

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { PharmacistRegistration } from '@/components/legal';
 import { ContentPage } from '@/components/page-header';
 import { brandName } from '@/lib/site';
 
@@ -8,7 +9,7 @@ export default function AboutPage() {
   return (
     <ContentPage
       title="About us"
-      lead={`${brandName()} is a private service led by GPhC-registered pharmacists.`}
+      lead={`${brandName()} is a private pharmacist-led medication review service for adults in England.`}
     >
       <p>
         Many people take several medicines prescribed at different times, sometimes by different
@@ -23,12 +24,14 @@ export default function AboutPage() {
         systems to make clinical decisions.
       </p>
 
-      <h2>Our pharmacists</h2>
+      <h2>Who provides the service</h2>
       <p>
-        All our pharmacists are registered with the General Pharmaceutical Council (GPhC). We check
-        each pharmacist&apos;s registration before they can see any patient information. Pharmacist
-        names and registration numbers will be shown here and on every report before launch.
+        {brandName()} is a trading name of PHARMA247 LTD. It is a private service, not an NHS
+        service. Every pharmacist who sees patient information must be verified before they are
+        given access. The lead pharmacist named for the service is below. Their live GPhC register
+        entry has not yet been independently confirmed.
       </p>
+      <PharmacistRegistration />
 
       <h2>Independent and private</h2>
       <p>

@@ -1,3 +1,4 @@
+import { screeningGuidance, type ScreeningAnswer } from '@mrd/domain';
 import { Alert, Button, Card } from '@mrd/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -39,22 +40,31 @@ export default async function OutcomePage({ params }: { params: Promise<{ orderI
   const screening = await getLatestScreening(order.id);
   if (!screening) redirect(`/account/review/${order.id}/screening`);
   const brand = brandName();
+  const answers = (screening.answers ?? {}) as Record<string, ScreeningAnswer>;
+  const guidance = screeningGuidance(answers, {
+    outcome: screening.outcome as 'emergency' | 'urgent' | 'routine',
+    matchedRuleIds: screening.matched_rule_ids ?? [],
+  });
 
-  if (screening.outcome === 'emergency') {
+  if (guidance === 'call_999' || guidance === 'call_999_or_111') {
     return (
       <div className="space-y-6" data-testid="outcome-emergency">
-        <h1 className="font-serif text-3xl sm:text-4xl">Call 999 now if this is happening</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl">
+          {guidance === 'call_999'
+            ? 'Call 999 now if this is happening'
+            : 'This may be an emergency'}
+        </h1>
         <FullEmergencyWarning />
         <Card className="space-y-3">
           <h2 className="text-xl">We have stopped this request</h2>
           <p>
-            Your answers suggest you may need emergency help. A medication review is not the right
-            service for this, so we cannot continue this request or take a booking or payment for
-            it.
+            {guidance === 'call_999'
+              ? 'Call 999 immediately. A medication review is not the right service, so this request is closed and cannot be paid for or booked.'
+              : 'If an emergency may be happening, call 999. Otherwise contact NHS 111 now for an assessment. This request is closed and cannot be paid for or booked.'}
           </p>
           <p>
-            {brand} will not contact emergency services for you and does not monitor this website.
-            If you have a life-threatening emergency, call 999 yourself now.
+            {brand} has not assessed you, will not contact emergency services for you, and is not
+            monitoring this page. This request is marked EMERGENCY_EXCLUDED.
           </p>
           <Acknowledge
             orderId={order.id}
@@ -66,20 +76,21 @@ export default async function OutcomePage({ params }: { params: Promise<{ orderI
     );
   }
 
-  if (screening.outcome === 'urgent' && order.status === 'safety_urgent_hold') {
+  if (guidance === 'nhs_111_or_999_if_life_threatening' || guidance === 'gp_or_111') {
     return (
       <div className="space-y-6" data-testid="outcome-urgent">
         <h1 className="font-serif text-3xl sm:text-4xl">Please get help today</h1>
-        <FullEmergencyWarning />
         <Card className="space-y-3">
           <h2 className="text-xl">Contact your GP or NHS 111 today</h2>
           <p>
-            Your answers suggest a problem that should be checked today. Do not wait for a
-            medication review or a response from us.
+            {guidance === 'nhs_111_or_999_if_life_threatening'
+              ? 'Contact NHS 111 now about this medicine problem. If you have life-threatening symptoms, call 999. Do not wait for a medication review.'
+              : 'Contact your GP or NHS 111 today. Do not wait for a medication review or a response from us.'}
           </p>
           <p>
-            We have paused this request. You cannot book a routine review for this concern until a
-            pharmacist has checked that it is suitable and recorded that decision.
+            We have paused this request (URGENT_EXCLUDED). You cannot book a routine review for this
+            concern until a pharmacist has checked that it is suitable and recorded that decision.
+            {brand} is not monitoring this page.
           </p>
           <Acknowledge
             orderId={order.id}
@@ -96,8 +107,8 @@ export default async function OutcomePage({ params }: { params: Promise<{ orderI
       <h1 className="font-serif text-3xl sm:text-4xl">Thank you. You can continue</h1>
       <Alert tone="info">
         <p>
-          Your answers do not stop you continuing. This does not mean your medicines are safe: a
-          pharmacist will look at everything you tell us.
+          Your answers do not stop you continuing. This is not a check that you, or your medicines,
+          are safe. A pharmacist will look at what you tell us.
         </p>
       </Alert>
       <Button asChild size="lg">

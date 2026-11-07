@@ -75,6 +75,13 @@ export async function submitScreeningAction(
     throw e;
   }
   const supabase = await createSupabaseServerClient();
+  if (formData.get('priorConcernConfirmed') === 'on') {
+    const confirmed = await supabase.rpc('confirm_prior_safety_concern', { p_order_id: orderId });
+    if (confirmed.error) {
+      const state = dbError('prior-concern', confirmed.error);
+      return state.status === 'error' ? { ...state, values } : state;
+    }
+  }
   const { error } = await supabase.rpc('submit_safety_screening', {
     p_order_id: orderId,
     p_answers: answers,

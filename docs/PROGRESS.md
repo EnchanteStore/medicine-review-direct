@@ -2,9 +2,20 @@
 
 ## Phase 2: Patient intake
 
+Product-owner decisions P-01 to P-11 (7 November 2026) are recorded in
+[DECISION_LOG.md](./DECISION_LOG.md) and implemented for development. They are not clinical, legal
+or regulatory certification. The active screening rule set is `2026-11-draft.2` (four questions).
+Not sure is never treated as no. PHARMA247 LTD and Cheuk Kin Sung (GPhC 2234388, live register
+check pending) are shown on the legal pages. Phone, email, ICO number and insurance are still
+placeholders. Public intake and payments stay disabled.
+
 **Status:** implemented on branch `cursor/phase-2-patient-intake`, stacked on Phase 1. Not
 deployed. Synthetic data only. The live clinical service is **disabled**: no launch sign-offs
-are recorded and the rule set is DRAFT. No Stripe, no SES, no real emails.
+are recorded and the rule set is pending clinical approval. No Stripe, no SES, no real emails.
+
+Follow-up check after P-01 to P-11, same day: format, typecheck and lint passed. Vitest 131
+(domain 60, validation 38, web 25, ui 8). `supabase db reset`, schema lint, and pgTAP passed
+(8 files, 217 assertions). Playwright and axe passed (70 tests, 51.5s).
 
 Evidence was produced on 7 November 2026 on the Cloud VM with the same toolchain as Phase 1
 (Node 22.23.4, pnpm 10.33.4, Docker 29.9.3, Supabase CLI 3.0.0 / Postgres 17, Playwright 1.65

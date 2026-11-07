@@ -10,24 +10,7 @@ import {
   waitForEmail,
 } from './helpers';
 
-const QUESTION_IDS = [
-  'E1',
-  'E2',
-  'E3',
-  'E4',
-  'E5',
-  'E6',
-  'E7',
-  'U1',
-  'U2',
-  'U3',
-  'U4',
-  'R1',
-  'R2',
-  'R3',
-  'R4',
-  'R5',
-];
+const QUESTION_IDS = ['Q1', 'Q2', 'Q3', 'Q4'];
 
 async function startReview(page: Page, email: string) {
   await signIn(page, email, TEST_PASSWORD);
@@ -62,9 +45,9 @@ test('emergency answers stop intake and block purchase (UI and database)', async
   const patient = await createPatient('emergency');
   const orderId = await startReview(page, patient.email);
 
-  const full = page.getByTestId('emergency-warning-full');
-  await expect(full).toContainText('If you have a life-threatening emergency');
-  await expect(page.getByText('Draft: awaiting clinical approval')).toBeVisible();
+  await expect(page.getByTestId('emergency-banner-short')).toContainText('is not monitored 24/7');
+  await expect(page.getByText('Pending clinical approval')).toBeVisible();
+  await expect(page.getByText('Not sure is not the same as no.')).toBeVisible();
   await expectNoA11yViolations(page);
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -73,9 +56,12 @@ test('emergency answers stop intake and block purchase (UI and database)', async
     page.getByRole('link', { name: 'Choose yes, no or not sure' }).first(),
   ).toBeVisible();
 
-  await answerScreening(page, { E1: 'yes' });
+  await answerScreening(page, { Q1: 'yes' });
   await expect(page).toHaveURL(new RegExp(`/review/${orderId}/outcome$`));
   await expect(page.getByTestId('outcome-emergency')).toBeVisible();
+  await expect(page.getByTestId('emergency-warning-full')).toContainText(
+    'If you are experiencing a life-threatening emergency',
+  );
   await expect(
     page.getByRole('heading', { name: 'Call 999 now if this is happening' }),
   ).toBeVisible();
@@ -122,7 +108,7 @@ test('emergency answers stop intake and block purchase (UI and database)', async
 test('urgent answers pause the request until a pharmacist reassesses it', async ({ page }) => {
   const patient = await createPatient('urgent');
   const orderId = await startReview(page, patient.email);
-  await answerScreening(page, { U3: 'yes' });
+  await answerScreening(page, { Q3: 'yes' });
   await expect(page.getByTestId('outcome-urgent')).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Contact your GP or NHS 111 today' }),
@@ -132,7 +118,7 @@ test('urgent answers pause the request until a pharmacist reassesses it', async 
 
   await page.goto('/account');
   await expect(page.getByTestId('dashboard-review-status')).toContainText(
-    'Paused: needs help today',
+    'Paused: urgent exclusion',
   );
   await expect(page.getByRole('button', { name: 'Start a medication review' })).toHaveCount(0);
 
@@ -146,9 +132,11 @@ test('routine intake: consent, multi-step questionnaire with drafts, submission,
 }) => {
   const patient = await createPatient('routine');
   const orderId = await startReview(page, patient.email);
-  await answerScreening(page, { R1: 'yes', R3: 'unsure' });
+  await answerScreening(page, {});
   await expect(page.getByTestId('outcome-routine')).toBeVisible();
-  await expect(page.getByText('This does not mean your medicines are safe')).toBeVisible();
+  await expect(
+    page.getByText('This is not a check that you, or your medicines, are safe.'),
+  ).toBeVisible();
   await page.getByRole('link', { name: 'Continue' }).click();
 
   // Consent
@@ -211,7 +199,7 @@ test('routine intake: consent, multi-step questionnaire with drafts, submission,
 
   // Step 4: full warning at the checkpoint, summary, submit
   await expect(page).toHaveURL(new RegExp(`/questionnaire/4$`));
-  await expect(page.getByTestId('emergency-warning-full')).toBeVisible();
+  await expect(page.getByTestId('emergency-banner-short')).toBeVisible();
   await expect(page.getByText('Synthetic Warfarin, 3mg')).toBeVisible();
   await expect(page.getByText("I don't know")).toBeVisible();
   await expect(page.getByText('Secure video call')).toBeVisible();

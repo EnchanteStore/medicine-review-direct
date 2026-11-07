@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(40);
+select plan(41);
 
 create function pg_temp.as_user(uid uuid, aal text default 'aal1') returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true);
@@ -49,7 +49,7 @@ select pg_temp.as_user('40000000-0000-4000-a000-000000000001');
 select lives_ok($$ select public.start_review_order() $$, 'patient can start a review in development mode');
 select is((select status::text from public.review_orders), 'draft', 'new order is a draft');
 select is(
-  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{"E1":"yes"}')) ->> 'outcome'),
+  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{"Q1":"yes"}')) ->> 'outcome'),
   'emergency', 'chest pain answer gives the emergency outcome (computed by the database)');
 select is((select status::text from public.review_orders), 'safety_emergency_excluded', 'emergency excludes the order');
 select throws_ok(
@@ -85,7 +85,7 @@ select pg_temp.as_user('40000000-0000-4000-a000-000000000002');
 set local role authenticated;
 select lives_ok($$ select public.start_review_order() $$, 'urgent patient starts a review');
 select is(
-  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{"U1":"yes"}')) ->> 'outcome'),
+  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{"Q2":"yes"}')) ->> 'outcome'),
   'urgent', 'serious side effect answer gives the urgent outcome');
 select is((select status::text from public.review_orders), 'safety_urgent_hold', 'urgent outcome places the order on hold');
 select is(public.start_review_order(), (select id from public.review_orders),
@@ -100,16 +100,17 @@ select pg_temp.as_user('40000000-0000-4000-a000-000000000003');
 set local role authenticated;
 select lives_ok($$ select public.start_review_order() $$, 'routine patient starts a review');
 select is(
-  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{"R1":"yes"}')) -> 'flags'),
-  '["high_risk_medicine"]'::jsonb, 'high-risk medicine is flagged for the pharmacist');
+  (select public.submit_safety_screening((select id from public.review_orders), pg_temp.ans('{}')) ->> 'outcome'),
+  'routine', 'all no answers continue as routine');
 select is((select status::text from public.review_orders), 'intake', 'routine outcome continues to intake');
-select ok((select suitability_review_required from public.review_orders), 'flagged routine order needs an individual suitability review');
+select ok(not (select suitability_review_required from public.review_orders), 'a routine screen alone does not require a suitability review');
 insert into public.consents (consent_type, document_version, granted, source) values
   ('health_data_processing', 'draft-test', true, 'intake'), ('remote_consultation', 'draft-test', true, 'intake');
 select lives_ok(
   $$ select public.save_questionnaire_draft((select id from public.review_orders), 4,
-       '{"mainConcern":"Synthetic concern"}', '[{"name":"Synthetic medicine A"}]') $$, 'routine patient saves questionnaire');
+       '{"mainConcern":"Synthetic concern"}', '[{"name":"Warfarin 3mg"}]') $$, 'routine patient saves a high-risk medicine');
 select is(public.submit_questionnaire((select id from public.review_orders)), 1, 'routine patient submits questionnaire v1');
+select ok((select suitability_review_required from public.review_orders), 'a high-risk medicine flags the review without excluding the patient');
 reset role;
 
 select throws_ok(

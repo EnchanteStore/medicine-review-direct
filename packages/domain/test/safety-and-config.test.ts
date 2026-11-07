@@ -10,6 +10,7 @@ import {
   emergencyText,
   evaluateScreening,
   fullEmergencyWarning,
+  screeningGuidance,
   placeholderText,
   resolveBusinessConfig,
   shortEmergencyWarning,
@@ -26,14 +27,12 @@ function answers(overrides: Record<string, string | null | undefined>) {
 describe('safety rule set', () => {
   it('is the DRAFT version the fixture documents', () => {
     expect(ACTIVE_RULESET.version).toBe(fixture.ruleset_version);
-    expect(ACTIVE_RULESET.status_note).toMatch(/^DRAFT/);
+    expect(ACTIVE_RULESET.status_note).toMatch(/Pending clinical approval/);
   });
 
-  it('covers every emergency topic in the owner decision', () => {
-    const emergencyIds = ACTIVE_RULESET.questions
-      .filter((q) => q.pathway === 'emergency')
-      .map((q) => q.id);
-    expect(emergencyIds).toEqual(['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7']);
+  it('uses the four P-01 questions and no others', () => {
+    expect(ACTIVE_RULESET.questions.map((q) => q.id)).toEqual(['Q1', 'Q2', 'Q3', 'Q4']);
+    expect(ACTIVE_RULESET.questions[0]?.pathway).toBe('emergency');
   });
 
   it('has positive, negative and ambiguous documented cases', () => {
@@ -53,6 +52,19 @@ describe('safety rule set', () => {
     );
   });
 
+  it('not sure is never treated as no, and guidance follows the matched question', () => {
+    const unsureEmergency = evaluateScreening(ACTIVE_RULESET, answers({ Q1: 'unsure' }));
+    expect(unsureEmergency.outcome).toBe('emergency');
+    expect(screeningGuidance(answers({ Q1: 'unsure' }), unsureEmergency)).toBe('call_999_or_111');
+    const overdose = evaluateScreening(ACTIVE_RULESET, answers({ Q2: 'yes' }));
+    expect(screeningGuidance(answers({ Q2: 'yes' }), overdose)).toBe(
+      'nhs_111_or_999_if_life_threatening',
+    );
+    expect(screeningGuidance(answers({}), evaluateScreening(ACTIVE_RULESET, answers({})))).toBe(
+      'routine',
+    );
+  });
+
   it('the generated pgTAP case file is up to date with the fixture', async () => {
     const modPath = '../scripts/generate-screening-pgtap.mjs';
     const mod = (await import(modPath)) as {
@@ -66,7 +78,7 @@ describe('safety rule set', () => {
     const sql = readFileSync(
       resolve(
         dirname(fileURLToPath(import.meta.url)),
-        '../../../supabase/migrations/20261107000300_phase2_patient_intake.sql',
+        '../../../supabase/migrations/20261107000400_owner_decisions.sql',
       ),
       'utf8',
     );
@@ -77,14 +89,17 @@ describe('safety rule set', () => {
 });
 
 describe('emergency wording', () => {
-  it('full version is the owner-approved text with the brand substituted', () => {
+  it('full and short versions match the 7 Nov 2026 wording when the brand is PharmReview', () => {
     expect(emergencyText(fullEmergencyWarning('PharmReview'))).toBe(
       [
-        'Important: Not an emergency service.',
-        'PharmReview does not provide emergency or urgent medical care and is not monitored 24 hours a day.',
-        'If you have a life-threatening emergency, including severe difficulty breathing, chest pain, signs of a stroke or a severe allergic reaction, call 999 immediately.',
-        'For urgent medical advice that cannot wait, contact your GP or NHS 111. Do not wait for a medication review or a response from us.',
+        'Important: PharmReview is not an emergency or urgent medical service.',
+        'If you are experiencing a life-threatening emergency, including severe difficulty breathing, chest pain, signs of a stroke or a severe allergic reaction, call 999 immediately.',
+        'For urgent medical advice that cannot wait, contact your GP or NHS 111.',
+        'Do not wait for a medication review, appointment or response from PharmReview.',
       ].join('\n\n'),
+    );
+    expect(emergencyText(shortEmergencyWarning('PharmReview'))).toContain(
+      'PharmReview does not provide urgent or emergency care and is not monitored 24/7.',
     );
   });
 
@@ -100,11 +115,24 @@ describe('emergency wording', () => {
 });
 
 describe('business configuration', () => {
-  it('defaults to the provisional PharmReview brand with every fact missing', () => {
+  it('records the owner-supplied company and names the lead pharmacist as pending verification', () => {
     const c = resolveBusinessConfig({});
     expect(c.tradingName).toBe(DEFAULT_TRADING_NAME);
     expect(c.tradingNameProvisional).toBe(true);
-    expect(Object.values(c.facts).every((f) => f.value === null && !f.verified)).toBe(true);
+    expect(c.facts.companyLegalName).toMatchObject({
+      value: 'PHARMA247 LTD',
+      status: 'owner_recorded',
+      verified: false,
+    });
+    expect(c.facts.companyNumber.value).toBe('17365383');
+    expect(c.facts.superintendentPharmacistName).toMatchObject({
+      value: 'Cheuk Kin Sung',
+      status: 'pending_verification',
+    });
+    expect(c.facts.superintendentPharmacistGphc.value).toBe('2234388');
+    expect(c.facts.icoRegistrationNumber.status).toBe('missing');
+    expect(c.facts.indemnityProvider.status).toBe('missing');
+    expect(c.facts.contactEmail.status).toBe('missing');
     expect(c.vatTreatmentConfirmed).toBe(false);
   });
 
@@ -115,7 +143,11 @@ describe('business configuration', () => {
       BUSINESS_ICO_REGISTRATION_NUMBER_VERIFIED: 'true',
       BRAND_TRADING_NAME: 'Other Name',
     });
-    expect(c.facts.companyNumber).toMatchObject({ value: '12345678', verified: false });
+    expect(c.facts.companyNumber).toMatchObject({
+      value: '12345678',
+      status: 'supplied',
+      verified: false,
+    });
     expect(c.facts.icoRegistrationNumber.verified).toBe(true);
     expect(c.tradingName).toBe('Other Name');
   });
@@ -127,8 +159,8 @@ describe('business configuration', () => {
 
   it('placeholders say clearly that the value is missing', () => {
     const c = resolveBusinessConfig({});
-    expect(placeholderText(c.facts.companyNumber)).toBe(
-      '[Placeholder: Company registration number not yet supplied and verified]',
+    expect(placeholderText(c.facts.icoRegistrationNumber)).toBe(
+      '[Placeholder: ICO registration number not yet supplied and verified]',
     );
   });
 

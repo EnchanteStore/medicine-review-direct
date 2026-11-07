@@ -16,11 +16,11 @@ export const BUSINESS_FIELDS = {
     env: 'BUSINESS_ICO_REGISTRATION_NUMBER',
   },
   superintendentPharmacistName: {
-    label: 'Responsible pharmacist name',
+    label: 'Lead pharmacist name',
     env: 'BUSINESS_RESPONSIBLE_PHARMACIST_NAME',
   },
   superintendentPharmacistGphc: {
-    label: 'Responsible pharmacist GPhC registration number',
+    label: 'Lead pharmacist GPhC registration number',
     env: 'BUSINESS_RESPONSIBLE_PHARMACIST_GPHC',
   },
   vatNumber: { label: 'VAT registration number', env: 'BUSINESS_VAT_NUMBER' },
@@ -32,12 +32,30 @@ export const BUSINESS_FIELDS = {
 
 export type BusinessFieldKey = keyof typeof BUSINESS_FIELDS;
 
+export type BusinessFactStatus =
+  'missing' | 'owner_recorded' | 'pending_verification' | 'supplied' | 'verified';
+
 export interface BusinessFact {
   key: BusinessFieldKey;
   label: string;
   value: string | null;
+  /** True only when an external check has been recorded. Owner-supplied is not verified. */
   verified: boolean;
+  status: BusinessFactStatus;
 }
+
+/** Company identity recorded by the owner on 7 Nov 2026 (P-08). Not independently re-checked here. */
+const OWNER_RECORDED_DEFAULTS: Partial<Record<BusinessFieldKey, string>> = {
+  companyLegalName: 'PHARMA247 LTD',
+  companyNumber: '17365383',
+  registeredAddress: '84 Babey Avenue, Babey Avenue, Rownhams, Southampton, England, SO16 8NL',
+};
+
+/** Supplied by the pharmacist. The live GPhC register entry has not been confirmed. */
+const PENDING_VERIFICATION_DEFAULTS: Partial<Record<BusinessFieldKey, string>> = {
+  superintendentPharmacistName: 'Cheuk Kin Sung',
+  superintendentPharmacistGphc: '2234388',
+};
 
 export interface BusinessConfig {
   tradingName: string;
@@ -58,13 +76,17 @@ export function resolveBusinessConfig(env: Env): BusinessConfig {
   const facts = {} as Record<BusinessFieldKey, BusinessFact>;
   for (const key of Object.keys(BUSINESS_FIELDS) as BusinessFieldKey[]) {
     const def = BUSINESS_FIELDS[key];
-    const value = clean(env[def.env]);
-    facts[key] = {
-      key,
-      label: def.label,
-      value,
-      verified: value !== null && env[`${def.env}_VERIFIED`] === 'true',
-    };
+    const fromEnv = clean(env[def.env]);
+    const value =
+      fromEnv ?? OWNER_RECORDED_DEFAULTS[key] ?? PENDING_VERIFICATION_DEFAULTS[key] ?? null;
+    const verified = value !== null && env[`${def.env}_VERIFIED`] === 'true';
+    let status: BusinessFactStatus = 'missing';
+    if (verified) status = 'verified';
+    else if (value === null) status = 'missing';
+    else if (fromEnv) status = 'supplied';
+    else if (OWNER_RECORDED_DEFAULTS[key]) status = 'owner_recorded';
+    else status = 'pending_verification';
+    facts[key] = { key, label: def.label, value, verified, status };
   }
   return {
     tradingName: clean(env.BRAND_TRADING_NAME) ?? DEFAULT_TRADING_NAME,

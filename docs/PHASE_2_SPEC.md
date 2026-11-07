@@ -1,5 +1,10 @@
 # Phase 2 specification: patient intake
 
+> Update, 7 November 2026. Product-owner decisions P-01 to P-11 replace the earlier 16-question
+> screen and the first banner draft. The active rule set is `2026-11-draft.2` (four questions).
+> Not sure is never treated as no. See [DECISION_LOG.md](./DECISION_LOG.md). Nothing in that
+> decision is clinical, legal or regulatory certification.
+
 Source: owner decisions by Eason Sung, 7 November 2026 (binding). This document records those
 decisions and how the software implements them. Where software cannot settle a matter (clinical,
 legal, regulatory), it is listed as a **pre-launch blocker** in section 9 and the live service

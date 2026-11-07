@@ -72,7 +72,10 @@ export default function PrivacyPage() {
       <p>We will not send identifiable records to AI providers without approved safeguards.</p>
 
       <h2>How long we keep it</h2>
-      <p>These periods are provisional and awaiting governance and privacy approval:</p>
+      <p>
+        A formal data protection impact assessment has not been completed. These periods are a
+        provisional schedule for development, not a claim that they are legally sufficient:
+      </p>
       <ul>
         <li>Completed clinical records: 8 years after your last clinical contact with us</li>
         <li>Safety escalations that form part of a care record: as clinical records</li>

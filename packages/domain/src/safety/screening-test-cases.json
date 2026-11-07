@@ -1,6 +1,6 @@
 {
-  "ruleset_version": "2026-11-draft.1",
-  "note": "Documented positive, negative and ambiguous cases. Unlisted questions are answered 'no'. DRAFT pending clinical approval.",
+  "ruleset_version": "2026-11-draft.2",
+  "note": "P-01 cases. Not sure is never treated as no. Unanswered is invalid. DRAFT pending clinical approval and MHRA assessment.",
   "cases": [
     {
       "name": "negative: all no",
@@ -10,187 +10,93 @@
       "flags": []
     },
     {
-      "name": "positive: E1 chest pain",
+      "name": "positive: Q1 yes stops intake",
       "kind": "positive",
-      "answers": { "E1": "yes" },
+      "answers": { "Q1": "yes" },
       "outcome": "emergency",
       "flags": []
     },
     {
-      "name": "positive: E2 stroke signs",
-      "kind": "positive",
-      "answers": { "E2": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: E3 severe breathing difficulty",
-      "kind": "positive",
-      "answers": { "E3": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: E4 severe allergic reaction",
-      "kind": "positive",
-      "answers": { "E4": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: E5 collapse",
-      "kind": "positive",
-      "answers": { "E5": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: E6 severe bleeding",
-      "kind": "positive",
-      "answers": { "E6": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: E7 immediate danger of self-harm",
-      "kind": "positive",
-      "answers": { "E7": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "positive: U1 serious side effect",
-      "kind": "positive",
-      "answers": { "U1": "yes" },
-      "outcome": "urgent",
-      "flags": []
-    },
-    {
-      "name": "positive: U2 harmful medication error",
-      "kind": "positive",
-      "answers": { "U2": "yes" },
-      "outcome": "urgent",
-      "flags": []
-    },
-    {
-      "name": "positive: U3 essential medicine supply",
-      "kind": "positive",
-      "answers": { "U3": "yes" },
-      "outcome": "urgent",
-      "flags": []
-    },
-    {
-      "name": "positive: U4 needs same-day assessment",
-      "kind": "positive",
-      "answers": { "U4": "yes" },
-      "outcome": "urgent",
-      "flags": []
-    },
-    {
-      "name": "routine: R1 high-risk medicine alone does not block",
-      "kind": "negative",
-      "answers": { "R1": "yes" },
-      "outcome": "routine",
-      "flags": ["high_risk_medicine"]
-    },
-    {
-      "name": "routine: R2 polypharmacy flag",
-      "kind": "negative",
-      "answers": { "R2": "yes" },
-      "outcome": "routine",
-      "flags": ["polypharmacy"]
-    },
-    {
-      "name": "routine: R3 monitoring gap flag",
-      "kind": "negative",
-      "answers": { "R3": "yes" },
-      "outcome": "routine",
-      "flags": ["monitoring_gap"]
-    },
-    {
-      "name": "routine: R4 vulnerable situation flag",
-      "kind": "negative",
-      "answers": { "R4": "yes" },
-      "outcome": "routine",
-      "flags": ["vulnerable_situation"]
-    },
-    {
-      "name": "routine: R5 pregnancy flag",
-      "kind": "negative",
-      "answers": { "R5": "yes" },
-      "outcome": "routine",
-      "flags": ["pregnancy_or_breastfeeding"]
-    },
-    {
-      "name": "routine: several flags together",
-      "kind": "negative",
-      "answers": { "R1": "yes", "R2": "yes", "R4": "yes" },
-      "outcome": "routine",
-      "flags": ["high_risk_medicine", "polypharmacy", "vulnerable_situation"]
-    },
-    {
-      "name": "precedence: emergency beats urgent",
-      "kind": "positive",
-      "answers": { "E1": "yes", "U1": "yes" },
-      "outcome": "emergency",
-      "flags": []
-    },
-    {
-      "name": "precedence: urgent beats routine flags",
-      "kind": "positive",
-      "answers": { "U2": "yes", "R1": "yes" },
-      "outcome": "urgent",
-      "flags": ["high_risk_medicine"]
-    },
-    {
-      "name": "ambiguous: unsure on emergency escalates",
+      "name": "ambiguous: Q1 not sure stops intake",
       "kind": "ambiguous",
-      "answers": { "E3": "unsure" },
+      "answers": { "Q1": "unsure" },
       "outcome": "emergency",
       "flags": []
     },
     {
-      "name": "ambiguous: unsure on urgent escalates",
-      "kind": "ambiguous",
-      "answers": { "U4": "unsure" },
+      "name": "positive: Q2 yes pauses intake",
+      "kind": "positive",
+      "answers": { "Q2": "yes" },
       "outcome": "urgent",
       "flags": []
     },
     {
-      "name": "ambiguous: unsure on routine flags incomplete information",
+      "name": "ambiguous: Q2 not sure pauses intake",
       "kind": "ambiguous",
-      "answers": { "R3": "unsure" },
-      "outcome": "routine",
-      "flags": ["incomplete_information"]
+      "answers": { "Q2": "unsure" },
+      "outcome": "urgent",
+      "flags": []
     },
     {
-      "name": "ambiguous: everything unsure",
+      "name": "positive: Q3 yes pauses booking",
+      "kind": "positive",
+      "answers": { "Q3": "yes" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q3 not sure pauses booking",
       "kind": "ambiguous",
-      "answers": {
-        "E1": "unsure",
-        "E2": "unsure",
-        "E3": "unsure",
-        "E4": "unsure",
-        "E5": "unsure",
-        "E6": "unsure",
-        "E7": "unsure",
-        "U1": "unsure",
-        "U2": "unsure",
-        "U3": "unsure",
-        "U4": "unsure",
-        "R1": "unsure",
-        "R2": "unsure",
-        "R3": "unsure",
-        "R4": "unsure",
-        "R5": "unsure"
-      },
+      "answers": { "Q3": "unsure" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "positive: Q4 yes pauses booking",
+      "kind": "positive",
+      "answers": { "Q4": "yes" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "ambiguous: Q4 not sure pauses booking",
+      "kind": "ambiguous",
+      "answers": { "Q4": "unsure" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "precedence: Q1 yes beats Q2 yes",
+      "kind": "positive",
+      "answers": { "Q1": "yes", "Q2": "yes" },
       "outcome": "emergency",
-      "flags": ["incomplete_information"]
+      "flags": []
+    },
+    {
+      "name": "precedence: Q1 not sure beats Q3 yes",
+      "kind": "ambiguous",
+      "answers": { "Q1": "unsure", "Q3": "yes" },
+      "outcome": "emergency",
+      "flags": []
+    },
+    {
+      "name": "precedence: Q2 yes beats Q4 no",
+      "kind": "positive",
+      "answers": { "Q2": "yes", "Q4": "no" },
+      "outcome": "urgent",
+      "flags": []
+    },
+    {
+      "name": "negative: not sure is not used",
+      "kind": "negative",
+      "answers": { "Q1": "no", "Q2": "no", "Q3": "no", "Q4": "no" },
+      "outcome": "routine",
+      "flags": []
     }
   ],
   "invalid": [
-    { "name": "invalid: missing answer", "answers": { "E1": null } },
-    { "name": "invalid: unknown question", "answers": { "Z9": "yes" } },
-    { "name": "invalid: answer outside yes/no/unsure", "answers": { "E1": "maybe" } }
+    { "name": "invalid: missing answer", "answers": { "Q1": null } },
+    { "name": "invalid: unknown question", "answers": { "E1": "yes" } },
+    { "name": "invalid: answer outside yes/no/unsure", "answers": { "Q1": "maybe" } }
   ]
 }

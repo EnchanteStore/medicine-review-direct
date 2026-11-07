@@ -7,13 +7,15 @@ export interface OrderRow {
   id: string;
   status: OrderStatus;
   created_at: string;
+  requires_prior_exclusion_review: boolean;
+  exclusion_label: string | null;
 }
 
 export async function getLatestOrder(userId: string): Promise<OrderRow | null> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from('review_orders')
-    .select('id, status, created_at')
+    .select('id, status, created_at, requires_prior_exclusion_review, exclusion_label')
     .eq('patient_id', userId)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -27,7 +29,7 @@ export async function requireOwnOrder(orderId: string): Promise<OrderRow> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from('review_orders')
-    .select('id, status, created_at')
+    .select('id, status, created_at, requires_prior_exclusion_review, exclusion_label')
     .eq('id', orderId)
     .maybeSingle();
   if (!data) notFound();
@@ -38,7 +40,7 @@ export async function getLatestScreening(orderId: string) {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from('safety_screenings')
-    .select('id, outcome, ruleset_version, acknowledged_at, created_at')
+    .select('id, outcome, ruleset_version, acknowledged_at, created_at, answers, matched_rule_ids')
     .eq('order_id', orderId)
     .order('created_at', { ascending: false })
     .limit(1)

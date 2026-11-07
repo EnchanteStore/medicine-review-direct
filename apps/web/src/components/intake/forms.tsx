@@ -53,9 +53,11 @@ const ANSWER_LABELS = [
 export function ScreeningForm({
   orderId,
   groups,
+  priorExclusion = false,
 }: {
   orderId: string;
   groups: { title: string; intro: string; questions: ScreeningQuestion[] }[];
+  priorExclusion?: boolean;
 }) {
   const [state, action] = useActionState(submitScreeningAction, initialFormState);
   const values = state.status === 'error' ? state.values : undefined;
@@ -108,6 +110,13 @@ export function ScreeningForm({
           })}
         </section>
       ))}
+      {priorExclusion ? (
+        <CheckboxField
+          id="priorConcernConfirmed"
+          name="priorConcernConfirmed"
+          label="I confirm that the earlier concern has been assessed by a doctor, NHS 111 or the emergency services, or that it is no longer present."
+        />
+      ) : null}
       <SubmitButton pendingText="Checking…">Continue</SubmitButton>
     </form>
   );
@@ -291,8 +300,10 @@ export function MedicinesStepForm({
       >
         <p className="text-ink-700">
           Include prescribed medicines, ones you buy yourself, vitamins and herbal remedies. If you
-          are not sure about something, tick &quot;I don&apos;t know&quot;. Your pharmacist will
-          check everything with you: we do not check spellings or doses automatically.
+          are not sure about something, tick &quot;I don&apos;t know&quot;. A familiar medicine name
+          may be flagged for your pharmacist. That flag does not mean the medicine is unsafe, and we
+          will never tell you to stop or change it. We do not check spellings or doses
+          automatically.
         </p>
         {rows.map((m, i) => (
           <fieldset

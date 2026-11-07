@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 
 const ruleset = JSON.parse(
   readFileSync(
-    new URL('../../../packages/domain/src/safety/ruleset-2026-11-draft-1.json', import.meta.url),
+    new URL('../../../packages/domain/src/safety/ruleset-2026-11-draft-2.json', import.meta.url),
     'utf8',
   ),
 );

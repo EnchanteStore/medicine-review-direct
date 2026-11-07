@@ -1,4 +1,4 @@
-import rulesetJson from './ruleset-2026-11-draft-1.json';
+import rulesetJson from './ruleset-2026-11-draft-2.json';
 
 export type ScreeningAnswer = 'yes' | 'no' | 'unsure';
 export type ScreeningPathway = 'emergency' | 'urgent' | 'routine';
@@ -32,8 +32,26 @@ export class ScreeningValidationError extends Error {
   }
 }
 
-/** The active rule set. DRAFT until approved by the responsible pharmacist. */
+/**
+ * Active rule set (P-01). Approved for development only. Pending clinical
+ * approval and an MHRA scope assessment. Not for public launch.
+ */
 export const ACTIVE_RULESET = rulesetJson as SafetyRuleset;
+
+export type ScreeningGuidance =
+  'call_999' | 'call_999_or_111' | 'nhs_111_or_999_if_life_threatening' | 'gp_or_111' | 'routine';
+
+/** Which advice to show. Derived from the stored answers; never a safety clearance. */
+export function screeningGuidance(
+  answers: Record<string, ScreeningAnswer | null | undefined>,
+  result: Pick<ScreeningResult, 'outcome' | 'matchedRuleIds'>,
+): ScreeningGuidance {
+  if (result.outcome === 'routine') return 'routine';
+  if (result.matchedRuleIds.includes('Q1'))
+    return answers.Q1 === 'yes' ? 'call_999' : 'call_999_or_111';
+  if (result.matchedRuleIds.includes('Q2')) return 'nhs_111_or_999_if_life_threatening';
+  return 'gp_or_111';
+}
 
 /**
  * Deterministic evaluation that mirrors `app.evaluate_screening` in the

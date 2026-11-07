@@ -1,6 +1,7 @@
 import { isStaff } from '@mrd/domain';
 import { Card, Container } from '@mrd/ui';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getStaffGrants, requireUser } from '@/lib/auth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -27,6 +28,9 @@ export default async function MfaPage() {
           cannot see any patient or clinical information.
         </p>
         <Card>{verified ? <VerifyMfa factorId={verified.id} /> : <EnrolMfa />}</Card>
+        <p>
+          <Link href="/mfa/locked-out">Lost your authenticator?</Link>
+        </p>
       </div>
     </Container>
   );

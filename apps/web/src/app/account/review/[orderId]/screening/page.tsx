@@ -2,7 +2,6 @@ import { ACTIVE_RULESET } from '@mrd/domain';
 import { Badge } from '@mrd/ui';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { FullEmergencyWarning } from '@/components/emergency-banner';
 import { ScreeningForm } from '@/components/intake/forms';
 import { requireOwnOrder } from '@/lib/intake';
 
@@ -13,36 +12,26 @@ export default async function ScreeningPage({ params }: { params: Promise<{ orde
   const order = await requireOwnOrder(orderId);
   if (order.status !== 'draft') redirect(`/account/review/${order.id}/outcome`);
 
-  const by = (p: string) => ACTIVE_RULESET.questions.filter((q) => q.pathway === p);
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl sm:text-4xl">Safety questions</h1>
-      <FullEmergencyWarning />
       <p className="text-lg text-ink-700">
-        Before you tell us about your medicines, we need to check this service is right for you
-        today. Answer every question. If you are not sure, choose &quot;Not sure&quot;.
+        These questions check whether a routine medication review is the right service today. They
+        are not a diagnosis, and nobody is reading your answers as you give them. Choose &quot;Not
+        sure&quot; if you are unsure. Not sure is not the same as no.
       </p>
       <p className="text-sm text-ink-600">
-        Question set {ACTIVE_RULESET.version}{' '}
-        <Badge tone="draft">Draft: awaiting clinical approval</Badge>
+        Question set {ACTIVE_RULESET.version} <Badge tone="draft">Pending clinical approval</Badge>
       </p>
       <ScreeningForm
         orderId={order.id}
+        priorExclusion={order.requires_prior_exclusion_review}
         groups={[
           {
-            title: 'Right now',
-            intro: 'These questions are about how you are at this moment.',
-            questions: by('emergency'),
-          },
-          {
-            title: 'In the last few days',
-            intro: 'These questions are about problems that may need help today.',
-            questions: by('urgent'),
-          },
-          {
-            title: 'About your medicines',
-            intro: 'These answers help your pharmacist. They do not stop you using the service.',
-            questions: by('routine'),
+            title: 'Before we continue',
+            intro:
+              'Answer every question. A routine review cannot take the place of emergency or urgent care.',
+            questions: ACTIVE_RULESET.questions,
           },
         ]}
       />

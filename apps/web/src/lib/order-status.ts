@@ -31,12 +31,12 @@ export function describeOrder(o: OrderContext): OrderView {
         label: 'Stopped: emergency symptoms',
         tone: 'danger',
         message:
-          'Your answers suggested an emergency, so we stopped this request. If you have a life-threatening emergency, call 999 immediately.',
+          'This request is closed (EMERGENCY_EXCLUDED). If you have a life-threatening emergency, call 999 immediately. You can start a new request afterwards. The exclusion stays on record, and a pharmacist must review it before any routine booking.',
         next: { href: `${base}/outcome`, label: 'See what to do' },
       };
     case 'safety_urgent_hold':
       return {
-        label: 'Paused: needs help today',
+        label: 'Paused: urgent exclusion',
         tone: 'warning',
         message:
           'Your answers suggested you need help today. Contact your GP or NHS 111 now. A pharmacist must check this request is suitable before it can continue.',
@@ -108,6 +108,10 @@ export function friendlyDbError(message: string | undefined): string {
     [
       /consent to a telephone or video consultation/,
       'Please confirm you agree to a telephone or video consultation.',
+    ],
+    [
+      /earlier concern has been assessed/,
+      'Confirm that the earlier concern has been assessed, or that it is no longer present.',
     ],
     [
       /questionnaire is incomplete/,
