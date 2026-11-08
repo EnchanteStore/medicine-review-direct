@@ -164,11 +164,15 @@ The purge job is designed, not scheduled.
 
 - UK GDPR lawful basis and Article 9 condition for health data; DPIA.
 - Data retention periods for clinical, financial and audit records.
-- Hosting region **decided: London (eu-west-2)** for Supabase and SES. Still to do: validate
-  residency of subprocessors, logs, backups and analytics, plus a transfer assessment for each
-  processor.
-- Email **decided: AWS SES London** (not implemented; local Mailpit only). SMS disabled. DPAs
-  still needed.
+- Database region **current: Central EU (Frankfurt, eu-central-1)** on the confirmed Supabase
+  project. The earlier London database decision remains in the decision log as history. Still to
+  do: validate residency of subprocessors, logs, backups and analytics, plus a transfer assessment
+  for each processor.
+- Web host **current preference: Cloudflare, Free plan first**. The clinical app is not deployed.
+  Workers Paid needs an owner approval and still cannot run the ClamAV scan. See
+  [HOSTING.md](./HOSTING.md). Netlify and Vercel are not the host.
+- Email **decided: AWS SES London** (not configured; local Mailpit only). SMS disabled. DPAs
+  still needed. MX and the working SPF record were not changed.
 - No identifiable records to AI providers without approved safeguards (there is no AI
   integration).
 - Cyber Essentials / DSPT scope.
