@@ -1,9 +1,10 @@
 # Backup and recovery
 
 This describes what exists today and what must be true before any real patient data is stored.
-No production database has been created. No restore drill has been run. The figures below are
-the provisional retention schedule from the 7 November 2026 decisions (P-06). They are not a
-completed DPIA.
+The confirmed Supabase project is in Central EU (Frankfurt, `eu-central-1`). It has the schema
+and no patient records. No restore drill has been run. Backup settings were not opened. The
+figures below are the provisional retention schedule from the 7 November 2026 decisions (P-06).
+They are not a completed DPIA. The earlier London database preference is history.
 
 ## What is protected already
 
@@ -18,14 +19,14 @@ completed DPIA.
 
 ## What is not in place
 
-| Item                                    | Status                                                                                       |
-| --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Hosted database in London (`eu-west-2`) | NOT CREATED. P-10 names that region. It has not been confirmed with a provider               |
-| Point-in-time recovery or daily backups | NOT CONFIGURED                                                                               |
-| Restore drill                           | NOT EXECUTED                                                                                 |
-| Scheduled retention job                 | NOT BUILT. `app.purge_abandoned_intake` exists and is tested; nothing calls it on a clock    |
-| Backup of Storage objects               | NOT CONFIGURED. The buckets `patient-documents` and `clinical-reports` are private and local |
-| Off-site copy of the audit log          | NOT CONFIGURED                                                                               |
+| Item                                          | Status                                                                                                                     |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Hosted database in Frankfurt (`eu-central-1`) | CREATED and empty of patient records. Project `qcjkngnwjjoxwutgjfyt`. London is no longer the preference                   |
+| Point-in-time recovery or daily backups       | NOT VERIFIED. The backup page was not opened                                                                               |
+| Restore drill                                 | NOT EXECUTED                                                                                                               |
+| Scheduled retention job                       | NOT BUILT. `app.purge_abandoned_intake` exists and is tested; nothing calls it on a clock                                  |
+| Backup of Storage objects                     | NOT CONFIGURED. Hosted buckets `patient-documents`, `clinical-reports` and `document-quarantine` exist and have no objects |
+| Off-site copy of the audit log                | NOT CONFIGURED                                                                                                             |
 
 Provisional periods, pending the DPIA: clinical records 8 years from last clinical contact,
 abandoned intake 90 days, accounting 6 years, security logs 12 months, temporary backups 30 to
@@ -40,8 +41,8 @@ Do not copy a local database, service-role key, or storage volume into a hosted 
 
 ## When a hosted database exists
 
-1. Confirm the project region is London (`eu-west-2`) before any patient data is written. If the
-   region is wrong, stop. Do not migrate clinical data to fix it.
+1. The confirmed region is Central EU (Frankfurt, `eu-central-1`). Do not create another project.
+   If a project is in a different region, stop. Do not migrate clinical data to fix it.
 2. Turn on the provider's backups and point-in-time recovery. Record the retention in the DPIA.
 3. Restore into a new, empty project. Do not restore over the database that is serving patients.
 4. On the restored copy, check that row level security is still enabled, that a patient cannot
