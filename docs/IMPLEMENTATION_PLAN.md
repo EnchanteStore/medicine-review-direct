@@ -75,7 +75,7 @@ Still later, and not claimed as done:
 
 - Staff invitations and an evidence pack for independent verification.
 - Message attachments, a correction as a new report version, and a background worker for PDFs.
-- An audit-log screen. Availability and recorded refunds already exist from Phase 3.
+- Availability and recorded refunds already exist from Phase 3. The audit-log screen is Phase 7.
 
 ## Phase 5: Assurance and launch preparation
 
@@ -123,6 +123,29 @@ Still later, and not claimed as done:
 
 - A store submission, push notifications, and a physical device or emulator run.
 - Starting a new review, answering screening, or booking inside the app.
+
+## Phase 7: Staff audit log
+
+Built on `cursor/phase-7-follow-on`. This does not open the service.
+
+- A verified clinical administrator or operations administrator, signed in with MFA, can read the
+  latest audit events at `/staff/audit`. A pharmacist, a patient, and a staff member without MFA
+  cannot. That matches `app.is_verified_admin()`.
+- The screen shows the action, the record identifier and a short details line. Unknown metadata
+  and free text are left off the page, so a medicine name or a message cannot appear there.
+- Public intake, live payments and store submission stay off.
+
+Still later, and not claimed as done. These need an owner decision or an outside approval, so
+they were not built in this phase:
+
+- A real malware scanner, SES, live or test-mode Stripe, a London deploy, EAS and store
+  submission.
+- Patient MFA, SMS phone verification, message attachments, and a corrected report version.
+- An unattended retention clock and storage purge. The purge function exists; the periods are
+  still provisional until the DPIA.
+- DCB0129, MHRA, CQC, indemnity, solicitor-approved pages, a penetration test, and a restore
+  drill against a hosted database.
+- A background worker. PDF generation stays in the pharmacist's request.
 
 ## Priority E2E scenarios (from the brief) and where they land
 
