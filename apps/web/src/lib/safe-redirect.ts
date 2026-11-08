@@ -20,7 +20,9 @@ export function safeNextPath(
   try {
     const url = new URL(value, 'http://internal.invalid');
     if (url.origin !== 'http://internal.invalid') return fallback;
-    return `${url.pathname}${url.search}${url.hash}`;
+    // The next path is a route only. A query or hash could carry an email address
+    // or a clinical detail, so neither is kept.
+    return url.pathname;
   } catch {
     return fallback;
   }

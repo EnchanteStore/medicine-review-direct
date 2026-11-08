@@ -160,6 +160,23 @@ SES, DNS changes, and store submission stay off.
 | M-14 | Automatic purge stays disabled                                                                                                                                       | Unchanged                                          |
 | M-15 | A patient may choose a pharmacist or the next available time. Handover is an audited reassignment. Approval uses the signed-in pharmacist's own name and GPhC number | Built                                              |
 
+## Infrastructure preparation, 8 November 2026
+
+Eason authorised preparation of three services. This is not launch approval. It does not authorise
+live charges, live DNS changes, real patient data, prescribing, or public intake. No message was
+sent. The Supabase URL below is recorded only. No keys are stored and the app is not connected.
+On 8 November 2026 Eason changed the intended Supabase region from London (`eu-west-2`) to
+Central EU (Frankfurt, `eu-central-1`). Safari on his Mac then confirmed
+`https://qcjkngnwjjoxwutgjfyt.supabase.co` is that Frankfurt project. No keys are stored and the
+app is not connected. SES remains London (`eu-west-2`).
+
+| ID   | Decision                                                                                                                                                                                          | What was prepared                                                                                                                                                             | What remains blocked                                             |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| M-16 | One empty Supabase project may be created. On 8 November 2026 Eason supplied `https://qcjkngnwjjoxwutgjfyt.supabase.co`. Safari on his Mac confirmed it is Central EU (Frankfurt, `eu-central-1`) | The URL is written in SUPABASE_LONDON.md. Migrations are listed. The local database is not copied. No key is stored and the app is not connected                              | Migrations have not been pushed. No patient data is stored there |
+| M-17 | AWS SES may be prepared in London for hello@, support@ and noreply@medsinfocus.co.uk                                                                                                              | The app selects that region and those addresses. Without credentials it does not send. MX records are unchanged                                                               | SES is not configured. Mailpit remains the local inbox           |
+| M-18 | Stripe Checkout test mode may be prepared                                                                                                                                                         | A live secret key is refused. With no `sk_test_` key the labelled local harness is used and Stripe is not called. Metadata is only the mode and the order id. No VAT is added | No test key is present. Live charges stay off                    |
+| M-19 | The Supabase database region is Central EU (Frankfurt, `eu-central-1`). `https://qcjkngnwjjoxwutgjfyt.supabase.co` is the confirmed Frankfurt project                                             | Safari on Eason's Mac confirmed the region on 8 November 2026. SES stays in London (`eu-west-2`). No key was added and the app is not connected                               | Migrations have not been pushed. No patient data is stored there |
+
 ## Launch tasks (external evidence, not new product decisions)
 
 | Task                                                                                                                                                         | Owner of the evidence           | Gate                                       |

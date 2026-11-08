@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { friendlyDbError } from '@/lib/order-status';
+import { mayCallStripeTestApi } from '@/lib/stripe-mode';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -20,10 +21,18 @@ export async function startCheckoutAction(formData: FormData): Promise<void> {
     );
   }
   const session = data as { session_id?: string; provider?: string };
-  if (session.provider !== 'local_test_harness' || !session.session_id) {
+  if (!session.session_id) redirect('/account');
+  if (session.provider === 'local_test_harness') {
+    redirect(`/dev/stripe-test/checkout/${session.session_id}`);
+  }
+  // A Stripe test session is not sent to Stripe from this preparation.
+  // Without an sk_test_ key the local harness remains the only checkout.
+  if (!mayCallStripeTestApi(process.env.STRIPE_SECRET_KEY)) {
     redirect(
-      `/account/review/${orderId}/pay?error=${encodeURIComponent('Live card checkout is not connected.')}`,
+      `/account/review/${orderId}/pay?error=${encodeURIComponent('Stripe test checkout is not configured.')}`,
     );
   }
-  redirect(`/dev/stripe-test/checkout/${session.session_id}`);
+  redirect(
+    `/account/review/${orderId}/pay?error=${encodeURIComponent('Stripe test checkout is prepared but not called from this server.')}`,
+  );
 }

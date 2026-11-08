@@ -13,6 +13,7 @@ import { clientIp, getCurrentUser } from '@/lib/auth';
 import { publicEnv } from '@/lib/env';
 import { formCheckbox, formString, type FormState } from '@/lib/form-state';
 import { authRateLimits } from '@/lib/rate-limit';
+import { authCallbackUrl } from '@/lib/origins';
 import { safeNextPath } from '@/lib/safe-redirect';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -54,7 +55,7 @@ export async function signUpAction(_prev: FormState, formData: FormData): Promis
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${publicEnv().NEXT_PUBLIC_SITE_URL}/auth/confirm`,
+      emailRedirectTo: authCallbackUrl(publicEnv().NEXT_PUBLIC_SITE_URL, process.env),
       data: { terms_version: CURRENT_TERMS_VERSION, adult_declaration: 'true' },
     },
   });
@@ -133,7 +134,7 @@ export async function resendVerificationAction(
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email: parsed.data.email,
-    options: { emailRedirectTo: `${publicEnv().NEXT_PUBLIC_SITE_URL}/auth/confirm` },
+    options: { emailRedirectTo: authCallbackUrl(publicEnv().NEXT_PUBLIC_SITE_URL, process.env) },
   });
   if (error && error.status !== 429) logAuthError('resend-verification', error.code);
   return {

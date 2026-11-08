@@ -1,4 +1,5 @@
 import 'server-only';
+import { emailWillSend, selectEmailTransport } from './email-transport';
 import {
   accountUpdateEmail,
   appointmentUpdateEmail,
@@ -33,18 +34,24 @@ function mailpitTransport(baseUrl: string): NotificationTransport {
 }
 
 /**
- * Picks a transport. Only Mailpit exists. Production email (AWS SES London)
- * is not implemented, so nothing is ever sent outside development.
+ * Mailpit is the only transport that sends. SES London is selected by config
+ * but is not called: without credentials, or without SES_SEND_ENABLED, nothing
+ * leaves the machine.
  */
 async function transport(): Promise<NotificationTransport | null> {
   const status = await getServiceStatus();
-  const mailpit = process.env.MAILPIT_URL;
-  if (
-    status.environment === 'development' &&
-    mailpit &&
-    /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(mailpit)
-  ) {
-    return mailpitTransport(mailpit);
+  const selected = selectEmailTransport({
+    MAILPIT_URL: process.env.MAILPIT_URL,
+    ENVIRONMENT: status.environment,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_SES_REGION: process.env.AWS_SES_REGION,
+    SES_FROM_EMAIL: process.env.SES_FROM_EMAIL,
+    SES_SEND_ENABLED: process.env.SES_SEND_ENABLED,
+  });
+  if (selected.kind === 'mailpit') return mailpitTransport(selected.url);
+  if (selected.kind === 'ses' && emailWillSend(selected)) {
+    console.error('[notify] SES London is not called from this preparation');
   }
   return null;
 }
