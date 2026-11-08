@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { classifyStripeSecret } from '@/lib/stripe-mode';
 import {
   LOCAL_TEST_WEBHOOK_SECRET,
   payloadHash,
@@ -29,8 +30,8 @@ interface CheckoutEvent {
 export async function POST(request: Request) {
   const payload = await request.text();
   const header = request.headers.get('stripe-signature');
-  const liveKey = process.env.STRIPE_SECRET_KEY ?? '';
-  if (liveKey.startsWith('sk_live_')) {
+  const stripeKey = classifyStripeSecret(process.env.STRIPE_SECRET_KEY);
+  if (stripeKey === 'live_refused') {
     return NextResponse.json({ error: 'Live Stripe keys are not allowed' }, { status: 400 });
   }
   let event: CheckoutEvent;
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
   if (mode !== 'local_test_harness' && mode !== 'stripe_test') {
     return NextResponse.json({ error: 'Unsupported checkout mode' }, { status: 400 });
   }
-  if (mode === 'stripe_test' && !liveKey.startsWith('sk_test_')) {
+  if (mode === 'stripe_test' && stripeKey !== 'test') {
     return NextResponse.json({ error: 'Stripe test key is not configured' }, { status: 400 });
   }
 

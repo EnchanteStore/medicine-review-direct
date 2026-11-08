@@ -6,7 +6,8 @@ import { safeNextPath } from '@/lib/safe-redirect';
 describe('safeNextPath', () => {
   it.each([
     ['/account', '/account'],
-    ['/account/profile?tab=1#x', '/account/profile?tab=1#x'],
+    ['/account/profile?tab=1#x', '/account/profile'],
+    ['/account?email=patient@example.test', '/account'],
     ['/staff', '/staff'],
   ])('allows same-origin path %s', (input, expected) => {
     expect(safeNextPath(input)).toBe(expected);

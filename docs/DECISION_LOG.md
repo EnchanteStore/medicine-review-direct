@@ -160,6 +160,18 @@ SES, DNS changes, and store submission stay off.
 | M-14 | Automatic purge stays disabled                                                                                                                                       | Unchanged                                          |
 | M-15 | A patient may choose a pharmacist or the next available time. Handover is an audited reassignment. Approval uses the signed-in pharmacist's own name and GPhC number | Built                                              |
 
+## Infrastructure preparation, 8 November 2026
+
+Eason authorised preparation of three services. This is not launch approval. It does not authorise
+live charges, live DNS changes, real patient data, prescribing, or public intake. No project was
+created and no message was sent.
+
+| ID   | Decision                                                                             | What was prepared                                                                                                                                                             | What remains blocked                                        |
+| ---- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| M-16 | One empty Supabase project may be created in London (`eu-west-2`)                    | Steps are in SUPABASE_LONDON.md. Migrations are listed. The local database is not copied                                                                                      | The project does not exist. No patient data is stored there |
+| M-17 | AWS SES may be prepared in London for hello@, support@ and noreply@medsinfocus.co.uk | The app selects that region and those addresses. Without credentials it does not send. MX records are unchanged                                                               | SES is not configured. Mailpit remains the local inbox      |
+| M-18 | Stripe Checkout test mode may be prepared                                            | A live secret key is refused. With no `sk_test_` key the labelled local harness is used and Stripe is not called. Metadata is only the mode and the order id. No VAT is added | No test key is present. Live charges stay off               |
+
 ## Launch tasks (external evidence, not new product decisions)
 
 | Task                                                                                                                                                         | Owner of the evidence           | Gate                                       |

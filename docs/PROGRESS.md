@@ -1,5 +1,25 @@
 # Progress
 
+## Hosting, email and Stripe test preparation
+
+**Status:** on `cursor/hosting-email-payments`, based on the MedsInFocus branch. Nothing is live.
+Eason authorised preparation of Supabase in London (`eu-west-2`), AWS SES in London, and Stripe
+test mode on 8 November 2026. He did not authorise live charges, DNS changes, real patient data,
+prescribing, or public intake. No Supabase project was created. Stripe was not called. SES was
+not called. MX records were not changed.
+
+Checked on 8 November 2026 (London), after a database reset.
+
+| Check                                                                                  | Result                                                                                        |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Typecheck                                                                              | PASS                                                                                          |
+| Unit tests for origins, redirects, Stripe mode, email transport, and checkout metadata | PASS. 27 tests in `hosting-prep.test.ts`, `lib.test.ts`, and `payment-metadata.test.ts`       |
+| pgTAP                                                                                  | PASS. 11 files, 299 assertions. No schema change in this preparation                          |
+| Stripe API call                                                                        | NOT EXECUTED. No `sk_test_` key is set, so the local harness remains and Stripe is not called |
+| SES send                                                                               | NOT EXECUTED. Credentials are absent, so nothing is sent. Mailpit remains the local transport |
+| Supabase London project                                                                | NOT EXECUTED. The project was not created                                                     |
+| Live charges, DNS changes, real patient data, prescribing, public intake               | BLOCKED. Not authorised                                                                       |
+
 ## MedsInFocus rebrand
 
 **Status:** on `cursor/medsinfocus-rebrand`, based on Phase 7. Not deployed. Public intake, live
