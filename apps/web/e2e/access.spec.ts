@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import {
   SEED,
   SEED_PASSWORD,
@@ -7,6 +7,7 @@ import {
   createStaff,
   expectNoA11yViolations,
   signIn,
+  signOut,
   totp,
 } from './helpers';
 import { readFileSync } from 'node:fs';
@@ -96,6 +97,43 @@ test.describe('staff area (UI, server-side role checks)', () => {
       await expect(page.getByText(new RegExp(text))).toBeVisible();
     });
   }
+});
+
+test.describe('audit log', () => {
+  async function enrol(page: Page, role: 'ops_admin' | 'pharmacist') {
+    const staff = await createStaff(`audit-${role}`, role);
+    await signIn(page, staff.email, TEST_PASSWORD);
+    await expect(page).toHaveURL(/\/account$/);
+    await page.goto('/staff');
+    await page.getByRole('button', { name: 'Set up an authenticator app' }).click();
+    const secret = (await page.getByTestId('mfa-secret').textContent())!.trim();
+    await page.getByLabel('6-digit code').fill(totp(secret));
+    await page.getByRole('button', { name: 'Verify' }).click();
+    await expect(page).toHaveURL(/\/staff$/);
+  }
+
+  test('an operations administrator can read the audit log and a pharmacist cannot', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await enrol(page, 'ops_admin');
+    await expect(page.getByRole('link', { name: 'Audit log' })).toBeVisible();
+    await page.getByRole('link', { name: 'Audit log' }).click();
+    await expect(page.getByRole('heading', { name: 'Audit log' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'staff_role.created' }).first()).toBeVisible();
+    await expect(page.getByText(/Paracetamol|stop taking/i)).toHaveCount(0);
+    await expectNoA11yViolations(page);
+    await page.screenshot({
+      path: '/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-7/audit-log.png',
+      fullPage: true,
+    });
+
+    await signOut(page);
+    await enrol(page, 'pharmacist');
+    await expect(page.getByRole('link', { name: 'Audit log' })).toHaveCount(0);
+    const response = await page.goto('/staff/audit');
+    expect(response?.status()).toBe(404);
+  });
 });
 
 test.describe('data API (RLS with real user tokens)', () => {

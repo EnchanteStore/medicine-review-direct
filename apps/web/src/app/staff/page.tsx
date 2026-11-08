@@ -1,4 +1,4 @@
-import { hasClinicalAccess, hasVerifiedRole } from '@mrd/domain';
+import { canReadAuditLog, hasClinicalAccess, hasVerifiedRole } from '@mrd/domain';
 import { Alert, Card } from '@mrd/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -23,6 +23,12 @@ export default async function StaffHomePage() {
         <Link href="/staff/launch-readiness">Launch readiness checklist</Link>
         {' · '}
         <Link href="/staff/availability">Available times</Link>
+        {canReadAuditLog(grants) ? (
+          <>
+            {' · '}
+            <Link href="/staff/audit">Audit log</Link>
+          </>
+        ) : null}
       </p>
       <Card>
         <h2 className="text-xl">Your roles</h2>

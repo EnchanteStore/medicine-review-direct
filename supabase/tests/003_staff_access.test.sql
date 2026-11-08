@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(24);
+select plan(25);
 
 insert into auth.users (id, email, aud, role, raw_user_meta_data) values
   ('20000000-0000-4000-a000-0000000000c1', 'rls.patient.c@example.test', 'authenticated', 'authenticated',
@@ -67,6 +67,8 @@ select is_empty($$ select 1 from public.audit_log $$, 'unverified pharmacist can
 select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000a1","role":"authenticated","aal":"aal2"}', true);
 select is_empty($$ select 1 from public.profiles where id = '20000000-0000-4000-a000-0000000000c1' $$,
   'verified pharmacist has no blanket access to patient profiles');
+select is_empty($$ select 1 from public.audit_log $$,
+  'verified pharmacist cannot read the audit log');
 
 -- Verified clinical admin
 select set_config('request.jwt.claims', '{"sub":"20000000-0000-4000-a000-0000000000b1","role":"authenticated","aal":"aal2"}', true);

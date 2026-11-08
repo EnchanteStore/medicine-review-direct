@@ -1,5 +1,32 @@
 # Progress
 
+## Phase 7: Staff audit log
+
+**Status:** built on `cursor/phase-7-follow-on`, stacked on Phase 6. Not deployed. Public intake,
+live payments and store submission stay off. The clinical wording approved for development on
+8 November 2026 was not rewritten. Synthetic data only.
+
+A verified operations administrator or clinical administrator can open `/staff/audit` after MFA.
+The page lists recent events. Details are limited to identifiers, flags and short codes. A
+verified pharmacist is sent to the not-found page, and the database already hides the log from
+that role.
+
+| Check                                                                                   | Result                                                                                                   |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Format, lint                                                                            | PASS                                                                                                     |
+| Typecheck                                                                               | PASS. The web production build also includes `/staff/audit`                                              |
+| Vitest                                                                                  | PASS. Domain 87, web 30, validation 38, ui 8, mobile 8                                                   |
+| pgTAP after database reset                                                              | PASS. 10 files, 281 assertions. A verified pharmacist cannot read the audit log                          |
+| Playwright audit screen, including axe                                                  | PASS. `e2e/access.spec.ts`. An operations administrator sees `staff_role.created`. A pharmacist gets 404 |
+| Full Playwright suite                                                                   | NOT EXECUTED this phase. The new test was run on its own                                                 |
+| Screen reader on the audit screen                                                       | NOT EXECUTED                                                                                             |
+| Public intake, live payments, store submission                                          | BLOCKED. Unchanged                                                                                       |
+| Malware scanner, SES, Stripe, hosting, EAS, MHRA, CQC, indemnity, DPIA, retention clock | BLOCKED. Not started. See the Phase 7 note in IMPLEMENTATION_PLAN.md                                     |
+
+Screenshot:
+
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/phase-7/audit-log.png`
+
 ## Phase 6: Local mobile app
 
 **Status:** a local Expo app on `cursor/phase-6-mobile`, stacked on Phase 5. Not submitted to a

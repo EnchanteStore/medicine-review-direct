@@ -29,3 +29,12 @@ export function hasVerifiedRole(grants: readonly StaffRoleGrant[], role: StaffRo
 export function isStaff(grants: readonly StaffRoleGrant[]): boolean {
   return grants.some((g) => g.verificationStatus === 'verified');
 }
+
+/**
+ * Mirrors `app.is_verified_admin()`: a verified clinical administrator or
+ * operations administrator. A pharmacist does not gain this by being verified.
+ * The database policy is the authority for the audit log.
+ */
+export function canReadAuditLog(grants: readonly StaffRoleGrant[]): boolean {
+  return hasVerifiedRole(grants, 'clinical_admin') || hasVerifiedRole(grants, 'ops_admin');
+}
