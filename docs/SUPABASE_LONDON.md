@@ -1,29 +1,36 @@
-# Supabase in London
+# Supabase project
 
-Eason authorised preparing a Supabase project in London (`eu-west-2`) on 8 November 2026.
-This is infrastructure preparation, not launch approval. Do not copy the local database into it.
-Do not load real patient data. Public intake stays off.
+Eason first authorised a Supabase project in London (`eu-west-2`). On 8 November 2026 he changed
+the intended database region to **Central EU (Frankfurt, `eu-central-1`)**. This is infrastructure
+preparation, not launch approval. SES remains London (`eu-west-2`). Do not copy the local database
+into a hosted project. Do not load real patient data. Public intake stays off.
 
 Eason supplied this project URL on 8 November 2026:
 
 `https://qcjkngnwjjoxwutgjfyt.supabase.co`
 
-No keys are stored here. The app is not connected to it. The region is not recorded as London.
-Confirm on the Supabase dashboard that the project says `eu-west-2` before linking, pushing
-migrations, or sending any traffic. If the dashboard shows another region, stop.
+No keys are stored here. The app is not connected to it. That URL is not recorded as Frankfurt,
+and it is not recorded as London. The hostname does not say which region the project is in.
+Read the region on the Supabase dashboard. Link it, push migrations, or send traffic only if the
+dashboard says `eu-central-1`. If it says anything else, do not use it and do not create a
+replacement from this repository.
 
-## Create one empty project
+## Region
+
+The database region to use is Central EU (Frankfurt, `eu-central-1`). Do not create that project
+from here. Do not treat `https://qcjkngnwjjoxwutgjfyt.supabase.co` as the Frankfurt project.
 
 1. Sign in to the Supabase dashboard with the owner's account.
-2. Choose **New project**.
-3. Set the region to **Europe (London)**, `eu-west-2`. If that region is not offered, stop. Do not pick another region.
-4. Do not import a database, and do not paste the local Docker data. The project starts empty.
-5. Do not run `supabase/seed.sql`. That file creates synthetic local users and a development setting.
-6. The URL above is already supplied. Before linking it, confirm the dashboard says `eu-west-2`. Do not treat the URL alone as proof of the region.
+2. Open the supplied project and read its region.
+3. Continue only when the dashboard says **Central EU (Frankfurt)**, `eu-central-1`.
+4. Do not import the local Docker database. Do not run `supabase/seed.sql`. That file creates synthetic local users and a development setting.
 
 ## Apply the tested migrations
 
 From a checkout of this repository, with the Supabase CLI logged in as the owner:
+
+Do this only after the dashboard for that project says `eu-central-1`. The ref below is the
+host label in the supplied URL. It is not evidence of the region.
 
 ```bash
 supabase link --project-ref qcjkngnwjjoxwutgjfyt
