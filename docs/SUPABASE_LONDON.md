@@ -1,8 +1,16 @@
 # Supabase in London
 
 Eason authorised preparing a Supabase project in London (`eu-west-2`) on 8 November 2026.
-This is infrastructure preparation, not launch approval. The project has not been created.
-Do not copy the local database into it. Do not load real patient data. Public intake stays off.
+This is infrastructure preparation, not launch approval. Do not copy the local database into it.
+Do not load real patient data. Public intake stays off.
+
+Eason supplied this project URL on 8 November 2026:
+
+`https://qcjkngnwjjoxwutgjfyt.supabase.co`
+
+No keys are stored here. The app is not connected to it. The region is not recorded as London.
+Confirm on the Supabase dashboard that the project says `eu-west-2` before linking, pushing
+migrations, or sending any traffic. If the dashboard shows another region, stop.
 
 ## Create one empty project
 
@@ -11,14 +19,14 @@ Do not copy the local database into it. Do not load real patient data. Public in
 3. Set the region to **Europe (London)**, `eu-west-2`. If that region is not offered, stop. Do not pick another region.
 4. Do not import a database, and do not paste the local Docker data. The project starts empty.
 5. Do not run `supabase/seed.sql`. That file creates synthetic local users and a development setting.
-6. After the project exists, confirm the dashboard still says `eu-west-2` before any application is pointed at it.
+6. The URL above is already supplied. Before linking it, confirm the dashboard says `eu-west-2`. Do not treat the URL alone as proof of the region.
 
 ## Apply the tested migrations
 
 From a checkout of this repository, with the Supabase CLI logged in as the owner:
 
 ```bash
-supabase link --project-ref <project-ref>
+supabase link --project-ref qcjkngnwjjoxwutgjfyt
 supabase db push
 ```
 
