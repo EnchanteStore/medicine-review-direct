@@ -103,7 +103,7 @@ export default function PrivacyPage() {
       <h2>Your rights</h2>
       <p>
         You have rights under UK data protection law, including to access, correct, restrict and in
-        some cases erase your information, and to complain to the Information Commissioner's
+        some cases erase your information, and to complain to the Information Commissioner&apos;s
         Office.{' '}
         <Placeholder>full rights wording and how to exercise them, needs legal review</Placeholder>
       </p>
