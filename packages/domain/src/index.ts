@@ -9,3 +9,4 @@ export * from './launch';
 export * from './booking';
 export * from './safety/screening';
 export * from './report-content';
+export * from './patient-actions';
