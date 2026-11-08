@@ -21,8 +21,9 @@ export default async function DocumentsPage({ params }: { params: Promise<{ orde
       </p>
       <Alert tone="warning">
         <p>
-          Security scanning of uploaded files is not yet switched on in this preview. Files stay
-          hidden from pharmacists until they have been scanned.
+          Files go into a private quarantine and are scanned with ClamAV. A pharmacist cannot open a
+          file until that scan marks it clean. If the scanner does not run, or the scan fails, the
+          file is not marked clean.
         </p>
       </Alert>
       {canUpload ? (

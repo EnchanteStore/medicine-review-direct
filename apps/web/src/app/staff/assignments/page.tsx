@@ -135,7 +135,24 @@ export default async function AssignmentsPage({
                       ))}
                     </select>
                   </div>
-                  <Button type="submit">Assign pharmacist</Button>
+                  {order.assigned_pharmacist_id ? (
+                    <div className="min-w-64 space-y-1">
+                      <Label htmlFor={`reason-${order.id}`}>Reason for handover</Label>
+                      <select
+                        id={`reason-${order.id}`}
+                        name="reason"
+                        required
+                        className="block min-h-12 w-full rounded-md border-2 border-ink-600 bg-white px-3"
+                      >
+                        <option value="patient_request">Patient request</option>
+                        <option value="availability">Availability</option>
+                        <option value="clinical_cover">Clinical cover</option>
+                      </select>
+                    </div>
+                  ) : null}
+                  <Button type="submit">
+                    {order.assigned_pharmacist_id ? 'Hand over this review' : 'Assign pharmacist'}
+                  </Button>
                 </form>
               </Card>
             </li>

@@ -11,6 +11,8 @@ begin
       ('00000000-0000-4000-a000-000000000001'::uuid, 'patient.demo@example.test'),
       ('00000000-0000-4000-a000-000000000011'::uuid, 'pharmacist.verified@example.test'),
       ('00000000-0000-4000-a000-000000000012'::uuid, 'pharmacist.pending@example.test'),
+      ('00000000-0000-4000-a000-000000000013'::uuid, 'cheuk.sung@example.test'),
+      ('00000000-0000-4000-a000-000000000014'::uuid, 'ka.po.ng@example.test'),
       ('00000000-0000-4000-a000-000000000021'::uuid, 'clinical.admin@example.test'),
       ('00000000-0000-4000-a000-000000000031'::uuid, 'ops.admin@example.test')
     ) as t(id, email)
@@ -45,13 +47,20 @@ insert into public.staff_roles (user_id, role, verification_status, gphc_registr
   ('00000000-0000-4000-a000-000000000031', 'ops_admin', 'verified', null, now(), '00000000-0000-4000-a000-000000000021'),
   ('00000000-0000-4000-a000-000000000021', 'clinical_admin', 'verified', null, now(), '00000000-0000-4000-a000-000000000031'),
   ('00000000-0000-4000-a000-000000000011', 'pharmacist', 'verified', '0000001', now(), '00000000-0000-4000-a000-000000000021'),
-  ('00000000-0000-4000-a000-000000000012', 'pharmacist', 'pending', null, null, null);
+  ('00000000-0000-4000-a000-000000000012', 'pharmacist', 'pending', null, null, null),
+  ('00000000-0000-4000-a000-000000000013', 'pharmacist', 'verified', '2234388', now(), '00000000-0000-4000-a000-000000000021'),
+  ('00000000-0000-4000-a000-000000000014', 'pharmacist', 'verified', '2235658', now(), '00000000-0000-4000-a000-000000000021');
 
 -- Synthetic staff names (report approval records the pharmacist's name).
 update public.profiles set given_name = 'Priya', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000011';
 update public.profiles set given_name = 'Pending', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000012';
 update public.profiles set given_name = 'Clara', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000021';
 update public.profiles set given_name = 'Omar', family_name = 'Synthetic' where id = '00000000-0000-4000-a000-000000000031';
+update public.profiles set given_name = 'Cheuk Kin', family_name = 'Sung' where id = '00000000-0000-4000-a000-000000000013';
+update public.profiles set given_name = 'Ka Po', family_name = 'Ng' where id = '00000000-0000-4000-a000-000000000014';
+-- Owner-confirmed independent prescriber. The prescribing flag cannot be turned on.
+update public.staff_roles set independent_prescriber_owner_confirmed = true
+  where user_id = '00000000-0000-4000-a000-000000000014' and role = 'pharmacist';
 
 -- Local development: opens synthetic intake. Payments and report release stay
 -- closed because no launch sign-offs are recorded and the rule set is DRAFT.

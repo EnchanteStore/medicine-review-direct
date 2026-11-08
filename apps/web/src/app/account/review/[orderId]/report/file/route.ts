@@ -12,8 +12,11 @@ export async function GET(_request: Request, context: { params: Promise<{ orderI
   const supabase = await createSupabaseServerClient();
   const { data: report } = await supabase
     .from('reports')
-    .select('status, pdf_storage_path')
+    .select('status, pdf_storage_path, version_no')
     .eq('order_id', orderId)
+    .in('status', ['released', 'ready_for_release'])
+    .order('version_no', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (
     !report?.pdf_storage_path ||

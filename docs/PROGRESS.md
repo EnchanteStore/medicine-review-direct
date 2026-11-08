@@ -1,5 +1,31 @@
 # Progress
 
+## MedsInFocus rebrand
+
+**Status:** on `cursor/medsinfocus-rebrand`, based on Phase 7. Not deployed. Public intake, live
+payments, prescribing, SES, and IONOS DNS stay off. The safety-question wording was not rewritten.
+The report limitations sentence now uses the name MedsInFocus. Synthetic data only.
+
+Checked on 8 November 2026 (London).
+
+| Check                                                                       | Result                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Format, lint, typecheck                                                     | PASS                                                                                                                                                                                                                                  |
+| Vitest                                                                      | PASS. Domain 89, including the brand strings and the rule that only ClamAV plus a clean verdict may mark a file clean. Web, validation, ui and mobile suites also passed                                                              |
+| pgTAP                                                                       | PASS. 11 files, 299 assertions. Includes prescribing locked off, audited handover, approval in the signed-in pharmacist's own name, report supersession, and a skipped scan staying rejected                                          |
+| Playwright rebrand, portal and pharmacist choice                            | PASS. Homepage, public pages on desktop and mobile, `/portal`, and both pharmacists returned as bookable choices                                                                                                                      |
+| Playwright quarantine upload                                                | PASS. A synthetic PDF goes through the scan step. The page does not say a file was marked clean without a scan                                                                                                                        |
+| ClamAV engine                                                               | PASS on this machine. `clamscan` 1.5.4 accepted a plain text file (exit 0) and reported `Eicar-Signature FOUND` for the EICAR test file (exit 1). CI does not install ClamAV, so this engine check is not part of the GitHub workflow |
+| Playwright released-report name and correction                              | PASS. `e2e/medsinfocus-report.spec.ts`. The patient sees Nia Approver, GPhC 0000099. After a correction the old finding is gone, the new version is shown, and version 1 is stored as superseded                                      |
+| Full Playwright suite                                                       | NOT EXECUTED                                                                                                                                                                                                                          |
+| Screen reader                                                               | NOT EXECUTED                                                                                                                                                                                                                          |
+| Public intake, live payments, prescribing, SES, IONOS DNS, store submission | BLOCKED. Unchanged                                                                                                                                                                                                                    |
+
+Screenshots:
+
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/medsinfocus/homepage.png`
+- `/cursor/stores/bc-aebf795e-5d25-4fe7-8cd8-05a4db3de130/media/medsinfocus/portal.png`
+
 ## Phase 7: Staff audit log
 
 **Status:** built on `cursor/phase-7-follow-on`, stacked on Phase 6. Not deployed. Public intake,

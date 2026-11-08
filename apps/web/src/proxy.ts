@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED_PREFIXES = ['/account', '/staff', '/mfa'];
+const PROTECTED_PREFIXES = ['/account', '/portal', '/staff', '/mfa'];
 
 /**
  * Refreshes the Supabase session cookie on each request and redirects

@@ -11,3 +11,4 @@ export * from './safety/screening';
 export * from './report-content';
 export * from './patient-actions';
 export * from './audit-display';
+export * from './brand';

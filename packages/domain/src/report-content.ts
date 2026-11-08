@@ -22,7 +22,7 @@ export interface ReportContent {
 
 /** Shown on every report. Avoids phrases that tell someone to change a medicine. */
 export const REPORT_LIMITATIONS_DRAFT =
-  'DRAFT pending clinical approval. This review is for discussion with the prescriber. It is not an instruction to alter any medicine by yourself. PharmReview is not an emergency service. If you have a life-threatening emergency, call 999. For urgent advice, contact your GP or NHS 111.';
+  'DRAFT pending clinical approval. This review is for discussion with the prescriber. It is not an instruction to alter any medicine by yourself. MedsInFocus is not an emergency service. If you have a life-threatening emergency, call 999. For urgent advice, contact your GP or NHS 111.';
 
 /** Shown wherever a patient or pharmacist can write a message. */
 export const MESSAGING_OUT_OF_HOURS_WARNING =

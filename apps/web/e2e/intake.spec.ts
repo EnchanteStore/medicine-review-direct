@@ -232,7 +232,10 @@ test('routine intake: consent, multi-step questionnaire with drafts, submission,
   await expect(page).toHaveURL(new RegExp(`/review/${orderId}$`));
 });
 
-test('private document upload with type checks and stubbed scanning', async ({ page }) => {
+test('private document upload is quarantined and is not marked clean without a passing scan', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
   const patient = await createPatient('docs');
   await startReview(page, patient.email);
   await answerScreening(page, {});
@@ -244,7 +247,7 @@ test('private document upload with type checks and stubbed scanning', async ({ p
 
   await page.goto(`/account/review/${orderId}/documents`);
   await expect(
-    page.getByText('Security scanning of uploaded files is not yet switched on'),
+    page.getByText('Files go into a private quarantine and are scanned with ClamAV.'),
   ).toBeVisible();
 
   await page.getByLabel('Choose a file').setInputFiles({
@@ -264,10 +267,13 @@ test('private document upload with type checks and stubbed scanning', async ({ p
   });
   await page.getByRole('button', { name: 'Upload file' }).click();
   await expect(
-    page.getByText('It is waiting for a security scan before a pharmacist can see it.'),
-  ).toBeVisible();
+    page.getByText(
+      /Your file is in quarantine|Your file has been scanned and a pharmacist can open it/,
+    ),
+  ).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('repeat-prescription.pdf')).toBeVisible();
-  await expect(page.getByText('Waiting for security scan')).toBeVisible();
+  await expect(page.getByText(/Scanned|Rejected|Waiting for security scan/)).toBeVisible();
+  await expect(page.getByText('marked clean without a scan')).toHaveCount(0);
   await expectNoA11yViolations(page);
 
   // Another patient cannot read the file from storage

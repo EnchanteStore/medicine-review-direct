@@ -108,6 +108,9 @@ export async function saveReportAction(formData: FormData): Promise<void> {
     .from('reports')
     .select('id')
     .eq('order_id', orderId)
+    .neq('status', 'superseded')
+    .order('version_no', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (!report) go(orderId, 'Start the report before saving it.');
   const { error } = await supabase.rpc('pharmacist_save_report_content', {
@@ -151,6 +154,9 @@ export async function confirmReportAction(formData: FormData): Promise<void> {
     .from('reports')
     .select('id')
     .eq('order_id', orderId)
+    .neq('status', 'superseded')
+    .order('version_no', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (!report) go(orderId, 'Start the report first.');
   const { error } = await supabase.rpc('pharmacist_confirm_report_checks', {
@@ -168,7 +174,14 @@ export async function approveReportAction(formData: FormData): Promise<void> {
   await requireUser(`/staff/reviews/${orderId}`);
   const supabase = await createSupabaseServerClient();
   const [{ data: report }, { data: consultation }] = await Promise.all([
-    supabase.from('reports').select('id').eq('order_id', orderId).maybeSingle(),
+    supabase
+      .from('reports')
+      .select('id')
+      .eq('order_id', orderId)
+      .neq('status', 'superseded')
+      .order('version_no', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     supabase
       .from('consultations')
       .select('id')
@@ -194,8 +207,11 @@ export async function generateReportAction(formData: FormData): Promise<void> {
   const supabase = await createSupabaseServerClient();
   const { data: report } = await supabase
     .from('reports')
-    .select('id, status')
+    .select('id, status, version_no')
     .eq('order_id', orderId)
+    .neq('status', 'superseded')
+    .order('version_no', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (!report) go(orderId, 'Start the report first.');
   if (report.status === 'generating') {
@@ -251,7 +267,14 @@ export async function releaseReportAction(formData: FormData): Promise<void> {
   await requireUser(`/staff/reviews/${orderId}`);
   const supabase = await createSupabaseServerClient();
   const [{ data: report }, { data: order }] = await Promise.all([
-    supabase.from('reports').select('id, status').eq('order_id', orderId).maybeSingle(),
+    supabase
+      .from('reports')
+      .select('id, status, version_no')
+      .eq('order_id', orderId)
+      .neq('status', 'superseded')
+      .order('version_no', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     supabase.from('review_orders').select('patient_id').eq('id', orderId).maybeSingle(),
   ]);
   if (!report || report.status !== 'ready_for_release') {
@@ -366,4 +389,33 @@ export async function recordSafetyNoticeAction(formData: FormData): Promise<void
   if (error) go(orderId, friendlyDbError(error.message));
   revalidatePath(`/staff/reviews/${orderId}`);
   go(orderId, undefined, 'Safety note recorded. This is not a medication review report.');
+}
+
+export async function startCorrectionAction(formData: FormData): Promise<void> {
+  const orderId = orderIdFrom(formData);
+  await requireUser(`/staff/reviews/${orderId}`);
+  const supabase = await createSupabaseServerClient();
+  const { data: report } = await supabase
+    .from('reports')
+    .select('id')
+    .eq('order_id', orderId)
+    .eq('status', 'released')
+    .order('version_no', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!report) go(orderId, 'There is no released report to correct.');
+  const { error } = await supabase.rpc('pharmacist_start_correction', {
+    p_report_id: report.id,
+    p_reason: String(formData.get('reason') ?? ''),
+  });
+  if (error) {
+    console.error('[report] correction failed', { code: error.code ?? 'unknown' });
+    go(orderId, friendlyDbError(error.message));
+  }
+  revalidatePath(`/staff/reviews/${orderId}`);
+  go(
+    orderId,
+    undefined,
+    'A new draft version has been started. The released report is unchanged until you release the new one.',
+  );
 }

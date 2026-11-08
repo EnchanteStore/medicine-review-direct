@@ -2,6 +2,8 @@
 
 **Clinical lead named by the company:** Cheuk Kin Sung, GPhC 2234388 (live register check pending). Product owner: Eason Sung. The binding Phase 2 decisions (7 Nov 2026) are recorded in [PHASE_2_SPEC.md](./PHASE_2_SPEC.md).
 
+On 8 November 2026 the patient-facing name became MedsInFocus (M-01). That is a product-design decision, not MHRA, CQC, legal, indemnity, or public-launch approval. The safety-question wording and the report and GP-letter clinical wording approved for development the same day were not rewritten, apart from substituting the trading name where a patient would otherwise still see the previous name.
+
 On 8 November 2026 Eason Sung approved, for development only, the current safety-question wording and the current report and GP-letter draft wording. That approval is recorded as OD-11 in [DECISION_LOG.md](./DECISION_LOG.md). It is not MHRA, CQC, legal, indemnity, or public-launch approval. The wording was not rewritten. Public intake, live payments and store submission stay off. No other website copy or rule is approved clinical content.
 
 This is not a DCB0129/DCB0160 clinical safety case. Producing one is part of the launch gates.

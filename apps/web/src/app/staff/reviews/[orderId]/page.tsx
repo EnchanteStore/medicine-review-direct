@@ -21,6 +21,7 @@ import {
   recordSafetyNoticeAction,
   releaseReportAction,
   saveGpLetterAction,
+  startCorrectionAction,
   saveReportAction,
   sendStaffMessageAction,
   verifyGpRecipientAction,
@@ -119,8 +120,13 @@ export default async function ReviewWorkspacePage({
       .order('occurred_at', { ascending: false }),
     supabase
       .from('reports')
-      .select('id, status, content, approver_display_name, approver_gphc_number, pdf_storage_path')
+      .select(
+        'id, status, content, approver_display_name, approver_gphc_number, pdf_storage_path, version_no, correction_reason',
+      )
       .eq('order_id', order.id)
+      .neq('status', 'superseded')
+      .order('version_no', { ascending: false })
+      .limit(1)
       .maybeSingle(),
     supabase
       .from('messages')
@@ -390,7 +396,25 @@ export default async function ReviewWorkspacePage({
             {report?.approver_display_name
               ? `. Approved by ${report.approver_display_name}, GPhC ${report.approver_gphc_number}. Live register check pending.`
               : ''}
+            {report?.version_no && report.version_no > 1 ? ` Version ${report.version_no}.` : ''}
           </p>
+          {assigned && report?.status === 'released' ? (
+            <form
+              action={startCorrectionAction}
+              className="space-y-3"
+              data-testid="correction-form"
+            >
+              <input type="hidden" name="orderId" value={order.id} />
+              <FormField
+                id="correctionReason"
+                label="Reason for a new version"
+                hint="The released report is kept. The patient sees the new version only after you approve and release it."
+              >
+                {(aria) => <Textarea {...aria} name="reason" required minLength={10} />}
+              </FormField>
+              <Button type="submit">Start a corrected version</Button>
+            </form>
+          ) : null}
           {assigned && !report ? (
             <form action={createReportAction}>
               <input type="hidden" name="orderId" value={order.id} />

@@ -932,6 +932,7 @@ export type Database = {
           approver_gphc_number: string | null;
           consultation_id: string | null;
           content: NonNullable<Json>;
+          correction_reason: string | null;
           created_at: string;
           id: string;
           information_sufficient_at: string | null;
@@ -941,7 +942,10 @@ export type Database = {
           released_at: string | null;
           released_by: string | null;
           status: Database['public']['Enums']['report_status'];
+          superseded_at: string | null;
+          supersedes_report_id: string | null;
           updated_at: string;
+          version_no: number;
         };
         ComputedFields: never;
         Insert: {
@@ -953,6 +957,7 @@ export type Database = {
           approver_gphc_number?: string | null;
           consultation_id?: string | null;
           content?: NonNullable<Json>;
+          correction_reason?: string | null;
           created_at?: string;
           id?: string;
           information_sufficient_at?: string | null;
@@ -962,7 +967,10 @@ export type Database = {
           released_at?: string | null;
           released_by?: string | null;
           status?: Database['public']['Enums']['report_status'];
+          superseded_at?: string | null;
+          supersedes_report_id?: string | null;
           updated_at?: string;
+          version_no?: number;
         };
         Update: {
           adequacy_confirmed_at?: string | null;
@@ -973,6 +981,7 @@ export type Database = {
           approver_gphc_number?: string | null;
           consultation_id?: string | null;
           content?: NonNullable<Json>;
+          correction_reason?: string | null;
           created_at?: string;
           id?: string;
           information_sufficient_at?: string | null;
@@ -982,7 +991,10 @@ export type Database = {
           released_at?: string | null;
           released_by?: string | null;
           status?: Database['public']['Enums']['report_status'];
+          superseded_at?: string | null;
+          supersedes_report_id?: string | null;
           updated_at?: string;
+          version_no?: number;
         };
         Relationships: [
           {
@@ -995,8 +1007,15 @@ export type Database = {
           {
             foreignKeyName: 'reports_order_id_fkey';
             columns: ['order_id'];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: 'review_orders';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reports_supersedes_report_id_fkey';
+            columns: ['supersedes_report_id'];
+            isOneToOne: false;
+            referencedRelation: 'reports';
             referencedColumns: ['id'];
           },
         ];
@@ -1219,6 +1238,8 @@ export type Database = {
           created_at: string;
           gphc_registration_number: string | null;
           id: string;
+          independent_prescriber_owner_confirmed: boolean;
+          prescribing_enabled: boolean;
           role: Database['public']['Enums']['staff_role'];
           updated_at: string;
           user_id: string;
@@ -1231,6 +1252,8 @@ export type Database = {
           created_at?: string;
           gphc_registration_number?: string | null;
           id?: string;
+          independent_prescriber_owner_confirmed?: boolean;
+          prescribing_enabled?: boolean;
           role: Database['public']['Enums']['staff_role'];
           updated_at?: string;
           user_id: string;
@@ -1242,6 +1265,8 @@ export type Database = {
           created_at?: string;
           gphc_registration_number?: string | null;
           id?: string;
+          independent_prescriber_owner_confirmed?: boolean;
+          prescribing_enabled?: boolean;
           role?: Database['public']['Enums']['staff_role'];
           updated_at?: string;
           user_id?: string;
@@ -1318,6 +1343,16 @@ export type Database = {
         Args: { p_order_id: string; p_pharmacist_id: string; p_starts: string };
         Returns: string;
       };
+      bookable_slot_choices: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          display_name: string;
+          ends_at: string;
+          gphc_number: string;
+          pharmacist_id: string;
+          starts_at: string;
+        }[];
+      };
       bookable_slots: {
         Args: { p_from: string; p_to: string };
         Returns: {
@@ -1327,6 +1362,10 @@ export type Database = {
         }[];
       };
       confirm_prior_safety_concern: { Args: { p_order_id: string }; Returns: undefined };
+      handover_review: {
+        Args: { p_order_id: string; p_pharmacist_id: string; p_reason: string };
+        Returns: undefined;
+      };
       launch_readiness: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1380,6 +1419,10 @@ export type Database = {
         Args: { p_pdf_path: string; p_report_id: string; p_status: string };
         Returns: undefined;
       };
+      pharmacist_start_correction: {
+        Args: { p_reason: string; p_report_id: string };
+        Returns: string;
+      };
       place_legal_hold: {
         Args: { p_order_id: string; p_reason: string; p_user_id: string };
         Returns: string;
@@ -1389,6 +1432,10 @@ export type Database = {
         Returns: string;
       };
       record_gp_letter_dispatch: { Args: { p_letter_id: string }; Returns: undefined };
+      record_malware_scan: {
+        Args: { p_document_id: string; p_engine: string; p_verdict: string };
+        Returns: string;
+      };
       record_manual_payment: { Args: { p_order_id: string; p_reference: string }; Returns: Json };
       record_refund: {
         Args: { p_amount_pence: number; p_payment_id: string; p_reason: string };
@@ -1484,7 +1531,8 @@ export type Database = {
         | 'generating'
         | 'generation_failed'
         | 'ready_for_release'
-        | 'released';
+        | 'released'
+        | 'superseded';
       ruleset_status: 'draft' | 'approved' | 'retired';
       staff_role: 'pharmacist' | 'clinical_admin' | 'ops_admin';
       verification_status: 'pending' | 'verified' | 'suspended' | 'revoked';
@@ -1643,6 +1691,7 @@ export const Constants = {
         'generation_failed',
         'ready_for_release',
         'released',
+        'superseded',
       ],
       ruleset_status: ['draft', 'approved', 'retired'],
       staff_role: ['pharmacist', 'clinical_admin', 'ops_admin'],

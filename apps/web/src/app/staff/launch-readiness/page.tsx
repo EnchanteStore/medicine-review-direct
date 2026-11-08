@@ -21,7 +21,7 @@ const EVIDENCE: Record<LaunchGate, string> = {
   company_ico_gphc_details:
     'ICO fee position, a live GPhC register check for 2234388, and confirmed indemnity.',
   vat_and_brand_checks:
-    'Accountant confirmation of VAT treatment, and brand clearance for PharmReview.',
+    'Accountant confirmation of VAT treatment, and brand clearance for MedsInFocus.',
   processor_agreements_and_security_review:
     'Processor register, Article 28 agreements, London-region checks, security test and recovery sign-off.',
 };

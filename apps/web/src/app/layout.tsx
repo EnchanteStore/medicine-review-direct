@@ -1,32 +1,40 @@
+import { BRAND_SEO_DESCRIPTION, BRAND_SEO_TITLE, CANONICAL_ORIGIN } from '@mrd/domain';
 import { SkipLink } from '@mrd/ui';
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import { EmergencyBanner } from '@/components/emergency-banner';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { ServiceNotice } from '@/components/service-notice';
-import { brandName } from '@/lib/site';
 import './globals.css';
 
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-jakarta',
+  display: 'swap',
+});
+
 export function generateMetadata(): Metadata {
-  const brand = brandName();
   return {
+    metadataBase: new URL(CANONICAL_ORIGIN),
     title: {
-      default: `${brand}: private pharmacist medication reviews`,
-      template: `%s | ${brand}`,
+      default: BRAND_SEO_TITLE,
+      template: '%s | MedsInFocus',
     },
-    description:
-      'A private medication review with a GPhC-registered pharmacist by telephone or secure video, followed by a written report. For adults in England.',
-    robots: { index: false, follow: false },
+    description: BRAND_SEO_DESCRIPTION,
+    alternates: { canonical: '/' },
+    robots: { index: true, follow: true },
   };
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0f5e63',
+  themeColor: '#143E39',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={jakarta.variable}>
       <body className="flex min-h-screen flex-col">
         <SkipLink />
         <EmergencyBanner />

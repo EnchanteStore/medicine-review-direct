@@ -1,8 +1,10 @@
 import { Container } from '@mrd/ui';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const NAV = [
   { href: '/account', label: 'Overview' },

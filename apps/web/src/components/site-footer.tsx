@@ -1,3 +1,4 @@
+import { COMPANY_FOOTER } from '@mrd/domain';
 import { Container } from '@mrd/ui';
 import Link from 'next/link';
 import { FOOTER_NAV, getBusinessConfig } from '@/lib/site';
@@ -30,9 +31,10 @@ export function SiteFooter() {
         </nav>
       </Container>
       <Container className="border-t border-sand-200 py-6 text-sm text-ink-700">
-        <p>
+        <p>{COMPANY_FOOTER}</p>
+        <p className="mt-2">
           {config.tradingNameProvisional
-            ? `${config.tradingName} is a provisional trading name, pending name and trade mark clearance. `
+            ? 'Trade mark clearance for MedsInFocus is still pending. '
             : null}
           Legal and clinical policies are placeholders awaiting professional review.
         </p>

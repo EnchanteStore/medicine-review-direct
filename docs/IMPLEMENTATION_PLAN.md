@@ -147,6 +147,13 @@ they were not built in this phase:
   drill against a hosted database.
 - A background worker. PDF generation stays in the pharmacist's request.
 
+## MedsInFocus rebrand
+
+Built on `cursor/medsinfocus-rebrand`, based on Phase 7. The patient-facing name is MedsInFocus.
+PHARMA247 LTD is unchanged. Public intake, live payments, prescribing, SES, DNS changes, and the
+Expo app's features stay as they were. Report corrections and ClamAV quarantine are in this
+slice. Trade mark clearance, a live GPhC check, and a running ClamAV daemon are not claimed.
+
 ## Priority E2E scenarios (from the brief) and where they land
 
 | #   | Scenario                               | Phase | Status                                                                      |
