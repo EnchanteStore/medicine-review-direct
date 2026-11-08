@@ -9,28 +9,25 @@ Eason supplied this project URL on 8 November 2026:
 
 `https://qcjkngnwjjoxwutgjfyt.supabase.co`
 
-No keys are stored here. The app is not connected to it. That URL is not recorded as Frankfurt,
-and it is not recorded as London. The hostname does not say which region the project is in.
-Read the region on the Supabase dashboard. Link it, push migrations, or send traffic only if the
-dashboard says `eu-central-1`. If it says anything else, do not use it and do not create a
-replacement from this repository.
+Safari on Eason's Mac confirmed that this project is **Central EU (Frankfurt, `eu-central-1`)**.
+That URL is the confirmed Frankfurt project. No keys are stored here. The app is not connected
+to it, and the migrations have not been pushed. Do not copy the local database into it.
 
 ## Region
 
-The database region to use is Central EU (Frankfurt, `eu-central-1`). Do not create that project
-from here. Do not treat `https://qcjkngnwjjoxwutgjfyt.supabase.co` as the Frankfurt project.
+The confirmed project is `https://qcjkngnwjjoxwutgjfyt.supabase.co`, Central EU (Frankfurt,
+`eu-central-1`). Do not create another project from this repository.
 
 1. Sign in to the Supabase dashboard with the owner's account.
-2. Open the supplied project and read its region.
-3. Continue only when the dashboard says **Central EU (Frankfurt)**, `eu-central-1`.
-4. Do not import the local Docker database. Do not run `supabase/seed.sql`. That file creates synthetic local users and a development setting.
+2. Open that project. Its region is already confirmed as Central EU (Frankfurt).
+3. Do not import the local Docker database. Do not run `supabase/seed.sql`. That file creates synthetic local users and a development setting.
 
 ## Apply the tested migrations
 
 From a checkout of this repository, with the Supabase CLI logged in as the owner:
 
-Do this only after the dashboard for that project says `eu-central-1`. The ref below is the
-host label in the supplied URL. It is not evidence of the region.
+The project ref is the host label in the confirmed Frankfurt URL. Linking and pushing have not
+been done from this repository.
 
 ```bash
 supabase link --project-ref qcjkngnwjjoxwutgjfyt
