@@ -157,12 +157,12 @@ notification.
 
 ## Environments
 
-| Environment | Status      | Notes                                                       |
-| ----------- | ----------- | ----------------------------------------------------------- |
-| Local       | Built       | Supabase CLI in Docker, Mailpit, synthetic seed             |
-| CI          | Built       | GitHub Actions: quality, database (pgTAP), e2e (Playwright) |
-| Staging     | Not created | Needs hosting region decision (UK/EU), see DECISION_LOG     |
-| Production  | Not created | Requires owner approval                                     |
+| Environment | Status      | Notes                                                                        |
+| ----------- | ----------- | ---------------------------------------------------------------------------- |
+| Local       | Built       | Supabase CLI in Docker, Mailpit, synthetic seed                              |
+| CI          | Built       | GitHub Actions: quality, database (pgTAP), e2e (Playwright)                  |
+| Staging     | Not created | Cloudflare Free cannot run the clinical app. See [HOSTING.md](./HOSTING.md) |
+| Production  | Not created | Requires owner approval. The Frankfurt database has schema only              |
 
 ## Key technology choices
 
