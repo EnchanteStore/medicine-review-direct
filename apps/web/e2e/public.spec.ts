@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { expectNoA11yViolations } from './helpers';
 
 const PAGES = [
-  { path: '/', h1: 'A private review of your medicines with a UK pharmacist' },
+  { path: '/', h1: 'Your medicines. A clearer picture.' },
   { path: '/how-it-works', h1: 'How it works' },
   { path: '/pricing', h1: 'Pricing' },
   { path: '/about', h1: 'About us' },
@@ -30,7 +30,7 @@ for (const p of PAGES) {
     const banner = page.getByTestId('emergency-banner-short');
     await expect(banner).toContainText('Not an emergency service');
     await expect(banner).toContainText('is not monitored 24/7');
-    await expect(banner).toContainText('PharmReview');
+    await expect(banner).toContainText('MedsInFocus');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en-GB');
     if (p.legal) {
       await expect(page.getByText('Placeholder', { exact: true })).toBeVisible();
@@ -38,7 +38,7 @@ for (const p of PAGES) {
     }
     if (p.full) {
       await expect(page.getByTestId('emergency-warning-full')).toContainText(
-        'PharmReview is not an emergency or urgent medical service.',
+        'MedsInFocus is not an emergency or urgent medical service.',
       );
     }
     await expectNoA11yViolations(page);

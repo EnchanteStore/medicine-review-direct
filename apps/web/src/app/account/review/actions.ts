@@ -24,11 +24,11 @@ import { redirect } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { formString, type FormState } from '@/lib/form-state';
 import { getDraft } from '@/lib/intake';
-import { scanUpload } from '@/lib/malware-scan';
+import { scanBytes, storedScanVerdict } from '@/lib/malware-scan';
 import { notifyAccountUpdate } from '@/lib/notifications';
 import { friendlyDbError } from '@/lib/order-status';
 import type { Json } from '@/lib/supabase/database.types';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient, createSupabaseServiceClient } from '@/lib/supabase/server';
 
 const CURRENT_CONSENT_VERSION = 'draft-2026-11';
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -295,32 +295,57 @@ export async function uploadDocumentAction(
   const check = checkUpload({ name: file.name, type: file.type, size: file.size, head });
   if (!check.ok) return { status: 'error', fieldErrors: { file: [check.error] } };
 
-  const scan = await scanUpload();
+  const bytes = new Uint8Array(await file.arrayBuffer());
   const path = `${user.id}/${orderId}/${crypto.randomUUID()}-${check.safeName}`;
   const supabase = await createSupabaseServerClient();
   const { error: uploadError } = await supabase.storage
-    .from('patient-documents')
-    .upload(path, file, { contentType: check.mimeType, upsert: false });
+    .from('document-quarantine')
+    .upload(path, bytes, { contentType: check.mimeType, upsert: false });
   if (uploadError) {
     console.error('[intake] upload failed', { code: 'storage' });
     return { status: 'error', message: 'We could not upload your file. Please try again.' };
   }
-  const { error } = await supabase.rpc('register_document', {
+  const { data: documentId, error } = await supabase.rpc('register_document', {
     p_order_id: orderId,
     p_storage_path: path,
     p_filename: check.safeName,
     p_mime: check.mimeType,
-    p_size: file.size,
+    p_size: bytes.byteLength,
   });
-  if (error) return dbError('register-document', error);
+  if (error || !documentId) return dbError('register-document', error ?? { code: 'no_id' });
+  const scan = await scanBytes(bytes);
+  const recorded = storedScanVerdict(scan);
+  const service = createSupabaseServiceClient();
+  const { data: verdict, error: scanError } = await service.rpc('record_malware_scan', {
+    p_document_id: documentId,
+    p_engine: recorded.engine,
+    p_verdict: recorded.verdict,
+  });
+  if (scanError || verdict !== 'clean') {
+    console.error('[intake] scan not clean', { code: scanError?.code ?? recorded.verdict });
+    revalidatePath(`/account/review/${orderId}/documents`);
+    return {
+      status: 'success',
+      message:
+        'Your file is in quarantine. It was not marked clean, so a pharmacist cannot see it. A skipped or failed scan is never treated as safe.',
+    };
+  }
+  const copied = await service.storage
+    .from('patient-documents')
+    .upload(path, bytes, { contentType: check.mimeType, upsert: false });
+  if (copied.error) {
+    await service.rpc('record_malware_scan', {
+      p_document_id: documentId,
+      p_engine: 'clamav',
+      p_verdict: 'copy_failed',
+    });
+    return {
+      status: 'error',
+      message: 'The file could not be released from quarantine. It has not been marked clean.',
+    };
+  }
   revalidatePath(`/account/review/${orderId}/documents`);
-  return {
-    status: 'success',
-    message:
-      scan.status === 'not_scanned'
-        ? 'Your file has been uploaded. It is waiting for a security scan before a pharmacist can see it.'
-        : 'Your file has been uploaded.',
-  };
+  return { status: 'success', message: 'Your file has been scanned and a pharmacist can open it.' };
 }
 
 export async function requestDeletionAction(

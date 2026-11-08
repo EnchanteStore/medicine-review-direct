@@ -3,7 +3,7 @@
  * until supplied and checked, and the software never invents them: a missing
  * value renders as a clearly marked placeholder.
  */
-export const DEFAULT_TRADING_NAME = 'PharmReview';
+export const DEFAULT_TRADING_NAME = 'MedsInFocus';
 
 export const BUSINESS_FIELDS = {
   companyLegalName: { label: 'Company legal name', env: 'BUSINESS_COMPANY_LEGAL_NAME' },

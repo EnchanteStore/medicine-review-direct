@@ -136,6 +136,30 @@ Eason Sung approved the current safety-question wording and the current report a
 | ----- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | OD-11 | 8 November 2026 | The current safety-question wording in rule set `2026-11-draft.2`, the current report draft wording, and the current GP-letter draft wording, for development | MHRA classification, CQC scope, solicitor approval, indemnity, and public launch. It also does not approve the emergency banner, out-of-hours messaging, the high-risk medicine list, or the escalation SOP | Recorded. The product text is unchanged, including the existing DRAFT labels. Public intake, live payments and app-store submission stay disabled |
 
+## Owner decisions, 8 November 2026 (MedsInFocus)
+
+These are product-design decisions. They do not renumber P-01 to P-11. They are not clinical,
+legal, regulatory, indemnity, or public-launch approval. Public intake, live payments, prescribing,
+SES, DNS changes, and store submission stay off.
+
+| ID   | Decision                                                                                                                                                             | Status                                             |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| M-01 | Patient-facing trading name is MedsInFocus                                                                                                                           | Recorded. Trade mark clearance is still pending    |
+| M-02 | Legal entity remains PHARMA247 LTD, company 17365383, England and Wales                                                                                              | Already shown. Not a new company fact              |
+| M-03 | Registrar is IONOS. DNS is not changed from this repository                                                                                                          | Pending. Targets in IONOS_DNS.md are blank         |
+| M-04 | Primary domain medsinfocus.co.uk. Secondary names .com, .uk and .info redirect after deployment                                                                      | Recorded. Not applied                              |
+| M-05 | Domain acquisition is owner-confirmed                                                                                                                                | Recorded                                           |
+| M-06 | Hosting is pending authorisation. Database target remains Supabase London (eu-west-2). Email target remains AWS SES London                                           | Not created. No live email                         |
+| M-07 | Payments remain Stripe Checkout when live payments are authorised                                                                                                    | Live payments stay off                             |
+| M-08 | Lead pharmacist Cheuk Kin Sung, GPhC 2234388. Second pharmacist Ka Po Ng, GPhC 2235658                                                                               | Shown. Live register check still pending for both  |
+| M-09 | Ka Po Ng is an owner-confirmed independent prescriber. Prescribing stays disabled and is not shown publicly                                                          | Flag cannot be turned on. No prescription workflow |
+| M-10 | Staff MFA stays mandatory. Patient MFA is supported later and is not required                                                                                        | Staff MFA unchanged. Patient MFA not built         |
+| M-11 | Uploads are scanned with ClamAV and fail closed                                                                                                                      | Built. A skipped or failed scan is never clean     |
+| M-12 | SMS stays deferred. Native app work stays deferred. The Expo app is not extended                                                                                     | Unchanged                                          |
+| M-13 | A released report is corrected by a new version, not by overwriting it                                                                                               | Built. The earlier version is kept                 |
+| M-14 | Automatic purge stays disabled                                                                                                                                       | Unchanged                                          |
+| M-15 | A patient may choose a pharmacist or the next available time. Handover is an audited reassignment. Approval uses the signed-in pharmacist's own name and GPhC number | Built                                              |
+
 ## Launch tasks (external evidence, not new product decisions)
 
 | Task                                                                                                                                                         | Owner of the evidence           | Gate                                       |

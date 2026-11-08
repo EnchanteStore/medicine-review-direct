@@ -21,9 +21,11 @@ export default async function PatientReportPage({
   const supabase = await createSupabaseServerClient();
   const { data: report } = await supabase
     .from('reports')
-    .select('status')
+    .select('status, version_no')
     .eq('order_id', orderId)
     .eq('status', 'released')
+    .order('version_no', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (!report) {
@@ -46,6 +48,12 @@ export default async function PatientReportPage({
   return (
     <div className="space-y-6" data-testid="patient-report">
       <h1 className="font-serif text-3xl">Your medication review</h1>
+      {report.version_no > 1 ? (
+        <p>
+          This report replaces an earlier version. The earlier version is kept and is no longer
+          shown here.
+        </p>
+      ) : null}
       <Alert tone="info">
         <p>
           This is the version your pharmacist released. Clinical wording in the template is{' '}

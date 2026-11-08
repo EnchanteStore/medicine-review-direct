@@ -54,8 +54,13 @@ export async function loadReportDocument(orderId: string): Promise<ReportDocumen
     await Promise.all([
       supabase
         .from('reports')
-        .select('content, approver_display_name, approver_gphc_number, consultation_id, status')
+        .select(
+          'content, approver_display_name, approver_gphc_number, consultation_id, status, version_no',
+        )
         .eq('order_id', orderId)
+        .neq('status', 'superseded')
+        .order('version_no', { ascending: false })
+        .limit(1)
         .maybeSingle(),
       supabase.from('review_orders').select('patient_id').eq('id', orderId).maybeSingle(),
       supabase

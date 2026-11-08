@@ -89,17 +89,20 @@ describe('safety rule set', () => {
 });
 
 describe('emergency wording', () => {
-  it('full and short versions match the 7 Nov 2026 wording when the brand is PharmReview', () => {
-    expect(emergencyText(fullEmergencyWarning('PharmReview'))).toBe(
+  it('full and short versions substitute the trading name, including MedsInFocus', () => {
+    expect(emergencyText(fullEmergencyWarning('MedsInFocus'))).toBe(
       [
-        'Important: PharmReview is not an emergency or urgent medical service.',
+        'Important: MedsInFocus is not an emergency or urgent medical service.',
         'If you are experiencing a life-threatening emergency, including severe difficulty breathing, chest pain, signs of a stroke or a severe allergic reaction, call 999 immediately.',
         'For urgent medical advice that cannot wait, contact your GP or NHS 111.',
-        'Do not wait for a medication review, appointment or response from PharmReview.',
+        'Do not wait for a medication review, appointment or response from MedsInFocus.',
       ].join('\n\n'),
     );
-    expect(emergencyText(shortEmergencyWarning('PharmReview'))).toContain(
-      'PharmReview does not provide urgent or emergency care and is not monitored 24/7.',
+    expect(emergencyText(shortEmergencyWarning('MedsInFocus'))).toBe(
+      [
+        'Not an emergency service',
+        'MedsInFocus does not provide urgent or emergency care and is not monitored 24/7. For a life-threatening emergency, call 999. For urgent medical advice, contact your GP or NHS 111. Do not wait for our response.',
+      ].join('\n\n'),
     );
   });
 

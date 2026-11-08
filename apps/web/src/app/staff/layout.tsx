@@ -1,10 +1,12 @@
 import { isStaff } from '@mrd/domain';
 import { Badge, Container } from '@mrd/ui';
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getStaffGrants, requireUser } from '@/lib/auth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /**
  * Staff area. Requires at least one verified staff role and an MFA (aal2)
