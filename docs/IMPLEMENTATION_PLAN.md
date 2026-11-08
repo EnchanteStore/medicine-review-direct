@@ -99,7 +99,8 @@ Still later, and not claimed as done:
 - DPIA, solicitor-approved legal pages, and the retention job.
 - Penetration test, nonce-based CSP, shared rate-limit store, a backup restore drill, monitoring,
   and an accessibility audit with screen-reader users.
-- Staging and production in London. Live Stripe only after an explicit owner decision.
+- Staging and production. Cloudflare Free cannot run the clinical app. See
+  [HOSTING.md](./HOSTING.md). Live Stripe only after an explicit owner decision.
 
 ## Phase 6: Native apps
 
@@ -138,8 +139,9 @@ Built on `cursor/phase-7-follow-on`. This does not open the service.
 Still later, and not claimed as done. These need an owner decision or an outside approval, so
 they were not built in this phase:
 
-- A real malware scanner, SES, live or test-mode Stripe, a London deploy, EAS and store
-  submission.
+- SES sending, a Pharma247 test-card charge, a production deploy, EAS and store submission.
+  ClamAV is implemented and fail-closed. The Frankfurt schema is applied. See
+  [HOSTING.md](./HOSTING.md).
 - Patient MFA, SMS phone verification, message attachments, and a corrected report version.
 - An unattended retention clock and storage purge. The purge function exists; the periods are
   still provisional until the DPIA.

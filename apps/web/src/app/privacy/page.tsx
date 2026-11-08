@@ -5,14 +5,26 @@ import { ContentPage } from '@/components/page-header';
 export const metadata: Metadata = { title: 'Privacy Notice (placeholder)' };
 
 const PROCESSORS = [
-  ['Supabase', 'Database, sign-in and private file storage', 'London (eu-west-2) region planned'],
+  [
+    'Supabase',
+    'Database, sign-in and private file storage',
+    'Central EU (Frankfurt). The project has no patient records. A transfer assessment is not complete',
+  ],
   [
     'Amazon Web Services (SES)',
     'Transactional email, with no health details in emails',
-    'London region planned',
+    'London planned. No email is sent yet',
   ],
-  ['Stripe', 'Card payments, with no health details in payment records', 'To be confirmed'],
-  ['Web hosting provider', 'Running this website', 'To be confirmed'],
+  [
+    'Stripe',
+    'Card payments, with no health details in payment records',
+    'Test mode only. Live payments are off',
+  ],
+  [
+    'Cloudflare',
+    'Preferred host for this website',
+    'Not deployed. The clinical service is not running there',
+  ],
 ] as const;
 
 export default function PrivacyPage() {
